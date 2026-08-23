@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>🐍 Змейка</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%;
+  background:#0d1117; color:#c9d1d9;
+  font-family:system-ui,-apple-system,sans-serif;
+  overflow:hidden; touch-action:none; user-select:none;
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center;
+}
+#gameWrap {
+  display:flex; flex-direction:column; align-items:center;
+  gap:10px; padding:10px; width:100%; max-width:420px;
+}
+h2 { font-size:20px; color:#58a6ff; margin:0; }
+.scoreRow {
+  display:flex; gap:20px; font-size:14px;
+}
+.scoreRow b { color:#3fb950; }
+#snakeCanvas {
+  border-radius:12px; border:2px solid #30363d;
+  background:#161b22;
+  box-shadow:0 0 20px rgba(88,166,255,0.1);
+  width:100%; max-width:400px; aspect-ratio:1;
+  touch-action:none;
+}
+#joystickCanvas {
+  border-radius:50%; touch-action:none; cursor:pointer;
+  width:160px; height:160px;
+}
+.controls {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+}
+.controls button {
+  padding:8px 16px; border-radius:8px; border:none;
+  font-size:13px; font-weight:600; cursor:pointer; color:#fff;
+}
+#btnStart { background:#238636; }
+#btnPause { background:#1f6feb; }
+#btnReset { background:#da3633; }
+.settings {
+  display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
+  font-size:12px; align-items:center;
+}
+.settings select, .settings input {
+  background:#21262d; color:#c9d1d9;
+  border:1px solid #30363d; border-radius:6px; padding:3px 6px;
+}
+#gameOverMsg {
+  display:none; position:fixed; top:45%; left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(13,17,23,0.95); padding:24px 36px;
+  border-radius:16px; border:1px solid #30363d;
+  text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.5);
+  z-index:100;
+}
+#gameOverMsg button {
+  margin-top:12px; padding:8px 24px; border-radius:8px;
+  border:none; background:#238636; color:#fff;
+  cursor:pointer; font-size:14px; font-weight:600;
+}
+.hint { font-size:11px; color:#8b949e; text-align:center; }
+</style>
+</head>
+<body>
+
+<div id="gameWrap">
+  <h2>🐍 Змейка</h2>
+  <div class="scoreRow">
+    <span>🏆 Рекорд: <b id="bestScore">0</b></span>
+    <span>⭐ Счёт: <b id="score">0</b></span>
+  </div>
+
+  <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+    <span style="font-size:11px;color:#8b949e;">👆 Тяни стик для управления</span>
+    <canvas id="joystickCanvas" width="180" height="180"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="btnStart">▶ Старт</button>
+    <button id="btnPause">⏸ Пауза</button>
+    <button id="btnReset">↺ Сброс</button>
+  </div>
+
+  <div class="settings">
+    <label>🚀 Скорость:
+      <select id="speedSelect">
+        <option value="200">Медленно</option>
+        <option value="120" selected>Нормально</option>
+        <option value="70">Быстро</option>
+        <option value="40">Безумно</option>
+      </select>
+    </label>
+    <label>🐍 Цвет:
+      <input type="color" id="snakeColor" value="#3fb950">
+    </label>
+    <label>🍎 Яблоко:
+      <input type="color" id="appleColor" value="#f85149">
+    </label>
+  </div>
+
+  <div class="hint">Также работают стрелки, свайпы по полю и WASD</div>
+</div>
+
+<div id="gameOverMsg">
+  <div style="font-size:28px;margin-bottom:8px;">💀</div>
+  <div style="font-size:18px;color:#f85149;font-weight:700;">Игра окончена!</div>
+  <div style="font-size:14px;color:#8b949e;">Счёт: <b id="finalScore" style="color:#3fb950;">0</b></div>
+  <button onclick="resetGame()">Играть снова</button>
+</div>
+
+<script>
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ===== GAME =====
+const canvas = document.getElementById('snakeCanvas');
+const ctx = canvas.getContext('2d');
+const gridSize = 20;
+const tileCount = canvas.width / gridSize;
+
+let snake=[], apple={}, dx=0, dy=0, score=0, bestScore=0;
+try{bestScore=parseInt(localStorage.getItem('snakeBest'))||0;}catch(e){}
+let gameInterval=null, isRunning=false, isPaused=false, speed=120;
+
+function initGame(){
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dx=1; dy=0; score=0;
+  placeApple(); updateScore();
+  document.getElementById('gameOverMsg').style.display='none';
+}
+function placeApple(){
+  do{ apple={x:Math.floor(Math.random()*tileCount),y:Math.floor(Math.random()*tileCount)}; }
+  while(snake.some(s=>s.x===apple.x&&s.y===apple.y));
+}
+function updateScore(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('bestScore').textContent=bestScore;
+}
+function draw(){
+  ctx.fillStyle='#161b22'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle='#21262d'; ctx.lineWidth=0.5;
+  for(let i=0;i<=tileCount;i++){
+    ctx.beginPath(); ctx.moveTo(i*gridSize,0); ctx.lineTo(i*gridSize,canvas.height); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*gridSize); ctx.lineTo(canvas.width,i*gridSize); ctx.stroke();
+  }
+  const appleColor=document.getElementById('appleColor').value;
+  ctx.fillStyle=appleColor; ctx.shadowColor=appleColor; ctx.shadowBlur=12;
+  ctx.beginPath(); ctx.arc(apple.x*gridSize+gridSize/2,apple.y*gridSize+gridSize/2,gridSize/2-2,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+
+  const snakeColor=document.getElementById('snakeColor').value;
+  snake.forEach((seg,i)=>{
+    const alpha=1-(i/(snake.length+5))*0.6;
+    ctx.fillStyle=snakeColor; ctx.globalAlpha=alpha;
+    const pad=i===0?1:2;
+    ctx.fillRect(seg.x*gridSize+pad,seg.y*gridSize+pad,gridSize-pad*2,gridSize-pad*2);
+    if(i===0){
+      ctx.fillStyle='#fff'; ctx.globalAlpha=1;
+      const ex1=seg.x*gridSize+(dx===1?14:dx===-1?4:8);
+      const ey1=seg.y*gridSize+(dy===1?14:dy===-1?4:6);
+      const ex2=seg.x*gridSize+(dx===1?14:dx===-1?4:12);
+      const ey2=seg.y*gridSize+(dy===1?14:dy===-1?4:10);
+      ctx.beginPath(); ctx.arc(ex1,ey1,2,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex2,ey2,2,0,Math.PI*2); ctx.fill();
+    }
+  });
+  ctx.globalAlpha=1;
+}
+function gameLoop(){
+  if(!isRunning||isPaused) return;
+  const head={x:snake[0].x+dx,y:snake[0].y+dy};
+  if(head.x<0||head.x>=tileCount||head.y<0||head.y>=tileCount){gameOver();return;}
+  if(snake.some(s=>s.x===head.x&&s.y===head.y)){gameOver();return;}
+  snake.unshift(head);
+  if(head.x===apple.x&&head.y===apple.y){
+    score+=10;
+    if(score>bestScore){bestScore=score; try{localStorage.setItem('snakeBest',bestScore);}catch(e){}}
+    updateScore(); placeApple();
+  }else{snake.pop();}
+  draw();
+}
+function gameOver(){
+  isRunning=false; clearInterval(gameInterval);
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('gameOverMsg').style.display='block';
+}
+function startGame(){
+  if(isRunning) return;
+  if(!isPaused) initGame();
+  isRunning=true; isPaused=false;
+  speed=parseInt(document.getElementById('speedSelect').value);
+  clearInterval(gameInterval); gameInterval=setInterval(gameLoop,speed);
+  draw(); document.getElementById('btnPause').textContent='⏸ Пауза';
+}
+function pauseGame(){
+  if(!isRunning&&!isPaused) return;
+  isPaused=!isPaused;
+  document.getElementById('btnPause').textContent=isPaused?'▶ Продолжить':'⏸ Пауза';
+  if(!isPaused){speed=parseInt(document.getElementById('speedSelect').value); clearInterval(gameInterval); gameInterval=setInterval(gameLoop,speed);}
+}
+function resetGame(){
+  isRunning=false; isPaused=false; clearInterval(gameInterval);
+  document.getElementById('btnPause').textContent='⏸ Пауза';
+  initGame(); draw();
+}
+function setDirection(ndx,ndy){
+  if(!isRunning||isPaused) return;
+  if(ndx===-dx&&ndy===-dy) return;
+  dx=ndx; dy=ndy;
+}
+
+document.addEventListener('keydown',(e)=>{
+  switch(e.key){
+    case 'ArrowUp':case 'w':case 'W':setDirection(0,-1);break;
+    case 'ArrowDown':case 's':case 'S':setDirection(0,1);break;
+    case 'ArrowLeft':case 'a':case 'A':setDirection(-1,0);break;
+    case 'ArrowRight':case 'd':case 'D':setDirection(1,0);break;
+    case ' ':e.preventDefault();pauseGame();break;
+  }
+});
+document.getElementById('btnStart').onclick=startGame;
+document.getElementById('btnPause').onclick=pauseGame;
+document.getElementById('btnReset').onclick=resetGame;
+document.getElementById('speedSelect').onchange=()=>{
+  if(isRunning&&!isPaused){speed=parseInt(document.getElementById('speedSelect').value);clearInterval(gameInterval);gameInterval=setInterval(gameLoop,speed);}
+};
+
+// Swipe on canvas
+let tsX=0,tsY=0;
+canvas.addEventListener('touchstart',(e)=>{tsX=e.touches[0].clientX;tsY=e.touches[0].clientY;},{passive:true});
+canvas.addEventListener('touchend',(e)=>{
+  const dx2=e.changedTouches[0].clientX-tsX, dy2=e.changedTouches[0].clientY-tsY;
+  if(Math.abs(dx2)<20&&Math.abs(dy2)<20)return;
+  if(Math.abs(dx2)>Math.abs(dy2))setDirection(dx2>0?1:-1,0); else setDirection(0,dy2>0?1:-1);
+},{passive:true});
+
+// ===== JOYSTICK =====
+const joyCanvas=document.getElementById('joystickCanvas');
+const joyCtx=joyCanvas.getContext('2d');
+const joyC={x:joyCanvas.width/2,y:joyCanvas.height/2};
+const joyR=70, stickR=28;
+let stickPos={x:joyC.x,y:joyC.y}, isDragging=false;
+
+function drawJoy(){
+  joyCtx.clearRect(0,0,joyCanvas.width,joyCanvas.height);
+  joyCtx.beginPath(); joyCtx.arc(joyC.x,joyC.y,joyR,0,Math.PI*2);
+  joyCtx.fillStyle='#21262d'; joyCtx.fill();
+  joyCtx.strokeStyle='#30363d'; joyCtx.lineWidth=2; joyCtx.stroke();
+  joyCtx.fillStyle='#484f58'; joyCtx.font='16px sans-serif';
+  joyCtx.textAlign='center'; joyCtx.textBaseline='middle';
+  joyCtx.fillText('↑',joyC.x,joyC.y-joyR+18);
+  joyCtx.fillText('↓',joyC.x,joyC.y+joyR-18);
+  joyCtx.fillText('←',joyC.x-joyR+18,joyC.y);
+  joyCtx.fillText('→',joyC.x+joyR-18,joyC.y);
+  const grad=joyCtx.createRadialGradient(stickPos.x-6,stickPos.y-6,2,stickPos.x,stickPos.y,stickR);
+  grad.addColorStop(0,'#79c0ff'); grad.addColorStop(1,'#1f6feb');
+  joyCtx.beginPath(); joyCtx.arc(stickPos.x,stickPos.y,stickR,0,Math.PI*2);
+  joyCtx.fillStyle=grad; joyCtx.fill();
+  joyCtx.strokeStyle='#58a6ff'; joyCtx.lineWidth=2; joyCtx.stroke();
+  if(isDragging){
+    joyCtx.beginPath(); joyCtx.arc(stickPos.x,stickPos.y,stickR+6,0,Math.PI*2);
+    joyCtx.strokeStyle='rgba(88,166,255,0.3)'; joyCtx.lineWidth=4; joyCtx.stroke();
+  }
+}
+function getPos(e){
+  const rect=joyCanvas.getBoundingClientRect();
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const cy=e.touches?e.touches[0].clientY:e.clientY;
+  return{x:cx-rect.left,y:cy-rect.top};
+}
+function updateDir(){
+  const ddx=stickPos.x-joyC.x, ddy=stickPos.y-joyC.y;
+  const dist=Math.sqrt(ddx*ddx+ddy*ddy);
+  if(dist<15)return;
+  if(Math.abs(ddx)>Math.abs(ddy))setDirection(ddx>0?1:-1,0); else setDirection(0,ddy>0?1:-1);
+}
+function clamp(){
+  const ddx=stickPos.x-joyC.x, ddy=stickPos.y-joyC.y;
+  const dist=Math.sqrt(ddx*ddx+ddy*ddy);
+  if(dist>joyR-stickR){const r=(joyR-stickR)/dist; stickPos.x=joyC.x+ddx*r; stickPos.y=joyC.y+ddy*r;}
+}
+function jStart(e){e.preventDefault(); const p=getPos(e); if(Math.sqrt((p.x-joyC.x)**2+(p.y-joyC.y)**2)<joyR+20){isDragging=true;stickPos=p;clamp();drawJoy();updateDir();}}
+function jMove(e){if(!isDragging)return;e.preventDefault();stickPos=getPos(e);clamp();drawJoy();updateDir();}
+function jEnd(){if(!isDragging)return;isDragging=false;stickPos={x:joyC.x,y:joyC.y};drawJoy();}
+
+joyCanvas.addEventListener('mousedown',jStart);
+document.addEventListener('mousemove',jMove);
+document.addEventListener('mouseup',jEnd);
+joyCanvas.addEventListener('touchstart',jStart,{passive:false});
+document.addEventListener('touchmove',jMove,{passive:false});
+document.addEventListener('touchend',jEnd);
+document.addEventListener('touchcancel',jEnd);
+
+// Init
+drawJoy(); initGame(); draw(); updateScore();
+</script>
+</body>
+</html>

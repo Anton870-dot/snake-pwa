@@ -10,6 +10,9 @@
 <title>Sunset Snake</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E9%81%BA%E8%B7%A1%E7%A0%82%E6%BC%A0%E8%8D%89%E5%8E%9F%E8%9B%87%E7%AB%A0&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg0:#0d0619; --bg1:#1b0d33;
@@ -126,6 +129,53 @@ button:disabled{cursor:default}
 .pw i{display:block;width:26px;height:3px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden}
 .pw i u{display:block;height:100%;background:currentColor}
 .stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+#game>*:not(.scene):not(.title-card){position:relative;z-index:1}
+/* ---------- пейзаж над полем ---------- */
+.scene{position:absolute;left:0;right:0;top:0;height:40%;display:none;z-index:0;overflow:hidden;pointer-events:none;
+  -webkit-mask-image:linear-gradient(#000 72%,transparent);mask-image:linear-gradient(#000 72%,transparent)}
+#game.scenic .scene{display:block;animation:fade .8s}
+#game.scenic .stage{align-items:flex-end}
+.scene-img{position:absolute;inset:-5%;background-size:cover;background-position:center 62%;animation:kenburns 38s ease-in-out infinite alternate}
+@keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1.6%,1.2%)}}
+.scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,3,18,.55) 0%,rgba(8,3,18,0) 26%,rgba(8,3,18,0) 70%,rgba(13,6,25,.35) 100%)}
+.petal{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.7);border-radius:70% 0 70% 0;opacity:.9;
+  background:linear-gradient(135deg,#fff,#ffc8dc);box-shadow:0 1px 3px rgba(0,0,0,.25);animation:petal var(--d) linear var(--dl) infinite}
+@keyframes petal{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(calc(var(--x)*.4),30vh) rotate(160deg)}
+  50%{transform:translate(calc(var(--x)*-.2),60vh) rotate(300deg)}100%{transform:translate(var(--x),110vh) rotate(620deg)}}
+#game.scenic .score-box b{filter:drop-shadow(0 2px 6px rgba(0,0,0,.8))}
+#game.scenic .score-box small,#game.scenic .best-mini,#game.scenic .lives,#game.scenic .combo span{text-shadow:0 1px 6px rgba(0,0,0,.9);color:#fff}
+#game.scenic .icon-btn{background:rgba(20,10,40,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+/* ---------- японская заставка уровня ---------- */
+.title-card{position:absolute;left:0;right:0;top:22%;transform:translateY(-50%);z-index:5;pointer-events:none;display:none;
+  flex-direction:column;align-items:center;padding:18px 0 16px}
+.title-card.show{display:flex}
+.tc-band{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(12,4,16,.62) 18%,rgba(12,4,16,.62) 82%,transparent);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:tcBand .5s ease-out both}
+@keyframes tcBand{from{opacity:0;transform:scaleX(.3)}}
+.tc-row{position:relative;display:flex;align-items:center;justify-content:center}
+.tc-sun{position:absolute;width:118px;height:118px;border-radius:50%;left:50%;top:50%;margin:-59px 0 0 -59px;
+  background:radial-gradient(circle at 42% 40%,#ff5a4a,#c8102e 62%,#8e0b22);box-shadow:0 0 30px rgba(200,16,46,.55);
+  animation:tcSun .7s .1s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes tcSun{from{transform:scale(0);opacity:0}}
+.tc-kanji{position:relative;display:flex;flex-direction:column;align-items:center;font-family:"Yuji Syuku","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  font-size:54px;line-height:1;color:#fff8ec;letter-spacing:.08em;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px rgba(0,0,0,.5);
+  animation:tcInk .9s .35s ease-out both}
+@keyframes tcInk{from{clip-path:inset(0 0 100% 0);filter:blur(3px)}to{clip-path:inset(0 0 0 0);filter:blur(0)}}
+.tc-seal{position:absolute;right:-44px;bottom:-4px;width:34px;height:34px;border-radius:6px;display:grid;place-items:center;
+  font-family:"Yuji Syuku","Yu Mincho",serif;font-size:22px;color:#fff3e8;background:#b3122c;border:2px solid #e86a74;
+  box-shadow:inset 0 0 0 2px #b3122c,0 2px 8px rgba(0,0,0,.4);transform:rotate(-8deg);animation:tcSeal .45s 1.15s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes tcSeal{from{transform:rotate(-30deg) scale(2.6);opacity:0}}
+.tc-name{position:relative;margin-top:14px;display:flex;align-items:center;gap:12px;
+  font-family:"Cormorant Garamond","Cormorant","Georgia",serif;font-weight:700;font-size:25px;letter-spacing:.22em;text-transform:uppercase;
+  color:#fff4e6;text-shadow:0 2px 10px rgba(0,0,0,.85);animation:tcName .7s .9s ease-out both}
+@keyframes tcName{from{opacity:0;letter-spacing:.6em}}
+.tc-name i{display:block;height:1.5px;width:34px;background:linear-gradient(90deg,transparent,#f3c98b);animation:tcLine .6s 1s ease-out both}
+.tc-name i:last-child{transform:scaleX(-1)}
+@keyframes tcLine{from{width:0}}
+.tc-sub{position:relative;margin-top:4px;font-family:"Cormorant Garamond",Georgia,serif;font-size:14px;font-weight:600;letter-spacing:.3em;color:#f3c98b;
+  text-shadow:0 1px 6px rgba(0,0,0,.9);animation:tcName .6s 1.2s ease-out both}
+.title-card.out{animation:tcOut .6s ease-in forwards}
+@keyframes tcOut{to{opacity:0;transform:translateY(-60%)}}
 .board{position:relative;border-radius:20px;overflow:hidden;transition:box-shadow .3s;
   box-shadow:0 0 0 2px rgba(255,122,69,.6),0 0 34px rgba(255,61,127,.28),0 24px 60px rgba(0,0,0,.55)}
 .board.portal{box-shadow:0 0 0 2px rgba(62,230,255,.55),0 0 34px rgba(62,230,255,.3),0 24px 60px rgba(0,0,0,.55)}
@@ -306,6 +356,13 @@ canvas{display:block}
 
 <!-- ===== GAME ===== -->
 <section id="game" class="screen">
+  <div class="scene" id="scene"><div class="scene-img" id="sceneImg"></div><div id="petals"></div></div>
+  <div class="title-card" id="titleCard">
+    <div class="tc-band"></div>
+    <div class="tc-row"><div class="tc-sun"></div><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
+    <div class="tc-name"><i></i><span id="tcName">Древние руины</span><i></i></div>
+    <div class="tc-sub" id="tcSub">ЛАБИРИНТ</div>
+  </div>
   <div class="hud">
     <button class="icon-btn" id="btnPause" aria-label="Пауза">❚❚</button>
     <div class="score-box"><small>Счёт</small><b id="score">0</b></div>
@@ -891,7 +948,7 @@ function queueDir(d){
   if (!G || (G.state !== 'play' && G.state !== 'ready')) return;
   if (G.state === 'ready'){
     if (d.x === -G.dir.x && d.y === -G.dir.y) return;
-    G.state = 'play'; G.acc = 0; $('hint').style.display = 'none'; SFX.start();
+    G.state = 'play'; G.acc = 0; $('hint').style.display = 'none'; SFX.start(); hideTitle();
     if (d.x !== G.dir.x || d.y !== G.dir.y) G.queue.push(d);
     return;
   }
@@ -1153,6 +1210,7 @@ function resize(){
   cv.height = bg.height = Math.round(size * dpr);
   cv.style.width = cv.style.height = size + 'px';
   buildBg();
+  layoutScene();
 }
 
 /* ---------- фон: три локации ---------- */
@@ -1753,6 +1811,58 @@ function frame(now){
 }
 requestAnimationFrame(frame);
 
+
+/* ===================== LEVEL SCENE & TITLE ===================== */
+const LOCATIONS = {
+  meadow:{kanji:'草原', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg'},
+  dunes: {kanji:'砂漠', name:'Ночная пустыня', sub:'ПОРТАЛ',   img:'img/dunes.jpg'},
+  ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg'}
+};
+const sceneState = {};   // biome -> 'ok' | 'fail' | 'loading'
+function applyScene(){
+  const biome = BIOME[mode], loc = LOCATIONS[biome], st = sceneState[biome];
+  const on = st === 'ok';
+  $('game').classList.toggle('scenic', on);
+  if (on) $('sceneImg').style.backgroundImage = `url("${loc.img}")`;
+  if (!st){
+    sceneState[biome] = 'loading';
+    const im = new Image();
+    im.onload = () => { sceneState[biome] = 'ok'; if (BIOME[mode] === biome && G){ applyScene(); resize(); } };
+    im.onerror = () => { sceneState[biome] = 'fail'; };
+    im.src = loc.img;
+  }
+  if (on && !$('petals').childElementCount){
+    let h = '';
+    for (let i = 0; i < 12; i++){
+      h += `<span class="petal" style="left:${Math.random() * 100}%;--s:${6 + Math.random() * 7}px;--d:${9 + Math.random() * 9}s;--dl:${-Math.random() * 18}s;--x:${(Math.random() * 2 - 1) * 80 + 40}px"></span>`;
+    }
+    $('petals').innerHTML = h;
+  }
+}
+function layoutScene(){
+  const g = $('game').getBoundingClientRect(), b = $('board').getBoundingClientRect();
+  const top = b.top - g.top;
+  $('scene').style.height = Math.max(120, top + size * .08) + 'px';
+  $('titleCard').style.top = Math.max(150, top * .56) + 'px';
+}
+let titleTimer = null;
+function showTitle(){
+  const loc = LOCATIONS[BIOME[mode]], tc = $('titleCard');
+  $('tcKanji').innerHTML = [...loc.kanji].map(ch => `<span>${ch}</span>`).join(''); $('tcName').textContent = loc.name; $('tcSub').textContent = loc.sub;
+  clearTimeout(titleTimer);
+  tc.classList.remove('show', 'out'); void tc.offsetWidth; tc.classList.add('show');
+  // кото: японская пентатоника + мягкий гонг
+  tone(98, 1.8, 'sine', .12, 92);
+  [329.6, 349.2, 440, 493.9, 523.3].forEach((f, i) => tone(f, .5, 'triangle', .07, null, .35 + i * .13));
+  titleTimer = setTimeout(hideTitle, 3000);
+}
+function hideTitle(){
+  const tc = $('titleCard');
+  if (!tc.classList.contains('show') || tc.classList.contains('out')) return;
+  clearTimeout(titleTimer);
+  tc.classList.add('out');
+  titleTimer = setTimeout(() => tc.classList.remove('show', 'out'), 600);
+}
 /* ===================== FLOW ===================== */
 function startGame(){
   audio();
@@ -1768,9 +1878,11 @@ function startGame(){
   abButtons = [...document.querySelectorAll('.ab')];
   overlay('ovOver', false); overlay('ovPause', false);
   Music.play(BIOME[mode]); Music.setWave(1);
+  applyScene();
   resize();
   newGame();
   requestAnimationFrame(resize);
+  showTitle();
 }
 function pause(){
   if (!G || (G.state !== 'play' && G.state !== 'ready')) return;
@@ -1781,7 +1893,7 @@ function resume(){
   G.state = G.prevState || 'play'; overlay('ovPause', false); Music.duck(false);
 }
 function toMenu(){
-  G = null; overlay('ovPause', false); overlay('ovOver', false);
+  G = null; hideTitle(); overlay('ovPause', false); overlay('ovOver', false);
   renderMenu(); show('menu'); Music.play('menu');
 }
 function openTree(){

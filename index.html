@@ -459,7 +459,7 @@ canvas{display:block}
 <!-- ===== GAME OVER ===== -->
 <div class="overlay" id="ovOver">
   <div class="card">
-    <h2>Игра окончена</h2>
+    <h2 id="goTitle">Игра окончена</h2>
     <div class="big-score" id="finalScore">0</div>
     <div class="record" id="newRecord">🏆 Новый рекорд!</div>
     <div class="stats">
@@ -881,6 +881,7 @@ $('modes').addEventListener('click', e => {
 /* ===================== GAME CORE ===================== */
 const COLS = 20, ROWS = 20;
 const COMBO_WINDOW = 3000, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
+const OASIS_WAVE = 10;   // «Портал»: дойди до этой волны — найдёшь оазис (победа)
 const SPECIALS = [
   {id:'gold',   emoji:'⭐', w:3, color:'#ffd166'},
   {id:'slow',   emoji:'❄️', w:2, color:'#7dd3fc', dur:6000, label:'Замедление'},
@@ -903,7 +904,7 @@ function newGame(){
   G = {
     snake:[{x:9,y:10},{x:8,y:10},{x:7,y:10}],
     dir:{x:1,y:0}, queue:[], grow:0,
-    food:null, special:null, obstacles:new Map(),
+    food:null, special:null, obstacles:new Map(), sands:[], sandT:4000, won:false,
     score:0, eaten:0, level:1, combo:0, maxCombo:0, lastEat:-1e9,
     powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
     state:'ready', acc:0, clock:0, anim:0,
@@ -927,6 +928,7 @@ function setPower(id, ms){
 function isFree(x, y){
   if (G.snake.some(s => s.x === x && s.y === y)) return false;
   if (G.obstacles.has(key(x, y))) return false;
+  if (G.sands.some(q => q.x === x && q.y === y)) return false;
   if (G.food && G.food.x === x && G.food.y === y) return false;
   if (G.special && G.special.x === x && G.special.y === y) return false;
   return true;
@@ -1018,6 +1020,7 @@ function step(){
       } else return crash();
     }
     if (G.obstacles.has(key(nx, ny))) return crash();
+    if (G.sands.some(q => q.x === nx && q.y === ny && q.t >= q.warn && q.t < q.warn + q.life)) return sinkCrash(nx, ny);
   }
 
   const old = G.snake.map(s => ({x:s.x, y:s.y}));
@@ -1034,6 +1037,79 @@ function step(){
     const f = G.food, dist = Math.abs(f.x - nx) + Math.abs(f.y - ny);
     if (dist > 0 && dist <= mr){ magnetFx(f.x, f.y, nx, ny); G.grow++; eatFood(f.x, f.y); }
   }
+}
+
+/* ---------- пустыня: зыбучие пески ---------- */
+// воронка сначала только «закручивается» (безопасно), потом затягивает, потом рассыпается
+function sandsUpdate(dt){
+  for (const q of G.sands) q.t += dt;
+  G.sands = G.sands.filter(q => q.t < q.warn + q.life + 600);
+  if ((G.sandT -= dt) > 0) return;
+  G.sandT = Math.max(1400, 5200 - G.level * 380) * (.7 + Math.random() * .6);
+  const alive = G.sands.filter(q => q.t < q.warn + q.life).length;
+  if (alive >= Math.min(2 + G.level, 11)) return;
+  const h = G.snake[0];
+  for (let tries = 0; tries < 60; tries++){
+    const x = rnd(COLS), y = rnd(ROWS);
+    // не прямо перед носом и не на линии движения рядом с головой
+    const dx = Math.min(Math.abs(x - h.x), COLS - Math.abs(x - h.x)), dy = Math.min(Math.abs(y - h.y), ROWS - Math.abs(y - h.y));
+    if (dx + dy < 5 || !isFree(x, y)) continue;
+    const life = 6500 + Math.random() * 4000 + G.level * 250;
+    G.sands.push({x, y, t:0, warn:1800, life, spin:Math.random() < .5 ? 1 : -1});
+    // иногда — двойная воронка
+    if (G.level >= 3 && Math.random() < .35){
+      const [ax, ay] = [[1,0],[0,1],[-1,0],[0,-1]][rnd(4)], x2 = (x + ax + COLS) % COLS, y2 = (y + ay + ROWS) % ROWS;
+      if (isFree(x2, y2)) G.sands.push({x:x2, y:y2, t:0, warn:1800, life, spin:-G.sands[G.sands.length - 1].spin});
+    }
+    tone(140, .5, 'sine', .04, 70);
+    return;
+  }
+}
+function sinkCrash(x, y){
+  burst(x, y, ['#e8c07a', '#b58a4a', '#fff1c1'], 22);
+  floatText(x, y, 'Зыбучие пески!', '#f3c98b', .9);
+  return crash();
+}
+function drawSands(c){
+  const S = cell;
+  for (const q of G.sands){
+    const cx = (q.x + .5) * S, cy = (q.y + .5) * S;
+    const warn = q.t < q.warn, end = q.warn + q.life, fade = q.t > end ? 1 - (q.t - end) / 600 : 1;
+    const grow = warn ? q.t / q.warn : 1, a = Math.max(0, fade);
+    const rot = G.anim / (warn ? 900 : 420) * q.spin, R = S * (.3 + .3 * grow);
+    if (warn){
+      // предупреждение: песок начинает кружить
+      c.strokeStyle = `rgba(80,45,15,${.5 + .3 * Math.sin(G.anim / 120)})`; c.lineWidth = Math.max(1.5, S * .07);
+      c.setLineDash([S * .12, S * .1]); c.lineDashOffset = -rot * S;
+      c.beginPath(); c.arc(cx, cy, R, 0, 7); c.stroke(); c.setLineDash([]);
+      continue;
+    }
+    const g = c.createRadialGradient(cx, cy, 0, cx, cy, R * 1.25);
+    g.addColorStop(0, `rgba(25,12,4,${.95 * a})`); g.addColorStop(.5, `rgba(95,58,22,${.8 * a})`); g.addColorStop(1, 'rgba(180,130,70,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 1.25, 0, 7); c.fill();
+    c.lineWidth = Math.max(1, S * .045); c.lineCap = 'round';
+    for (let arm = 0; arm < 3; arm++){
+      c.strokeStyle = `rgba(255,225,165,${.75 * a})`; c.beginPath();
+      for (let i = 0; i <= 14; i++){
+        const k = i / 14, ang = rot + arm * 2.094 + k * 3.4 * q.spin, r = R * (1 - k * .85);
+        const px = cx + Math.cos(ang) * r, py = cy + Math.sin(ang) * r;
+        i ? c.lineTo(px, py) : c.moveTo(px, py);
+      }
+      c.stroke();
+    }
+  }
+}
+function winOasis(){
+  G.won = true;
+  const bonus = 500;
+  G.score += bonus;
+  const h = G.snake[0];
+  floatText(h.x, h.y - 1, '+' + bonus, '#ffd166', 1.4);
+  for (let i = 0; i < 6; i++) burst(rnd(COLS), rnd(ROWS), ['#7ee0a0', '#ffd166', '#6fd3ff', '#fff'], 30);
+  banner('🌴 ОАЗИС НАЙДЕН!');
+  G.sands.length = 0;
+  [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, 'triangle', .1, null, i * .11));
+  die(true);
 }
 
 function crash(){
@@ -1093,7 +1169,8 @@ function eatSpecial(){
 function levelUp(){
   G.level++;
   Music.setWave(G.level);
-  banner('Волна ' + G.level);
+  if (mode === 'portal' && G.level >= OASIS_WAVE) return winOasis();
+  banner(mode === 'portal' ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70) addCluster();
   if (sk('regen') && G.level % 3 === 0){
@@ -1114,12 +1191,14 @@ function useAbility(id){
   updateHud(true);
 }
 
-function die(){
+function die(win = false){
   Music.duck(true);
-  G.state = 'dying'; G.deathT = 0; G.shake = 16; G.flash = 0.6;
+  G.state = 'dying'; G.deathT = win ? -1300 : 0; G.shake = win ? 0 : 16; G.flash = 0.6;
   G.from = G.snake.map(s => ({...s}));
-  G.snake.forEach((s, i) => burst(s.x, s.y, [HSL(skinOf().col(i / G.snake.length, G.anim))], i === 0 ? 30 : 4));
-  SFX.crash(); buzz([60, 40, 120]);
+  if (!win){
+    G.snake.forEach((s, i) => burst(s.x, s.y, [HSL(skinOf().col(i / G.snake.length, G.anim))], i === 0 ? 30 : 4));
+    SFX.crash(); buzz([60, 40, 120]);
+  } else buzz([30, 40, 30, 40, 80]);
   const bests = store.get('ss_best', {});
   G.newBest = G.score > (bests[mode] || 0);
   if (G.newBest){ bests[mode] = G.score; store.set('ss_best', bests); }
@@ -1138,6 +1217,7 @@ function die(){
 
 function showGameOver(){
   G.state = 'over';
+  $('goTitle').textContent = G.won ? '🌴 Оазис найден!' : 'Игра окончена';
   $('stLen').textContent = G.snake.length;
   $('stApples').textContent = G.eaten;
   $('stCombo').textContent = '×' + (1 + G.maxCombo);
@@ -1613,7 +1693,7 @@ function drawSnake(c, t, dt){
   const dead = G.state === 'dying' || G.state === 'over';
   c.save();
   if (G.powers.ghost) c.globalAlpha = 0.45 + Math.sin(G.anim / 90) * 0.15;
-  if (G.state === 'dying') c.globalAlpha = Math.max(0, 1 - G.deathT / 700);
+  if (G.state === 'dying') c.globalAlpha = Math.min(1, Math.max(0, 1 - G.deathT / 700));
   c.lineCap = 'round'; c.lineJoin = 'round';
 
   const mr = sk('magnet');
@@ -1809,6 +1889,7 @@ function render(dt){
   c.drawImage(bg, 0, 0, size, size);
   drawGround(c);
   if (G.powers.slow){ c.fillStyle = 'rgba(125,211,252,.1)'; c.fillRect(0, 0, size, size); }
+  drawSands(c);
   drawObstacles(c);
   drawApple(c);
   drawSpecial(c);
@@ -1832,6 +1913,7 @@ function frame(now){
       for (const k in G.powers){ G.powers[k] -= dt; if (G.powers[k] <= 0) delete G.powers[k]; }
       for (const k in G.cd){ if (G.cd[k] > 0) G.cd[k] = Math.max(0, G.cd[k] - dt); }
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
+      if (mode === 'portal') sandsUpdate(dt);
       G.wave += dt / stepMs() * 2.4;
       for (const g of G.gulps) g.p += dt / stepMs();
       G.gulps = G.gulps.filter(g => g.p < G.snake.length + 1);
@@ -1853,7 +1935,7 @@ requestAnimationFrame(frame);
 /* ===================== LEVEL SCENE & TITLE ===================== */
 const LOCATIONS = {
   meadow:{kanji:'草原', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg'},
-  dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
+  dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ · НАЙДИ ОАЗИС',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
   ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg', aspect:1.5, sky:'rgb(7,119,225)'}
 };
 /* ---------- живой пейзаж пустыни: песок с гребней + падающие звёзды ---------- */

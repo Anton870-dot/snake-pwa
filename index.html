@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E9%81%BA%E8%B7%A1%E7%A0%82%E6%BC%A0%E8%8D%89%E5%8E%9F%E8%9B%87%E7%AB%A0&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -148,7 +149,7 @@ button:disabled{cursor:default}
 #game.scenic .score-box b{filter:drop-shadow(0 2px 6px rgba(0,0,0,.8))}
 #game.scenic .score-box small,#game.scenic .best-mini,#game.scenic .lives,#game.scenic .combo span{text-shadow:0 1px 6px rgba(0,0,0,.9);color:#fff}
 #game.scenic .icon-btn{background:rgba(20,10,40,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-/* ---------- японская заставка уровня ---------- */
+/* ---------- заставка уровня (японская; для пустыни — арабская, см. .arab) ---------- */
 .title-card{position:absolute;left:0;right:0;top:22%;transform:translateY(-50%);z-index:5;pointer-events:none;display:none;
   flex-direction:column;align-items:center;padding:18px 0 16px}
 .title-card.show{display:flex}
@@ -177,6 +178,40 @@ button:disabled{cursor:default}
 @keyframes tcLine{from{width:0}}
 .tc-sub{position:relative;margin-top:4px;font-family:"Cormorant Garamond",Georgia,serif;font-size:14px;font-weight:600;letter-spacing:.3em;color:#f3c98b;
   text-shadow:0 1px 6px rgba(0,0,0,.9);animation:tcName .6s 1.2s ease-out both}
+/* ---------- арабская заставка (пустыня) ---------- */
+.tc-orn{display:none;position:absolute;width:150px;height:150px;left:50%;top:50%;margin:-75px 0 0 -75px;overflow:visible;
+  filter:drop-shadow(0 0 14px rgba(232,176,78,.45))}
+.tc-orn-star{opacity:.55;transform-origin:0 0;animation:tcStar 1s .1s cubic-bezier(.2,1.2,.4,1) both,tcSpin 40s 1.1s linear infinite}
+@keyframes tcStar{from{transform:scale(0) rotate(-90deg);opacity:0}}
+@keyframes tcSpin{to{transform:rotate(360deg)}}
+.tc-orn-moon{opacity:.28;animation:tcMoon .9s .25s ease-out both}
+@keyframes tcMoon{from{opacity:0}}
+.title-card.arab .tc-sun{display:none}
+.title-card.arab .tc-orn{display:block}
+.title-card.arab .tc-band{background:
+  linear-gradient(90deg,transparent,rgba(232,176,78,.9) 20%,rgba(255,236,180,1) 50%,rgba(232,176,78,.9) 80%,transparent) top/100% 1.5px no-repeat,
+  linear-gradient(90deg,transparent,rgba(232,176,78,.9) 20%,rgba(255,236,180,1) 50%,rgba(232,176,78,.9) 80%,transparent) bottom/100% 1.5px no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%23e8b04e' stroke-opacity='.16' stroke-width='1'%3E%3Crect x='11' y='11' width='14' height='14'/%3E%3Crect x='11' y='11' width='14' height='14' transform='rotate(45 18 18)'/%3E%3Cpath d='M0 18h4M32 18h4M18 0v4M18 32v4'/%3E%3C/g%3E%3C/svg%3E") center/36px 36px,
+  linear-gradient(90deg,transparent,rgba(10,14,40,.72) 16%,rgba(10,14,40,.72) 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.title-card.arab .tc-kanji{display:block;direction:rtl;font-family:"Aref Ruqaa","Amiri","Traditional Arabic","Arabic Typesetting",serif;font-weight:700;
+  font-size:64px;line-height:1.25;letter-spacing:0;padding:0 .12em;
+  background:linear-gradient(100deg,#9a6a1c 0%,#e8b04e 28%,#fff4cf 46%,#e8b04e 62%,#b07a24 100%);background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;
+  filter:drop-shadow(0 2px 0 rgba(40,20,0,.55)) drop-shadow(0 0 16px rgba(0,0,0,.6));
+  animation:tcQalam 1.1s .35s cubic-bezier(.45,.05,.3,1) both,tcShine 2.6s 1.4s ease-in-out infinite}
+@keyframes tcQalam{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tcShine{from{background-position:100% 0}to{background-position:-20% 0}}
+.title-card.arab .tc-seal{right:-50px;bottom:6px;width:42px;height:42px;border:0;border-radius:0;box-shadow:none;
+  font-family:"Aref Ruqaa","Amiri",serif;font-weight:700;font-size:15px;line-height:1;color:#2a1600;padding-top:2px;
+  background:linear-gradient(135deg,#fff1c1,#e8b04e 50%,#9a6a1c);
+  clip-path:polygon(50% 0,61% 22%,85% 15%,78% 39%,100% 50%,78% 61%,85% 85%,61% 78%,50% 100%,39% 78%,15% 85%,22% 61%,0 50%,22% 39%,15% 15%,39% 22%);
+  transform:rotate(0);filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.title-card.arab .tc-name{color:#fff1d2;letter-spacing:.14em;white-space:nowrap;font-size:23px;animation-name:tcNameA}
+@keyframes tcNameA{from{opacity:0;letter-spacing:.4em}}
+.title-card.arab .tc-name i{background:linear-gradient(90deg,transparent,#e8b04e);height:1px;width:40px;position:relative}
+.title-card.arab .tc-name i::after{content:"";position:absolute;right:-3px;top:-3px;width:6px;height:6px;background:#e8b04e;transform:rotate(45deg)}
+.title-card.arab .tc-sub{color:#e8b04e}
 .title-card.out{animation:tcOut .6s ease-in forwards}
 @keyframes tcOut{to{opacity:0;transform:translateY(-60%)}}
 .board{position:relative;border-radius:20px;overflow:hidden;transition:box-shadow .3s;
@@ -362,7 +397,7 @@ canvas{display:block}
   <div class="scene" id="scene"><div class="scene-img" id="sceneImg"><canvas id="sceneFx"></canvas></div><div id="petals"></div></div>
   <div class="title-card" id="titleCard">
     <div class="tc-band"></div>
-    <div class="tc-row"><div class="tc-sun"></div><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
+    <div class="tc-row"><div class="tc-sun"></div><svg class="tc-orn" viewBox="-60 -60 120 120" aria-hidden="true"><defs><linearGradient id="tcGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c1"/><stop offset=".45" stop-color="#e8b04e"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs><g class="tc-orn-star"><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6"/><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6" transform="rotate(45)"/><circle r="54" fill="none" stroke="url(#tcGold)" stroke-width=".8" stroke-dasharray="2 4"/></g><path class="tc-orn-moon" d="M-8,-36 A36,36 0 1,0 -8,36 A29,29 0 1,1 -8,-36 Z" transform="translate(-6,0) rotate(-20)" fill="url(#tcGold)"/></svg><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
     <div class="tc-name"><i></i><span id="tcName">Древние руины</span><i></i></div>
     <div class="tc-sub" id="tcSub">ЛАБИРИНТ</div>
   </div>
@@ -1818,7 +1853,7 @@ requestAnimationFrame(frame);
 /* ===================== LEVEL SCENE & TITLE ===================== */
 const LOCATIONS = {
   meadow:{kanji:'草原', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg'},
-  dunes: {kanji:'砂漠', name:'Ночная пустыня', sub:'ПОРТАЛ',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
+  dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
   ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg', aspect:1.5, sky:'rgb(7,119,225)'}
 };
 /* ---------- живой пейзаж пустыни: песок с гребней + падающие звёзды ---------- */
@@ -1974,12 +2009,29 @@ function layoutScene(){
 let titleTimer = null;
 function showTitle(){
   const loc = LOCATIONS[BIOME[mode]], tc = $('titleCard');
-  $('tcKanji').innerHTML = [...loc.kanji].map(ch => `<span>${ch}</span>`).join(''); $('tcName').textContent = loc.name; $('tcSub').textContent = loc.sub;
+  const arab = !!loc.arabic;
+  tc.classList.toggle('arab', arab);
+  // арабскую вязь не режем на буквы — иначе рассыплются соединения
+  if (arab) $('tcKanji').textContent = loc.arabic;
+  else $('tcKanji').innerHTML = [...loc.kanji].map(ch => `<span>${ch}</span>`).join('');
+  tc.querySelector('.tc-seal').textContent = arab ? loc.seal : '蛇';
+  $('tcName').textContent = loc.name; $('tcSub').textContent = loc.sub;
   clearTimeout(titleTimer);
   tc.classList.remove('show', 'out'); void tc.offsetWidth; tc.classList.add('show');
-  // кото: японская пентатоника + мягкий гонг
-  tone(98, 1.8, 'sine', .12, 92);
-  [329.6, 349.2, 440, 493.9, 523.3].forEach((f, i) => tone(f, .5, 'triangle', .07, null, .35 + i * .13));
+  if (arab){
+    // уд + дарбука: лад хиджаз (ре, ми♭, фа♯, соль, ля)
+    tone(92, .35, 'sine', .16, 60); tone(1800, .05, 'square', .02, 900, .02);          // дум
+    tone(92, .3, 'sine', .12, 60, .75); tone(2200, .04, 'square', .02, 1100, .5);      // тек · дум
+    [293.7, 311.1, 370, 392, 440, 392, 370, 311.1].forEach((f, i) => {
+      const d = .3 + i * .14 + (i > 4 ? .08 : 0);
+      tone(f, .42, 'sawtooth', .025, null, d); tone(f * 2, .25, 'triangle', .03, null, d);
+    });
+    tone(146.8, 1.6, 'sine', .07, null, 1.5);
+  } else {
+    // кото: японская пентатоника + мягкий гонг
+    tone(98, 1.8, 'sine', .12, 92);
+    [329.6, 349.2, 440, 493.9, 523.3].forEach((f, i) => tone(f, .5, 'triangle', .07, null, .35 + i * .13));
+  }
   titleTimer = setTimeout(hideTitle, 3000);
 }
 function hideTitle(){

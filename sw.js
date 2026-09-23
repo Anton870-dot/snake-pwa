@@ -1,5 +1,5 @@
 // Меняй номер версии при каждом обновлении игры
-const CACHE_NAME = 'snake-v10';
+const CACHE_NAME = 'snake-v11';
 const urls = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 // Установка: кладём файлы в новый кэш и сразу активируемся

@@ -26,6 +26,7 @@ body{background:
   linear-gradient(180deg,var(--bg1),var(--bg0))}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 button:active{transform:scale(.96)}
+button:disabled{cursor:default}
 
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;
   padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 14px)}
@@ -45,42 +46,56 @@ button:active{transform:scale(.96)}
     radial-gradient(1px 1px at 52% 4%,#fff 50%,transparent 51%);
   animation:twinkle 4s ease-in-out infinite alternate}
 @keyframes twinkle{from{opacity:.45}to{opacity:.95}}
-.floor{position:absolute;left:-50%;right:-50%;bottom:0;height:34%;pointer-events:none;
+.floor{position:absolute;left:-50%;right:-50%;bottom:0;height:30%;pointer-events:none;
   background-image:linear-gradient(rgba(255,61,127,.45) 2px,transparent 2px),linear-gradient(90deg,rgba(255,61,127,.45) 2px,transparent 2px);
   background-size:56px 56px;transform:perspective(260px) rotateX(62deg);transform-origin:bottom;
   -webkit-mask-image:linear-gradient(transparent,#000 70%);mask-image:linear-gradient(transparent,#000 70%);
-  animation:floor 1.1s linear infinite;opacity:.55}
+  animation:floor 1.1s linear infinite;opacity:.5}
 @keyframes floor{to{background-position:0 56px}}
 #menu{justify-content:space-between;overflow:hidden}
 .hero{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0}
-.sun{width:min(58vw,250px,30vh);aspect-ratio:1;border-radius:50%;
+.sun{width:min(56vw,240px,24vh);aspect-ratio:1;border-radius:50%;
   background:linear-gradient(180deg,var(--sun1) 0%,var(--sun2) 50%,var(--sun3) 100%);
   box-shadow:0 0 70px rgba(255,122,69,.55),0 0 160px rgba(255,61,127,.35);
   -webkit-mask-image:linear-gradient(#000 0 54%,transparent 54% 57%,#000 57% 65%,transparent 65% 69%,#000 69% 76%,transparent 76% 81%,#000 81% 87%,transparent 87% 93%,#000 93%);
   mask-image:linear-gradient(#000 0 54%,transparent 54% 57%,#000 57% 65%,transparent 65% 69%,#000 69% 76%,transparent 76% 81%,#000 81% 87%,transparent 87% 93%,#000 93%);
   animation:sunrise 1s cubic-bezier(.2,.9,.3,1) both}
 @keyframes sunrise{from{transform:translateY(40px);opacity:0}}
-.title{text-align:center;line-height:.9;margin-top:-34px;animation:sunrise 1s .15s cubic-bezier(.2,.9,.3,1) both}
+.title{text-align:center;line-height:.9;margin-top:-30px;animation:sunrise 1s .15s cubic-bezier(.2,.9,.3,1) both}
 .title small{display:block;font-size:13px;font-weight:700;letter-spacing:.7em;padding-left:.7em;color:#ffd6a8;margin-bottom:6px}
-.title h1{font-size:clamp(52px,16vw,80px);font-weight:900;letter-spacing:.03em;
+.title h1{font-size:clamp(48px,15vw,78px);font-weight:900;letter-spacing:.03em;
   background:linear-gradient(180deg,#fff 15%,#ffc27a 55%,#ff3d7f 95%);-webkit-background-clip:text;background-clip:text;color:transparent;
   filter:drop-shadow(0 4px 22px rgba(255,61,127,.6))}
-.menu-panel{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px;animation:sunrise .9s .3s cubic-bezier(.2,.9,.3,1) both}
+.menu-panel{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;animation:sunrise .9s .3s cubic-bezier(.2,.9,.3,1) both}
+.glass{background:rgba(20,10,40,.55);border:1px solid var(--stroke);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.player{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;text-align:left;width:100%}
+.lvl-badge{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;line-height:1;text-align:center;flex:none;
+  background:linear-gradient(135deg,#ffd166,#ff7a45);color:#2a1200;box-shadow:0 4px 16px rgba(255,160,70,.35)}
+.lvl-badge small{display:block;font-size:8.5px;font-weight:800;letter-spacing:.05em}
+.lvl-badge b{font-size:18px;font-weight:900}
+.xp-info{flex:1;min-width:0}
+.xp-row{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.xp-row .hot{color:#ffd166}
+.xpbar{height:8px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.xpbar div{height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#ffd166,#ff7a45,#ff3d7f);transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mode{padding:12px 4px 10px;border-radius:18px;background:rgba(20,10,40,.55);border:1px solid var(--stroke);
-  display:flex;flex-direction:column;align-items:center;gap:3px;transition:background .2s,border-color .2s,box-shadow .2s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.mode i{font-style:normal;font-size:24px}
+.mode{padding:11px 4px 9px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:background .2s,border-color .2s,box-shadow .2s}
+.mode i{font-style:normal;font-size:22px}
 .mode b{font-size:14px}
 .mode small{font-size:10.5px;color:var(--muted);text-align:center}
 .mode.active{background:linear-gradient(160deg,rgba(255,122,69,.3),rgba(255,61,127,.22));border-color:rgba(255,150,110,.75);box-shadow:0 0 24px rgba(255,90,90,.3)}
-.best-line{text-align:center;font-size:14px;color:var(--muted)}
-.best-line b{color:var(--sun1);font-size:16px}
-.btn-play{width:100%;padding:18px;border-radius:22px;font-size:21px;font-weight:900;letter-spacing:.06em;
+.btn-play{width:100%;padding:17px;border-radius:22px;font-size:21px;font-weight:900;letter-spacing:.06em;
   background:linear-gradient(135deg,#ffb347,#ff7a45 45%,#ff3d7f);
   box-shadow:0 12px 32px rgba(255,80,80,.45),inset 0 1px 0 rgba(255,255,255,.45);animation:glow 2.2s ease-in-out infinite}
+.btn-play small{display:block;font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.85;margin-top:2px}
 @keyframes glow{50%{box-shadow:0 12px 44px rgba(255,80,80,.7),inset 0 1px 0 rgba(255,255,255,.45)}}
-.row{display:flex;gap:10px}
-.btn-ghost{flex:1;padding:14px;border-radius:18px;background:rgba(20,10,40,.55);border:1px solid var(--stroke);font-weight:700;font-size:15px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{position:relative;padding:10px 4px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;font-size:13px}
+.tile i{font-style:normal;font-size:22px}
+.tile.hot{border-color:rgba(167,139,250,.8);box-shadow:0 0 20px rgba(139,92,246,.35)}
+.badge{position:absolute;top:-7px;right:-4px;min-width:22px;height:22px;border-radius:11px;padding:0 6px;display:grid;place-items:center;
+  font-size:12px;font-weight:900;background:linear-gradient(135deg,#ff7a45,#ff3d7f);box-shadow:0 0 12px rgba(255,61,127,.7);animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{50%{transform:translateY(-3px)}}
 
 /* ---------- GAME ---------- */
 #game{gap:8px}
@@ -92,17 +107,19 @@ button:active{transform:scale(.96)}
   background:linear-gradient(180deg,#fff,#ffcf9a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .bump{animation:bump .28s ease-out}
 @keyframes bump{40%{transform:scale(1.28)}}
-.lvl{justify-self:end;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;text-align:center;line-height:1;
+.wave{justify-self:end;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;text-align:center;line-height:1;
   background:linear-gradient(135deg,#ff7a45,#ff3d7f);box-shadow:0 6px 20px rgba(255,61,127,.35)}
-.lvl small{font-size:8.5px;font-weight:800;letter-spacing:.1em;opacity:.85;display:block}
-.lvl b{font-size:18px;font-weight:900}
+.wave small{font-size:7.5px;font-weight:800;letter-spacing:.06em;opacity:.9;display:block;margin-bottom:1px}
+.wave b{font-size:18px;font-weight:900}
 .subhud{width:100%;max-width:560px;min-height:28px;display:flex;align-items:center;gap:8px;font-size:13px}
 .best-mini{color:var(--muted);white-space:nowrap}
 .best-mini b{color:var(--sun1)}
-.combo{display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .2s;flex:1;justify-content:center}
+.lives{font-size:13px;white-space:nowrap}
+.lives.hit{animation:bump .35s}
+.combo{display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .2s;flex:1;justify-content:center;min-width:0}
 .combo.on{opacity:1}
-.combo span{font-weight:900;color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.7)}
-.combo-track{width:70px;height:6px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.combo span{font-weight:900;color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.7);white-space:nowrap}
+.combo-track{width:60px;height:6px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;flex:none}
 .combo-track div{height:100%;width:0;background:linear-gradient(90deg,#ffd166,#ff3d7f);border-radius:9px}
 .powers{display:flex;gap:6px;margin-left:auto}
 .pw{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:16px;line-height:1}
@@ -122,48 +139,120 @@ canvas{display:block}
   font-size:30px;font-weight:900;text-shadow:0 0 22px rgba(255,61,127,.9),0 2px 8px rgba(0,0,0,.6)}
 .banner.show{animation:banner 1.5s ease-out}
 @keyframes banner{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
-.dpad{display:none;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,50px);gap:6px;margin-top:4px}
+.abilities{display:none;gap:10px;justify-content:center;width:100%;max-width:560px}
+.abilities.on{display:flex}
+.ab{position:relative;overflow:hidden;flex:1;max-width:180px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:18px;
+  background:var(--panel);border:1px solid var(--stroke);font-weight:800;font-size:14px;transition:box-shadow .3s,border-color .3s}
+.ab-ico{font-size:22px;line-height:1}
+.ab.ready{border-color:rgba(167,139,250,.9);box-shadow:0 0 18px rgba(139,92,246,.45);background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(236,72,153,.2))}
+.ab-cd{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;font-weight:900;pointer-events:none;
+  background:conic-gradient(rgba(10,4,20,.75) calc(var(--p,0) * 360deg), transparent 0)}
+.ab kbd{margin-left:auto;font:inherit;font-size:10.5px;opacity:.5;border:1px solid var(--stroke);border-radius:6px;padding:1px 5px}
+@media (pointer:coarse){.ab kbd{display:none}}
+.ab.cool .ab-ico,.ab.cool .ab-name{opacity:.22}
+.ab-cd{text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.dpad{display:none;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,50px);gap:6px;margin-top:2px}
 .dpad.on{display:grid}
 .dpad button{border-radius:16px;background:var(--panel);border:1px solid var(--stroke);font-size:20px;color:#ffd6a8}
 .dpad button:active{background:rgba(255,122,69,.3)}
 .dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .r{grid-column:3;grid-row:2}.dpad .d{grid-column:2;grid-row:3}
+
+/* ---------- SKILL TREE ---------- */
+#tree{gap:10px}
+.tree-head{width:100%;max-width:520px;display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:10px}
+.tree-head h2{font-size:22px;font-weight:900;text-align:center}
+.pts{padding:10px 14px;border-radius:15px;background:var(--panel);border:1px solid var(--stroke);font-weight:800;font-size:15px;white-space:nowrap}
+.pts.glow{background:linear-gradient(135deg,#ff7a45,#ff3d7f);border-color:transparent;box-shadow:0 0 20px rgba(255,61,127,.5)}
+.tree-lvl{width:100%;max-width:520px;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;background:var(--panel);border:1px solid var(--stroke)}
+.reset{font-size:12px;font-weight:700;color:var(--muted);padding:8px 10px;border-radius:12px;border:1px solid var(--stroke);white-space:nowrap;flex:none}
+.reset.warn{color:#fff;background:#b91c1c;border-color:transparent}
+.tree-scroll{flex:1;min-height:0;width:100%;max-width:520px;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.tree{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px 0 10px}
+.branch{display:flex;flex-direction:column;align-items:center}
+.b-head{font-size:13px;font-weight:900;color:var(--c);margin-bottom:8px;white-space:nowrap;text-shadow:0 0 12px var(--c)}
+.tn{position:relative;display:flex;flex-direction:column;align-items:center;padding-top:12px;width:100%}
+.tn.first{padding-top:0}
+.tn:not(.first)::before{content:"";position:absolute;top:-2px;left:50%;width:3px;height:16px;margin-left:-1.5px;background:rgba(255,255,255,.12);border-radius:3px}
+.tn.linked:not(.first)::before{background:var(--c);box-shadow:0 0 8px var(--c)}
+.node{position:relative;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:23px;
+  background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.16);transition:transform .2s}
+.node.ult{border-radius:18px}
+.node .ico{line-height:1}
+.node.locked .ico{filter:grayscale(1);opacity:.35}
+.node.has{border-color:var(--c);box-shadow:inset 0 0 16px var(--c)}
+.node.max{border-color:#ffe29a;box-shadow:inset 0 0 22px var(--c),0 0 16px var(--c)}
+.node.can{animation:canpulse 1.4s ease-in-out infinite}
+@keyframes canpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),0 0 6px var(--c)}50%{box-shadow:0 0 0 5px rgba(255,255,255,.14),0 0 22px var(--c)}}
+.node.sel{outline:3px solid #fff;outline-offset:3px}
+.node.pop{animation:nodepop .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes nodepop{0%{transform:scale(.6)}}
+.rank{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:900;padding:1px 6px;border-radius:8px;
+  background:#1b0d33;border:1px solid var(--stroke);white-space:nowrap}
+.node.max .rank{background:#ffd166;color:#2a1200;border-color:transparent}
+.lk{position:absolute;top:-7px;right:-12px;font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:8px;background:#2a1a44;border:1px solid var(--stroke);color:var(--muted);white-space:nowrap}
+.node.act::after{content:"⚡";position:absolute;top:-6px;left:-7px;font-size:13px}
+.nname{margin-top:10px;font-size:10.5px;font-weight:700;text-align:center;color:var(--muted);line-height:1.12;max-width:112px}
+.node.sel + .nname{color:#fff}
+.sheet{width:100%;max-width:520px;padding:12px 14px 2px;border-radius:24px;flex:none;
+  background:linear-gradient(180deg,rgba(44,22,78,.96),rgba(24,12,44,.96));border:1px solid var(--stroke);box-shadow:0 -10px 40px rgba(0,0,0,.4)}
+.s-top{display:flex;gap:12px;align-items:center}
+.s-ico{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:26px;border:2px solid var(--c);box-shadow:inset 0 0 14px var(--c);flex:none}
+.s-name{font-size:17px;font-weight:900}
+.tag{display:inline-block;font-size:9.5px;font-weight:900;padding:2px 7px;border-radius:8px;background:var(--c);color:#1a0a1a;vertical-align:3px;margin-left:4px;letter-spacing:.04em}
+.s-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.s-desc{font-size:13px;margin:8px 0 6px;line-height:1.3}
+.s-eff{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.s-eff div{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:12px;background:rgba(0,0,0,.22)}
+.s-eff span{color:var(--muted);white-space:nowrap}
+.s-eff b{color:var(--c);text-align:right}
+.sheet .btn{margin:8px 0 12px;padding:13px}
+.btn:disabled{opacity:.7;font-size:14px}
 
 /* ---------- OVERLAYS ---------- */
 .overlay{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:20px;
   background:rgba(8,3,16,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .overlay.active{display:flex;animation:fade .2s}
 @keyframes fade{from{opacity:0}}
-.card{width:100%;max-width:370px;max-height:100%;overflow:auto;text-align:center;padding:26px 22px 22px;border-radius:28px;
+.card{width:100%;max-width:370px;max-height:100%;overflow:auto;touch-action:pan-y;text-align:center;padding:24px 20px 20px;border-radius:28px;
   background:linear-gradient(180deg,rgba(44,22,78,.95),rgba(20,10,36,.97));border:1px solid var(--stroke);
   box-shadow:0 30px 80px rgba(0,0,0,.6);animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
 @keyframes pop{from{transform:scale(.85);opacity:0}}
 .card h2{font-size:26px;font-weight:900;margin-bottom:6px}
 .card .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
-.big-score{font-size:64px;font-weight:900;line-height:1;margin:6px 0 10px;
+.big-score{font-size:60px;font-weight:900;line-height:1;margin:4px 0 10px;
   background:linear-gradient(180deg,#fff,#ffc27a 60%,#ff3d7f);-webkit-background-clip:text;background-clip:text;color:transparent;
   filter:drop-shadow(0 4px 18px rgba(255,61,127,.5))}
 .record{display:none;margin:0 auto 12px;width:max-content;padding:6px 14px;border-radius:999px;font-weight:800;font-size:14px;color:#2a1200;
   background:linear-gradient(135deg,#ffe29a,#ffb347);box-shadow:0 0 22px rgba(255,209,102,.6);animation:shine 1s ease-in-out infinite alternate}
 .record.on{display:block}
 @keyframes shine{to{box-shadow:0 0 36px rgba(255,209,102,.95)}}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px}
-.stat{background:var(--panel);border:1px solid var(--stroke);border-radius:16px;padding:10px 6px}
-.stat b{display:block;font-size:20px;font-weight:900}
-.stat small{font-size:11px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:8px 2px}
+.stat b{display:block;font-size:18px;font-weight:900}
+.stat small{font-size:10.5px;color:var(--muted)}
+.xp-box{text-align:left;padding:12px 14px;border-radius:16px;background:var(--panel);border:1px solid var(--stroke)}
+.xp-box .xp-row b{color:#ffd166}
+.lvlup{display:none;margin-top:10px;font-weight:800;font-size:14px;color:#ffd166;text-align:center}
+.lvlup.on{display:block;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
 .btn{display:block;width:100%;padding:15px;border-radius:18px;font-weight:800;font-size:17px;margin-top:10px}
 .btn.primary{background:linear-gradient(135deg,#ffb347,#ff7a45 45%,#ff3d7f);box-shadow:0 10px 26px rgba(255,80,80,.4)}
 .btn.ghost{background:var(--panel);border:1px solid var(--stroke)}
+.btn.magic{background:linear-gradient(135deg,#8b5cf6,#ec4899);box-shadow:0 10px 26px rgba(139,92,246,.4)}
 
 .set-row{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:16px}
 .set-row>label{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.03em}
 .seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--stroke)}
 .seg button{flex:1;padding:9px 2px;border-radius:10px;font-size:13px;font-weight:700;color:var(--muted)}
 .seg button.on{background:linear-gradient(135deg,#ff7a45,#ff3d7f);color:#fff;box-shadow:0 4px 14px rgba(255,61,127,.35)}
-.skins{display:flex;gap:10px;justify-content:space-between}
-.skin{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--muted)}
+.skins{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px}
+.skin{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--muted)}
 .skin i{width:40px;height:40px;border-radius:50%;border:3px solid transparent;transition:.2s}
 .skin.on{color:#fff}
 .skin.on i{border-color:#fff;box-shadow:0 0 16px rgba(255,255,255,.45)}
+.skin.lock i{filter:grayscale(.85) brightness(.5)}
+.skin.lock::before{content:"🔒";position:absolute;top:10px;font-size:15px}
+.skin.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 2px;border-top:1px solid var(--stroke);font-weight:700;font-size:15px}
 .switch{width:50px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:.25s}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
@@ -194,16 +283,23 @@ canvas{display:block}
     <div class="title"><small>SUNSET</small><h1>SNAKE</h1></div>
   </div>
   <div class="menu-panel">
+    <button class="player glass" id="btnPlayer">
+      <div class="lvl-badge"><div><small>УР.</small><b id="pLvl">1</b></div></div>
+      <div class="xp-info">
+        <div class="xp-row"><span id="pTitle">Змейка</span><span id="pXp">0 / 150 XP</span></div>
+        <div class="xpbar"><div id="pXpFill"></div></div>
+      </div>
+    </button>
     <div class="modes" id="modes">
-      <button class="mode" data-mode="classic"><i>🧱</i><b>Классика</b><small>Стены опасны</small></button>
-      <button class="mode" data-mode="portal"><i>🌀</i><b>Портал</b><small>Сквозь края</small></button>
-      <button class="mode" data-mode="maze"><i>🗿</i><b>Лабиринт</b><small>Растут преграды</small></button>
+      <button class="mode glass" data-mode="classic"><i>🧱</i><b>Классика</b><small>Стены опасны</small></button>
+      <button class="mode glass" data-mode="portal"><i>🌀</i><b>Портал</b><small>Сквозь края</small></button>
+      <button class="mode glass" data-mode="maze"><i>🗿</i><b>Лабиринт</b><small>Растут преграды</small></button>
     </div>
-    <div class="best-line">Рекорд в режиме: <b id="menuBest">0</b></div>
-    <button class="btn-play" id="btnPlay">ИГРАТЬ</button>
-    <div class="row">
-      <button class="btn-ghost" id="btnRecords">🏆 Рекорды</button>
-      <button class="btn-ghost" id="btnSettings">⚙️ Настройки</button>
+    <button class="btn-play" id="btnPlay">ИГРАТЬ<small>Рекорд в режиме: <span id="menuBest">0</span></small></button>
+    <div class="row3">
+      <button class="tile glass" id="btnTree"><i>🧬</i>Навыки<span class="badge" id="treeBadge">1</span></button>
+      <button class="tile glass" id="btnRecords"><i>🏆</i>Рекорды</button>
+      <button class="tile glass" id="btnSettings"><i>⚙️</i>Настройки</button>
     </div>
   </div>
 </section>
@@ -213,10 +309,11 @@ canvas{display:block}
   <div class="hud">
     <button class="icon-btn" id="btnPause" aria-label="Пауза">❚❚</button>
     <div class="score-box"><small>Счёт</small><b id="score">0</b></div>
-    <div class="lvl"><div><small>УР.</small><b id="level">1</b></div></div>
+    <div class="wave"><div><small>ВОЛНА</small><b id="level">1</b></div></div>
   </div>
   <div class="subhud">
     <div class="best-mini">🏆 <b id="best">0</b></div>
+    <div class="lives" id="lives"></div>
     <div class="combo" id="combo"><span id="comboText">×2</span><div class="combo-track"><div id="comboFill"></div></div></div>
     <div class="powers" id="powers"></div>
   </div>
@@ -227,10 +324,30 @@ canvas{display:block}
       <div class="banner" id="banner"></div>
     </div>
   </div>
+  <div class="abilities" id="abilities"></div>
   <div class="dpad" id="dpad">
     <button class="u" data-d="u">▲</button><button class="l" data-d="l">◀</button>
     <button class="r" data-d="r">▶</button><button class="d" data-d="d">▼</button>
   </div>
+</section>
+
+<!-- ===== SKILL TREE ===== -->
+<section id="tree" class="screen">
+  <div class="tree-head">
+    <button class="icon-btn" id="btnTreeBack" aria-label="Назад" style="letter-spacing:0;font-size:20px">←</button>
+    <h2>Прокачка</h2>
+    <div class="pts" id="ptsPill">🧬 0</div>
+  </div>
+  <div class="tree-lvl">
+    <div class="lvl-badge"><div><small>УР.</small><b id="tLvl">1</b></div></div>
+    <div class="xp-info">
+      <div class="xp-row"><span>Опыт</span><span id="tXp">0 / 150 XP</span></div>
+      <div class="xpbar"><div id="tXpFill"></div></div>
+    </div>
+    <button class="reset" id="btnResetSkills">↺ Сброс</button>
+  </div>
+  <div class="tree-scroll"><div class="tree" id="treeGrid"></div></div>
+  <div class="sheet" id="sheet"></div>
 </section>
 
 <!-- ===== PAUSE ===== -->
@@ -253,10 +370,16 @@ canvas{display:block}
     <div class="stats">
       <div class="stat"><b id="stLen">0</b><small>длина</small></div>
       <div class="stat"><b id="stApples">0</b><small>яблок</small></div>
-      <div class="stat"><b id="stCombo">×1</b><small>макс. комбо</small></div>
-      <div class="stat"><b id="stLevel">1</b><small>уровень</small></div>
+      <div class="stat"><b id="stCombo">×1</b><small>комбо</small></div>
+      <div class="stat"><b id="stLevel">1</b><small>волна</small></div>
+    </div>
+    <div class="xp-box">
+      <div class="xp-row"><span id="goLvl">Уровень змейки 1</span><b id="goXp">+0 XP</b></div>
+      <div class="xpbar"><div id="goXpFill"></div></div>
+      <div class="lvlup" id="goLvlUp"></div>
     </div>
     <button class="btn primary" id="btnAgain">Ещё раз</button>
+    <button class="btn magic" id="btnGoTree" style="display:none">🧬 Прокачать змейку</button>
     <button class="btn ghost" id="btnToMenu2">Главное меню</button>
   </div>
 </div>
@@ -267,7 +390,7 @@ canvas{display:block}
     <h2>Настройки</h2>
     <p class="sub">Сохраняются автоматически</p>
     <div class="set-row">
-      <label>СКОРОСТЬ</label>
+      <label>СКОРОСТЬ <span style="font-weight:600">· быстрее = больше опыта</span></label>
       <div class="seg" data-key="diff">
         <button data-val="easy">Спокойно</button><button data-val="normal">Норма</button>
         <button data-val="hard">Быстро</button><button data-val="insane">Безумие</button>
@@ -316,6 +439,14 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
     this.arcTo(x, y+h, x, y, r); this.arcTo(x, y, x+w, y, r); this.closePath();
   };
 }
+function plural(n, one, few, many){
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5) return few;
+  if (b === 1) return one;
+  return many;
+}
+const fmt = n => String(n).replace('.', ',');
 
 /* ===================== SETTINGS & STORAGE ===================== */
 const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false}, store.get('ss_settings', {}));
@@ -328,7 +459,7 @@ const MODES = {
   maze:{icon:'🗿', name:'Лабиринт'}
 };
 
-// перенос рекордов из старой версии игры
+// перенос рекордов из самой первой версии игры
 (function migrate(){
   if (store.get('ss_best', null)) return;
   let old = 0; try { old = parseInt(localStorage.getItem('snakeBest2')) || 0; } catch(e){}
@@ -338,14 +469,81 @@ const MODES = {
 })();
 const getBest = m => (store.get('ss_best', {})[m] || 0);
 
+/* ===================== PROGRESSION (RPG) ===================== */
+const XP_NEED = L => 150 + 100 * (L - 1);
+function levelInfo(xp){
+  let L = 1, need = XP_NEED(1);
+  while (xp >= need){ xp -= need; L++; need = XP_NEED(L); }
+  return {level:L, cur:xp, need};
+}
+let profile = store.get('ss_profile', null);
+if (!profile){
+  // опыт за уже сыгранные игры засчитывается
+  const recs = store.get('ss_records', []);
+  profile = {xp:Math.min(3000, recs.reduce((a, r) => a + (r.s || 0), 0)), skills:{}};
+  store.set('ss_profile', profile);
+}
+profile.skills = profile.skills || {};
+const saveProfile = () => store.set('ss_profile', profile);
+const sk = id => profile.skills[id] || 0;
+const spentPts = () => Object.values(profile.skills).reduce((a, b) => a + b, 0);
+const pointsLeft = () => Math.max(0, levelInfo(profile.xp).level - spentPts());
+const DIFF_XP = {easy:.75, normal:1, hard:1.25, insane:1.5};
+
+const ACTIVES = {
+  slowmo:{icon:'⏳', name:'Время', power:'slow',  dur:4000, cd:30000, key:'Q'},
+  phase: {icon:'👻', name:'Фаза',  power:'ghost', dur:2500, cd:25000, key:'E'}
+};
+const cdMult = (m = sk('mastery')) => 1 - 0.2 * m;
+const cdSec = id => Math.round(ACTIVES[id].cd * cdMult() / 1000);
+
+const TIER_LVL = [1, 2, 4, 6, 9];
+const TREE = [
+  {id:'glutton', name:'Обжора', icon:'🍎', color:'#ff8a4c', nodes:[
+    {id:'juicy',    icon:'🍎', name:'Сочные яблоки', max:3, desc:'Каждое яблоко приносит больше очков.', eff:r => `+${15*r}% очков за яблоко`},
+    {id:'memory',   icon:'🧠', name:'Цепкая память', max:3, desc:'Больше времени, чтобы не сорвать комбо.', eff:r => `окно комбо +${fmt((0.6*r).toFixed(1))} с`},
+    {id:'gamble',   icon:'🎲', name:'Азарт', max:2, desc:'Комбо разгоняется до большего множителя.', eff:r => `комбо до ×${5+r}`},
+    {id:'goldrush', icon:'⭐', name:'Золотая лихорадка', max:2, desc:'Звёзды появляются чаще и стоят дороже.', eff:r => `⭐ в ${fmt(1+0.5*r)} раза чаще, ${50+25*r} очков`},
+    {id:'feast',    icon:'🍗', name:'Пир', max:1, ult:true, desc:'Каждое 10-е яблоко за игру превращается в пиршество.', eff:() => 'каждое 10-е яблоко даёт ×5 очков'}
+  ]},
+  {id:'survival', name:'Выживание', icon:'🛡️', color:'#34d399', nodes:[
+    {id:'calm',      icon:'🍃', name:'Хладнокровие', max:3, desc:'Змейка движется чуть спокойнее — легче успеть среагировать.', eff:r => `скорость −${5*r}%`},
+    {id:'longfx',    icon:'⏱️', name:'Долгие эффекты', max:3, desc:'Бонусы с поля (❄️ 👻 💎) действуют дольше.', eff:r => `+${20*r}% к длительности`},
+    {id:'lives',     icon:'❤️', name:'Вторая жизнь', max:2, desc:'Удар отнимает жизнь, а не всю игру. После удара — 2 секунды неуязвимости.', eff:r => `+${r} ${plural(r,'жизнь','жизни','жизней')} в каждой игре`},
+    {id:'autophagy', icon:'🐍', name:'Самоед', max:1, desc:'Укус собственного хвоста больше не убивает — хвост просто откусывается.', eff:() => 'хвост откусывается вместо проигрыша'},
+    {id:'regen',     icon:'💖', name:'Регенерация', max:1, ult:true, desc:'Каждая третья волна восстанавливает одну жизнь.', eff:() => '+1 ❤️ каждые 3 волны'}
+  ]},
+  {id:'magic', name:'Магия', icon:'✨', color:'#a78bfa', nodes:[
+    {id:'slowmo',  icon:'⏳', name:'Замедление', max:1, active:true, desc:'Кнопка во время игры: на 4 секунды время замедляется.', eff:() => `4 с замедления, перезарядка ${cdSec('slowmo')} с`},
+    {id:'luck',    icon:'🍀', name:'Удача', max:3, desc:'Бонусы появляются на поле чаще.', eff:r => `+${20*r}% к шансу бонусов`},
+    {id:'magnet',  icon:'🧲', name:'Магнит', max:2, desc:'Яблоки поблизости сами прилетают к голове.', eff:r => `радиус ${r} ${plural(r,'клетка','клетки','клеток')}`},
+    {id:'phase',   icon:'👻', name:'Фазовый рывок', max:1, active:true, desc:'Кнопка во время игры: 2,5 секунды проходишь сквозь стены, хвост и преграды.', eff:() => `2,5 с неуязвимости, перезарядка ${cdSec('phase')} с`},
+    {id:'mastery', icon:'💫', name:'Мастер магии', max:2, ult:true, desc:'Способности ⏳ и 👻 перезаряжаются быстрее.', eff:r => `перезарядка −${20*r}%`}
+  ]}
+];
+const NODE = {};
+TREE.forEach(b => b.nodes.forEach((n, t) => { NODE[n.id] = {n, b, t}; }));
+
+function nodeStatus(id){
+  const {n, b, t} = NODE[id], r = sk(id), lvl = levelInfo(profile.xp).level;
+  if (r >= n.max) return {max:true};
+  if (lvl < TIER_LVL[t]) return {locked:true, lvlLock:TIER_LVL[t], reason:`🔒 Откроется на уровне змейки ${TIER_LVL[t]}`};
+  if (t > 0 && sk(b.nodes[t-1].id) < 1) return {locked:true, reason:`🔒 Сначала изучи «${b.nodes[t-1].name}»`};
+  if (pointsLeft() < 1) return {reason:'Нет очков — играй, чтобы набрать опыт'};
+  return {ok:true};
+}
+
 const hue = h => ((h % 360) + 360) % 360;
 const SKINS = {
-  sunset: {name:'Закат',  glow:'#ff7a45', col:(t)=>`hsl(${hue(42 - t*80)},100%,${62 - t*6}%)`},
-  neon:   {name:'Неон',   glow:'#3ee6ff', col:(t)=>`hsl(${hue(185 + t*110)},100%,${62 - t*4}%)`},
-  fire:   {name:'Огонь',  glow:'#ff4d1f', col:(t)=>`hsl(${hue(52 - t*52)},100%,${60 - t*12}%)`},
-  mint:   {name:'Мята',   glow:'#34d399', col:(t)=>`hsl(${hue(160 - t*50)},80%,${60 - t*10}%)`},
-  rainbow:{name:'Радуга', glow:'#c084fc', col:(t,a)=>`hsl(${hue(t*300 + a*0.08)},95%,62%)`}
+  sunset: {name:'Закат',  lvl:1, glow:'#ff7a45', col:(t)=>`hsl(${hue(42 - t*80)},100%,${62 - t*6}%)`},
+  neon:   {name:'Неон',   lvl:1, glow:'#3ee6ff', col:(t)=>`hsl(${hue(185 + t*110)},100%,${62 - t*4}%)`},
+  fire:   {name:'Огонь',  lvl:1, glow:'#ff4d1f', col:(t)=>`hsl(${hue(52 - t*52)},100%,${60 - t*12}%)`},
+  mint:   {name:'Мята',   lvl:1, glow:'#34d399', col:(t)=>`hsl(${hue(160 - t*50)},80%,${60 - t*10}%)`},
+  rainbow:{name:'Радуга', lvl:1, glow:'#c084fc', col:(t,a)=>`hsl(${hue(t*300 + a*0.08)},95%,62%)`},
+  gold:   {name:'Золото', lvl:5, glow:'#ffd166', col:(t,a)=>`hsl(${hue(44 - t*12)},100%,${66 - t*22 + Math.sin(t*14 - a*0.006)*6}%)`},
+  galaxy: {name:'Космос', lvl:8, glow:'#8b5cf6', col:(t,a)=>`hsl(${hue(265 + Math.sin(t*5 + a*0.003)*55)},90%,${58 + Math.sin(t*11 - a*0.005)*10}%)`}
 };
+const skinOf = () => SKINS[settings.skin] || SKINS.sunset;
 
 /* ===================== SOUND & VIBRATION ===================== */
 let ac = null;
@@ -365,10 +563,15 @@ function tone(freq, dur, type='sine', vol=.12, slideTo=null, delay=0){
   o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + 0.03);
 }
 const SFX = {
-  eat: c => { const f = 520 * Math.pow(1.19, c); tone(f, .12, 'triangle', .15, f*1.6); },
+  eat: c => { const f = 520 * Math.pow(1.17, c); tone(f, .12, 'triangle', .15, f*1.6); },
   bonus: () => [660, 880, 1320].forEach((f,i) => tone(f, .13, 'square', .05, null, i*.06)),
   level: () => [523, 659, 784, 1047].forEach((f,i) => tone(f, .18, 'triangle', .1, null, i*.09)),
+  learn: () => [392, 523, 659, 784, 1047].forEach((f,i) => tone(f, .22, 'triangle', .09, null, i*.07)),
   crash: () => { tone(240, .55, 'sawtooth', .16, 40); tone(90, .45, 'square', .07, 30, .04); },
+  hurt: () => { tone(330, .25, 'square', .09, 110); },
+  magic: () => { tone(300, .35, 'sine', .12, 1200); tone(600, .3, 'triangle', .05, 2400, .05); },
+  chomp: () => { tone(180, .08, 'square', .1, 90); tone(140, .08, 'square', .08, 70, .09); },
+  deny: () => tone(160, .12, 'square', .06),
   click: () => tone(880, .05, 'sine', .05),
   start: () => tone(440, .12, 'triangle', .09, 880)
 };
@@ -378,18 +581,26 @@ function buzz(p){ if (settings.vibro && navigator.vibrate) try{ navigator.vibrat
 function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
 function overlay(id, on){ $(id).classList.toggle('active', on); }
 
-function renderModes(){
+function renderMenu(){
   document.querySelectorAll('.mode').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   $('menuBest').textContent = getBest(mode);
+  const i = levelInfo(profile.xp), p = pointsLeft();
+  $('pLvl').textContent = i.level;
+  $('pXp').textContent = `${i.cur} / ${i.need} XP`;
+  $('pXpFill').style.width = (i.cur / i.need * 100) + '%';
+  $('pTitle').innerHTML = p > 0 ? `<span class="hot">🧬 ${p} ${plural(p,'очко','очка','очков')} навыков!</span>` : 'Уровень змейки';
+  $('treeBadge').textContent = p;
+  $('treeBadge').style.display = p > 0 ? '' : 'none';
+  $('btnTree').classList.toggle('hot', p > 0);
 }
 $('modes').addEventListener('click', e => {
   const b = e.target.closest('.mode'); if (!b) return;
-  mode = b.dataset.mode; store.set('ss_mode', mode); SFX.click(); renderModes();
+  mode = b.dataset.mode; store.set('ss_mode', mode); SFX.click(); renderMenu();
 });
 
 /* ===================== GAME CORE ===================== */
 const COLS = 20, ROWS = 20;
-const COMBO_WINDOW = 3200, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
+const COMBO_WINDOW = 3000, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
 const SPECIALS = [
   {id:'gold',   emoji:'⭐', w:3, color:'#ffd166'},
   {id:'slow',   emoji:'❄️', w:2, color:'#7dd3fc', dur:6000, label:'Замедление'},
@@ -406,6 +617,7 @@ let G = null;
 
 const key = (x, y) => y * COLS + x;
 const rnd = n => Math.floor(Math.random() * n);
+const comboWindow = () => COMBO_WINDOW + 600 * sk('memory');
 
 function newGame(){
   G = {
@@ -413,7 +625,8 @@ function newGame(){
     dir:{x:1,y:0}, queue:[], grow:0,
     food:null, special:null, obstacles:new Map(),
     score:0, eaten:0, level:1, combo:0, maxCombo:0, lastEat:-1e9,
-    powers:{}, state:'ready', acc:0, clock:0, anim:0,
+    powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
+    state:'ready', acc:0, clock:0, anim:0,
     particles:[], floats:[], shake:0, flash:0, deathT:0, newBest:false,
     headAng:0, overShown:false
   };
@@ -424,6 +637,11 @@ function newGame(){
   $('hint').style.display = '';
   $('best').textContent = getBest(mode);
   updateHud(true);
+}
+
+function setPower(id, ms){
+  G.powers[id] = Math.max(G.powers[id] || 0, ms);
+  G.powerMax[id] = G.powers[id];
 }
 
 function isFree(x, y){
@@ -445,10 +663,11 @@ function freeCell(minDist = 2){
 function placeFood(){ const c = freeCell(3); G.food = c ? {...c, born:G.anim} : null; }
 
 function spawnSpecial(){
-  const pool = SPECIALS.filter(s => s.id !== 'shrink' || G.snake.length > 9);
-  const total = pool.reduce((a, s) => a + s.w, 0);
-  let r = Math.random() * total, pick = pool[0];
-  for (const s of pool){ if ((r -= s.w) < 0){ pick = s; break; } }
+  const pool = SPECIALS.filter(s => s.id !== 'shrink' || G.snake.length > 9)
+    .map(s => ({s, w: s.id === 'gold' ? s.w * (1 + 0.5 * sk('goldrush')) : s.w}));
+  const total = pool.reduce((a, p) => a + p.w, 0);
+  let r = Math.random() * total, pick = pool[0].s;
+  for (const p of pool){ if ((r -= p.w) < 0){ pick = p.s; break; } }
   const c = freeCell(4); if (!c) return;
   G.special = {...c, type:pick, life:SPECIAL_LIFE, born:G.anim};
 }
@@ -465,10 +684,10 @@ function addCluster(){
     const ok = cells.every(([x, y]) => {
       if (!isFree(x, y)) return false;
       if (Math.abs(x - h.x) + Math.abs(y - h.y) < 6) return false;
-      if (G.dir.x && y === h.y) return false;            // не ставим прямо на пути головы
+      if (G.dir.x && y === h.y) return false;
       if (G.dir.y && x === h.x) return false;
       for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++)
-        if (G.obstacles.has(key(x + dx, y + dy))) return false; // не слепляем преграды в тупики
+        if (G.obstacles.has(key(x + dx, y + dy))) return false;
       return true;
     });
     if (ok){ cells.forEach(([x, y]) => G.obstacles.set(key(x, y), G.anim)); return; }
@@ -478,6 +697,7 @@ function addCluster(){
 function stepMs(){
   const base = {easy:150, normal:115, hard:85, insane:62}[settings.diff] || 115;
   let ms = Math.max(base * 0.55, base - (G.snake.length - 3) * 1.2 - (G.level - 1) * 3);
+  ms /= (1 - 0.05 * sk('calm'));
   if (G.powers.slow) ms *= 1.6;
   return ms;
 }
@@ -485,7 +705,7 @@ function stepMs(){
 function queueDir(d){
   if (!G || (G.state !== 'play' && G.state !== 'ready')) return;
   if (G.state === 'ready'){
-    if (d.x === -G.dir.x && d.y === -G.dir.y) return;   // назад на старте нельзя
+    if (d.x === -G.dir.x && d.y === -G.dir.y) return;
     G.state = 'play'; G.acc = 0; $('hint').style.display = 'none'; SFX.start();
     if (d.x !== G.dir.x || d.y !== G.dir.y) G.queue.push(d);
     return;
@@ -501,49 +721,84 @@ function step(){
   let nx = h.x + G.dir.x, ny = h.y + G.dir.y;
   if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS){
     if (mode === 'portal' || ghost){ nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
-    else return die();
+    else return crash();
   }
   const eatsFood = G.food && nx === G.food.x && ny === G.food.y;
   const willGrow = G.grow > 0 || eatsFood;
-  const body = willGrow ? G.snake : G.snake.slice(0, -1);
-  if (!ghost && body.some(s => s.x === nx && s.y === ny)) return die();
-  if (!ghost && G.obstacles.has(key(nx, ny))) return die();
+  const bodyLen = willGrow ? G.snake.length : G.snake.length - 1;
+  if (!ghost){
+    let hit = -1;
+    for (let i = 0; i < bodyLen; i++) if (G.snake[i].x === nx && G.snake[i].y === ny){ hit = i; break; }
+    if (hit >= 0){
+      if (sk('autophagy') && hit >= 2){
+        const cut = G.snake.splice(hit);
+        cut.forEach(s => burst(s.x, s.y, [skinOf().col(.8, G.anim), '#fff'], 5));
+        floatText(nx, ny, 'Ам!', '#fda4af', 1.1);
+        G.combo = 0; G.shake = 6; SFX.chomp(); buzz([20, 20, 20]);
+      } else return crash();
+    }
+    if (G.obstacles.has(key(nx, ny))) return crash();
+  }
 
   const old = G.snake.map(s => ({x:s.x, y:s.y}));
   G.snake.unshift({x:nx, y:ny});
   if (G.grow > 0) G.grow--; else if (!eatsFood) G.snake.pop();
-  G.from = G.snake.map((s, i) => i === 0 ? old[0] : old[i - 1]);
+  G.from = G.snake.map((s, i) => i === 0 ? old[0] : (old[i - 1] || s));
 
   if (eatsFood) eatFood(nx, ny);
   if (G.special && nx === G.special.x && ny === G.special.y) eatSpecial();
+
+  // магнит
+  const mr = sk('magnet');
+  if (mr && G.food){
+    const f = G.food, dist = Math.abs(f.x - nx) + Math.abs(f.y - ny);
+    if (dist > 0 && dist <= mr){ magnetFx(f.x, f.y, nx, ny); G.grow++; eatFood(f.x, f.y); }
+  }
+}
+
+function crash(){
+  if (G.lives > 0){
+    G.lives--;
+    setPower('ghost', 2200);
+    G.combo = 0; G.shake = 10; G.flash = .5;
+    floatText(G.snake[0].x, G.snake[0].y, '−❤️', '#ff5a7a', 1.2);
+    SFX.hurt(); buzz([40, 30, 40]);
+    const l = $('lives'); l.classList.remove('hit'); void l.offsetWidth; l.classList.add('hit');
+    updateHud(true);
+    return;
+  }
+  die();
 }
 
 function eatFood(x, y){
-  const quick = G.clock - G.lastEat < COMBO_WINDOW;
-  G.combo = quick ? Math.min(G.combo + 1, 4) : 0;
+  const quick = G.clock - G.lastEat < comboWindow();
+  G.combo = quick ? Math.min(G.combo + 1, 4 + sk('gamble')) : 0;
   G.maxCombo = Math.max(G.maxCombo, G.combo);
   G.lastEat = G.clock;
-  let pts = 10 * (1 + G.combo);
+  G.eaten++;
+  let pts = Math.round(10 * (1 + G.combo) * (1 + 0.15 * sk('juicy')));
   if (G.powers.double) pts *= 2;
-  G.score += pts; G.eaten++;
-  burst(x, y, ['#ff5a5a', '#ffb347', '#ffd166', '#ff3d7f'], 18);
-  floatText(x, y, '+' + pts, G.combo ? '#ffd166' : '#fff');
+  const feast = sk('feast') && G.eaten % 10 === 0;
+  if (feast){ pts *= 5; banner('🍗 ПИР! ×5'); G.flash = .4; }
+  G.score += pts;
+  burst(x, y, feast ? ['#ffd166', '#fff', '#ff7a45'] : ['#ff5a5a', '#ffb347', '#ffd166', '#ff3d7f'], feast ? 40 : 18);
+  floatText(x, y, '+' + pts, G.combo || feast ? '#ffd166' : '#fff', feast ? 1.3 : 1);
   if (G.combo >= 1) floatText(x, y - 0.9, 'КОМБО ×' + (1 + G.combo) + '!', '#ff7ab6', 0.8);
   SFX.eat(G.combo); buzz(12);
   if (G.eaten % APPLES_PER_LEVEL === 0) levelUp();
   placeFood();
-  if (!G.special && G.eaten >= 3 && Math.random() < 0.33) spawnSpecial();
+  if (!G.special && G.eaten >= 3 && Math.random() < 0.33 * (1 + 0.2 * sk('luck'))) spawnSpecial();
   updateHud(true);
 }
 
 function eatSpecial(){
   const sp = G.special, t = sp.type; G.special = null;
   const mult = G.powers.double ? 2 : 1;
-  if (t.id === 'gold'){ G.score += 50 * mult; floatText(sp.x, sp.y, '+' + (50 * mult), '#ffd166', 1.2); }
+  if (t.id === 'gold'){ const v = (50 + 25 * sk('goldrush')) * mult; G.score += v; floatText(sp.x, sp.y, '+' + v, '#ffd166', 1.2); }
   else {
     G.score += 15 * mult;
     floatText(sp.x, sp.y, t.label, t.color, 1);
-    if (t.dur) G.powers[t.id] = t.dur;
+    if (t.dur) setPower(t.id, t.dur * (1 + 0.2 * sk('longfx')));
     if (t.id === 'shrink'){
       const cut = Math.min(3, G.snake.length - 3);
       for (let i = 0; i < cut; i++){ const s = G.snake.pop(); G.from.pop(); burst(s.x, s.y, [t.color], 6); }
@@ -556,17 +811,32 @@ function eatSpecial(){
 
 function levelUp(){
   G.level++;
-  banner('Уровень ' + G.level);
+  banner('Волна ' + G.level);
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70) addCluster();
+  if (sk('regen') && G.level % 3 === 0){
+    G.lives++;
+    floatText(G.snake[0].x, G.snake[0].y - 1, '+❤️', '#ff7ab6', 1.2);
+  }
+}
+
+function useAbility(id){
+  if (!G || G.state !== 'play' || !sk(id) || (G.cd[id] || 0) > 0){ if (G && G.state === 'play') SFX.deny(); return; }
+  const a = ACTIVES[id];
+  setPower(a.power, a.dur);
+  G.cd[id] = G.cdMax[id] = a.cd * cdMult();
+  const h = G.snake[0];
+  burst(h.x, h.y, ['#a78bfa', '#f0abfc', '#fff'], 30);
+  floatText(h.x, h.y - .6, a.icon + ' ' + a.name, '#d8b4fe', 1);
+  G.flash = .3; SFX.magic(); buzz(25);
+  updateHud(true);
 }
 
 function die(){
   G.state = 'dying'; G.deathT = 0; G.shake = 16; G.flash = 0.6;
   G.from = G.snake.map(s => ({...s}));
-  G.snake.forEach((s, i) => burst(s.x, s.y, [SKINS[settings.skin].col(i / G.snake.length, G.anim)], i === 0 ? 30 : 4));
+  G.snake.forEach((s, i) => burst(s.x, s.y, [skinOf().col(i / G.snake.length, G.anim)], i === 0 ? 30 : 4));
   SFX.crash(); buzz([60, 40, 120]);
-  // сохранение рекорда
   const bests = store.get('ss_best', {});
   G.newBest = G.score > (bests[mode] || 0);
   if (G.newBest){ bests[mode] = G.score; store.set('ss_best', bests); }
@@ -576,6 +846,11 @@ function die(){
     recs.sort((a, b) => b.s - a.s);
     store.set('ss_records', recs.slice(0, 30));
   }
+  // опыт
+  const gain = Math.round(G.score * (DIFF_XP[settings.diff] || 1));
+  const before = levelInfo(profile.xp);
+  profile.xp += gain; saveProfile();
+  G.xp = {gain, before, after:levelInfo(profile.xp)};
 }
 
 function showGameOver(){
@@ -585,6 +860,22 @@ function showGameOver(){
   $('stCombo').textContent = '×' + (1 + G.maxCombo);
   $('stLevel').textContent = G.level;
   $('newRecord').classList.toggle('on', G.newBest);
+  // опыт и уровень змейки
+  const {gain, before, after} = G.xp, up = after.level - before.level;
+  $('goLvl').textContent = 'Уровень змейки ' + after.level;
+  $('goXp').textContent = '+' + gain + ' XP';
+  const fill = $('goXpFill');
+  fill.style.transition = 'none';
+  fill.style.width = (up ? 0 : before.cur / before.need * 100) + '%';
+  void fill.offsetWidth;
+  fill.style.transition = '';
+  setTimeout(() => { fill.style.width = (after.cur / after.need * 100) + '%'; }, 250);
+  const lu = $('goLvlUp');
+  lu.classList.toggle('on', up > 0);
+  if (up > 0) lu.textContent = `🎉 Новый уровень! +${up} ${plural(up,'очко','очка','очков')} навыков`;
+  const pts = pointsLeft();
+  $('btnGoTree').style.display = pts > 0 ? '' : 'none';
+  $('btnGoTree').textContent = `🧬 Прокачать змейку (${pts})`;
   overlay('ovOver', true);
   const target = G.score, t0 = performance.now();
   (function count(now){
@@ -592,7 +883,8 @@ function showGameOver(){
     $('finalScore').textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
     if (k < 1) requestAnimationFrame(count);
   })(t0);
-  if (G.newBest) setTimeout(() => SFX.level(), 300);
+  if (up > 0) setTimeout(() => SFX.learn(), 500);
+  else if (G.newBest) setTimeout(() => SFX.level(), 300);
 }
 
 /* ===================== EFFECTS ===================== */
@@ -605,6 +897,14 @@ function burst(x, y, colors, n){
   }
   if (G.particles.length > 600) G.particles.splice(0, G.particles.length - 600);
 }
+function magnetFx(fx, fy, hx, hy){
+  for (let i = 0; i <= 8; i++){
+    const k = i / 8, x = (fx + (hx - fx) * k + .5) * cell, y = (fy + (hy - fy) * k + .5) * cell;
+    G.particles.push({x, y, vx:(Math.random() - .5) * cell * .05, vy:(Math.random() - .5) * cell * .05, life:1, decay:.035,
+      r:cell * .12, c: i % 2 ? '#a78bfa' : '#f0abfc'});
+  }
+  floatText(fx, fy - .4, '🧲', '#fff', .8);
+}
 function floatText(x, y, text, color, scale = 1){
   G.floats.push({x:(x + .5) * cell, y:(y + .5) * cell, text, color, scale, life:1});
 }
@@ -614,7 +914,7 @@ function banner(text){
 }
 
 /* ===================== HUD ===================== */
-let lastScoreShown = -1, hudTimer = 0;
+let lastScoreShown = -1, hudTimer = 0, abButtons = [];
 function updateHud(force){
   if (!G) return;
   if (G.score !== lastScoreShown){
@@ -624,17 +924,26 @@ function updateHud(force){
     $('best').textContent = Math.max(getBest(mode), G.score);
   }
   $('level').textContent = G.level;
-  const comboLeft = 1 - (G.clock - G.lastEat) / COMBO_WINDOW;
-  const comboOn = G.combo > 0 && comboLeft > 0 && G.state !== 'over' && G.state !== 'dying';
+  const comboLeft = 1 - (G.clock - G.lastEat) / comboWindow();
+  const comboOn = G.combo > 0 && comboLeft > 0 && (G.state === 'play' || G.state === 'paused');
   $('combo').classList.toggle('on', comboOn);
   if (comboOn){ $('comboText').textContent = 'КОМБО ×' + (1 + G.combo); $('comboFill').style.width = (comboLeft * 100) + '%'; }
+  for (const b of abButtons){
+    const id = b.dataset.ab, cd = G.cd[id] || 0, max = G.cdMax[id] || 1;
+    b.style.setProperty('--p', cd > 0 ? cd / max : 0);
+    b.classList.toggle('ready', cd <= 0 && G.state !== 'dying' && G.state !== 'over');
+    b.classList.toggle('cool', cd > 0);
+    const t = cd > 0 ? Math.ceil(cd / 1000) : '';
+    if (b._t !== t){ b._t = t; b.querySelector('.ab-cd').textContent = t; }
+  }
   hudTimer -= 16;
   if (force || hudTimer <= 0){
     hudTimer = 120;
     $('powers').innerHTML = Object.keys(G.powers).map(id => {
       const sp = SPECIALS.find(s => s.id === id);
-      return `<div class="pw" style="color:${sp.color}">${sp.emoji}<i><u style="width:${Math.max(0, G.powers[id] / sp.dur * 100)}%"></u></i></div>`;
+      return `<div class="pw" style="color:${sp.color}">${sp.emoji}<i><u style="width:${Math.max(0, G.powers[id] / (G.powerMax[id] || 1) * 100)}%"></u></i></div>`;
     }).join('');
+    $('lives').textContent = G.lives > 3 ? '❤️×' + G.lives : '❤️'.repeat(G.lives);
   }
 }
 
@@ -691,11 +1000,13 @@ function drawApple(c){
   const appear = Math.min(1, (G.anim - f.born) / 260), ease = 1 + 1.6 * Math.pow(appear - 1, 3) + .6 * Math.pow(appear - 1, 2);
   const r = S * 0.36 * (1 + Math.sin(G.anim / 220) * 0.06) * Math.max(0, ease);
   if (r <= 0) return;
+  const feastNext = sk('feast') && (G.eaten + 1) % 10 === 0;
   const gl = c.createRadialGradient(cx, cy, 0, cx, cy, r * 2.6);
-  gl.addColorStop(0, 'rgba(255,80,80,.5)'); gl.addColorStop(1, 'rgba(255,80,80,0)');
+  gl.addColorStop(0, feastNext ? 'rgba(255,209,102,.7)' : 'rgba(255,80,80,.5)'); gl.addColorStop(1, 'rgba(255,80,80,0)');
   c.fillStyle = gl; c.beginPath(); c.arc(cx, cy, r * 2.6, 0, 7); c.fill();
   const g = c.createRadialGradient(cx - r*.35, cy - r*.35, r*.1, cx, cy, r*1.1);
-  g.addColorStop(0, '#ff9a8a'); g.addColorStop(.45, '#ff3b3b'); g.addColorStop(1, '#a50f2d');
+  if (feastNext){ g.addColorStop(0, '#fff4c2'); g.addColorStop(.45, '#ffc93b'); g.addColorStop(1, '#b8740a'); }
+  else { g.addColorStop(0, '#ff9a8a'); g.addColorStop(.45, '#ff3b3b'); g.addColorStop(1, '#a50f2d'); }
   c.fillStyle = g; c.beginPath(); c.ellipse(cx, cy + r*.05, r*1.04, r*.96, 0, 0, 7); c.fill();
   c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(cx - r*.38, cy - r*.35, r*.26, r*.16, -.6, 0, 7); c.fill();
   c.strokeStyle = '#6b3e26'; c.lineWidth = S * .07; c.lineCap = 'round';
@@ -732,7 +1043,7 @@ function snakePoints(t){
 }
 
 function drawSnake(c, t, dt){
-  const S = cell, skin = SKINS[settings.skin] || SKINS.sunset, n = G.snake.length;
+  const S = cell, skin = skinOf(), n = G.snake.length;
   const P = snakePoints(t);
   const width = i => S * (0.8 - 0.34 * (i / Math.max(1, n - 1)));
   const linked = i => Math.hypot(P[i].x - P[i-1].x, P[i].y - P[i-1].y) < S * 1.5;
@@ -742,7 +1053,16 @@ function drawSnake(c, t, dt){
   if (G.state === 'dying') c.globalAlpha = Math.max(0, 1 - G.deathT / 700);
   c.lineCap = 'round'; c.lineJoin = 'round';
 
-  // свечение
+  // магнитное поле
+  const mr = sk('magnet');
+  if (mr && G.state !== 'dying'){
+    c.save();
+    c.strokeStyle = 'rgba(167,139,250,.28)'; c.lineWidth = 1.5; c.setLineDash([3, 5]);
+    c.lineDashOffset = -G.anim / 40;
+    c.beginPath(); c.arc(P[0].x, P[0].y, (mr + .5) * S, 0, 7); c.stroke();
+    c.restore();
+  }
+
   c.save();
   c.shadowColor = skin.glow; c.shadowBlur = S * .9;
   c.strokeStyle = skin.glow; c.globalAlpha *= .35; c.lineWidth = S * .7;
@@ -750,7 +1070,6 @@ function drawSnake(c, t, dt){
   for (let i = 1; i < n; i++){ if (linked(i)) c.lineTo(P[i].x, P[i].y); else c.moveTo(P[i].x, P[i].y); }
   c.stroke(); c.restore();
 
-  // тело
   for (let i = n - 1; i >= 1; i--){
     const col = skin.col(i / Math.max(1, n - 1), G.anim);
     c.fillStyle = col; c.beginPath(); c.arc(P[i].x, P[i].y, width(i) / 2, 0, 7); c.fill();
@@ -759,10 +1078,8 @@ function drawSnake(c, t, dt){
       c.beginPath(); c.moveTo(P[i].x, P[i].y); c.lineTo(P[i-1].x, P[i-1].y); c.stroke();
     }
   }
-  // чешуйки
   c.fillStyle = 'rgba(0,0,0,.12)';
   for (let i = 2; i < n; i += 2){ c.beginPath(); c.arc(P[i].x, P[i].y, width(i) * .22, 0, 7); c.fill(); }
-  // блик
   c.strokeStyle = 'rgba(255,255,255,.28)';
   c.beginPath();
   for (let i = 0; i < n; i++){
@@ -771,7 +1088,6 @@ function drawSnake(c, t, dt){
   }
   c.lineWidth = S * .16; c.stroke();
 
-  // голова
   const h = P[0], hr = S * .5;
   const target = Math.atan2(G.dir.y, G.dir.x);
   let diff = target - G.headAng; while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
@@ -783,7 +1099,6 @@ function drawSnake(c, t, dt){
   c.fillStyle = hc; c.beginPath(); c.ellipse(h.x + fx*S*.04, h.y + fy*S*.04, hr, hr, 0, 0, 7); c.fill();
   c.fillStyle = hg; c.beginPath(); c.arc(h.x + fx*S*.04, h.y + fy*S*.04, hr, 0, 7); c.fill();
 
-  // язык — когда рядом еда или время от времени
   const f = G.food, near = f && Math.abs(f.x - G.snake[0].x) + Math.abs(f.y - G.snake[0].y) <= 3;
   if (G.state !== 'dying' && (near || G.anim % 2600 < 260)){
     const flick = Math.sin(G.anim / 40) * .25;
@@ -795,7 +1110,6 @@ function drawSnake(c, t, dt){
     c.moveTo(ex, ey); c.lineTo(ex + fx*S*.12 - px*S*.1, ey + fy*S*.12 - py*S*.1);
     c.stroke();
   }
-  // глаза
   const blink = G.anim % 3400 < 110;
   for (const sgn of [-1, 1]){
     const ex = h.x + fx * S * .14 + px * S * .2 * sgn, ey = h.y + fy * S * .14 + py * S * .2 * sgn;
@@ -857,8 +1171,7 @@ function render(dt){
   drawApple(c);
   drawSpecial(c);
   let t = 1;
-  if (G.state === 'play') t = Math.min(1, G.acc / stepMs());
-  else if (G.state === 'paused') t = Math.min(1, G.acc / stepMs());
+  if (G.state === 'play' || G.state === 'paused') t = Math.min(1, G.acc / stepMs());
   else if (G.state === 'ready') t = 0;
   drawSnake(c, t, dt);
   drawEffects(c, dt);
@@ -874,6 +1187,7 @@ function frame(now){
     if (G.state === 'play'){
       G.clock += dt;
       for (const k in G.powers){ G.powers[k] -= dt; if (G.powers[k] <= 0) delete G.powers[k]; }
+      for (const k in G.cd){ if (G.cd[k] > 0) G.cd[k] = Math.max(0, G.cd[k] - dt); }
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
       G.acc += dt;
       let guard = 0;
@@ -895,10 +1209,17 @@ function startGame(){
   lastScoreShown = -1;
   show('game');
   $('dpad').classList.toggle('on', !!settings.dpad);
+  const acts = Object.keys(ACTIVES).filter(id => sk(id));
+  $('abilities').innerHTML = acts.map(id => {
+    const a = ACTIVES[id];
+    return `<button class="ab" data-ab="${id}"><span class="ab-ico">${a.icon}</span><span class="ab-name">${a.name}</span><kbd>${a.key}</kbd><span class="ab-cd"></span></button>`;
+  }).join('');
+  $('abilities').classList.toggle('on', acts.length > 0);
+  abButtons = [...document.querySelectorAll('.ab')];
   overlay('ovOver', false); overlay('ovPause', false);
-  requestAnimationFrame(() => { resize(); });
   resize();
   newGame();
+  requestAnimationFrame(resize);
 }
 function pause(){
   if (!G || (G.state !== 'play' && G.state !== 'ready')) return;
@@ -910,7 +1231,16 @@ function resume(){
 }
 function toMenu(){
   G = null; overlay('ovPause', false); overlay('ovOver', false);
-  renderModes(); show('menu');
+  renderMenu(); show('menu');
+}
+function openTree(){
+  G = null; overlay('ovPause', false); overlay('ovOver', false);
+  const p = pointsLeft();
+  // выбрать первый доступный для изучения навык
+  const firstCan = Object.keys(NODE).find(id => nodeStatus(id).ok);
+  if (firstCan && p > 0) selNode = firstCan;
+  renderTree(); show('tree');
+  $('treeGrid').parentElement.scrollTop = 0;
 }
 
 $('btnPlay').onclick = () => { SFX.click(); startGame(); };
@@ -918,7 +1248,10 @@ $('btnPause').onclick = () => { SFX.click(); pause(); };
 $('btnResume').onclick = () => { SFX.click(); resume(); };
 $('btnRestart').onclick = () => { SFX.click(); startGame(); };
 $('btnAgain').onclick = () => { SFX.click(); startGame(); };
+$('btnGoTree').onclick = () => { SFX.click(); openTree(); };
 $('btnToMenu1').onclick = $('btnToMenu2').onclick = () => { SFX.click(); toMenu(); };
+$('btnTree').onclick = $('btnPlayer').onclick = () => { SFX.click(); openTree(); };
+$('btnTreeBack').onclick = () => { SFX.click(); toMenu(); };
 document.addEventListener('visibilitychange', () => { if (document.hidden && G && G.state === 'play') pause(); });
 window.addEventListener('resize', () => { if (G) resize(); });
 
@@ -927,17 +1260,17 @@ document.addEventListener('keydown', e => {
   const map = {ArrowUp:'u', w:'u', W:'u', 'ц':'u', ArrowDown:'d', s:'d', S:'d', 'ы':'d',
                ArrowLeft:'l', a:'l', A:'l', 'ф':'l', ArrowRight:'r', d:'r', D:'r', 'в':'r'};
   if (map[e.key] && G){ e.preventDefault(); queueDir(DIRS[map[e.key]]); return; }
+  const ab = {q:'slowmo', Q:'slowmo', 'й':'slowmo', '1':'slowmo', e:'phase', E:'phase', 'у':'phase', '2':'phase'}[e.key];
+  if (ab && G){ e.preventDefault(); useAbility(ab); return; }
   if (e.key === ' ' || e.key === 'Escape' || e.key === 'p' || e.key === 'з'){
     e.preventDefault();
     if (!G) return;
     if (G.state === 'paused') resume(); else pause();
   }
-  if (e.key === 'Enter'){
-    if (!G) startGame(); else if (G.state === 'over') startGame();
-  }
+  if (e.key === 'Enter' && $('menu').classList.contains('active')) startGame();
+  else if (e.key === 'Enter' && G && G.state === 'over') startGame();
 });
 
-// свайпы по всему экрану игры, без необходимости отпускать палец
 let sw = null;
 $('game').addEventListener('touchstart', e => {
   if (e.target.closest('button')) return;
@@ -954,7 +1287,6 @@ $('game').addEventListener('touchmove', e => {
   }
 }, {passive:true});
 $('game').addEventListener('touchend', () => { sw = null; }, {passive:true});
-// мышь (для компьютера)
 let ms = null;
 $('stage').addEventListener('mousedown', e => { ms = {x:e.clientX, y:e.clientY}; });
 window.addEventListener('mousemove', e => {
@@ -968,22 +1300,99 @@ $('dpad').addEventListener('pointerdown', e => {
   const b = e.target.closest('button'); if (!b) return;
   e.preventDefault(); queueDir(DIRS[b.dataset.d]); buzz(8);
 });
+$('abilities').addEventListener('pointerdown', e => {
+  const b = e.target.closest('.ab'); if (!b) return;
+  e.preventDefault(); useAbility(b.dataset.ab);
+});
+
+/* ===================== SKILL TREE UI ===================== */
+let selNode = 'juicy', resetArmed = null;
+function renderTree(){
+  const info = levelInfo(profile.xp), pts = pointsLeft();
+  $('tLvl').textContent = info.level;
+  $('tXp').textContent = `${info.cur} / ${info.need} XP`;
+  $('tXpFill').style.width = (info.cur / info.need * 100) + '%';
+  $('ptsPill').innerHTML = `🧬 <b>${pts}</b> ${plural(pts,'очко','очка','очков')}`;
+  $('ptsPill').classList.toggle('glow', pts > 0);
+  $('treeGrid').innerHTML = TREE.map(b =>
+    `<div class="branch" style="--c:${b.color}"><div class="b-head">${b.icon} ${b.name}</div>` +
+    b.nodes.map((n, t) => {
+      const st = nodeStatus(n.id), r = sk(n.id), linked = t === 0 || sk(b.nodes[t-1].id) > 0;
+      const cls = ['node', r > 0 ? 'has' : '', st.max ? 'max' : '', st.ok ? 'can' : '', st.locked ? 'locked' : '',
+        selNode === n.id ? 'sel' : '', n.active ? 'act' : '', n.ult ? 'ult' : ''].join(' ');
+      return `<div class="tn ${t ? '' : 'first'} ${linked ? 'linked' : ''}">
+        <button class="${cls}" data-id="${n.id}"><span class="ico">${n.icon}</span>
+        ${n.max > 1 || r ? `<span class="rank">${r}/${n.max}</span>` : ''}
+        ${st.lvlLock ? `<span class="lk">ур.${st.lvlLock}</span>` : ''}</button>
+        <div class="nname">${n.name}</div></div>`;
+    }).join('') + '</div>'
+  ).join('');
+  renderSheet();
+}
+function renderSheet(){
+  const {n, b} = NODE[selNode], r = sk(selNode), st = nodeStatus(selNode);
+  let eff = '';
+  if (r > 0) eff += `<div><span>Сейчас</span><b>${n.eff(r)}</b></div>`;
+  if (r < n.max) eff += `<div><span>${r ? 'Следующий ранг' : 'Эффект'}</span><b>${n.eff(r + 1)}</b></div>`;
+  const tag = n.active ? '<span class="tag">КНОПКА</span>' : n.ult ? '<span class="tag">УЛЬТА</span>' : '';
+  const btn = st.ok
+    ? `<button class="btn primary" id="btnLearn">${r ? 'Улучшить' : 'Изучить'} · 1 🧬</button>`
+    : `<button class="btn ghost" disabled>${st.max ? '✓ Изучено полностью' : st.reason}</button>`;
+  $('sheet').style.setProperty('--c', b.color);
+  $('sheet').innerHTML = `
+    <div class="s-top"><div class="s-ico">${n.icon}</div>
+      <div><div class="s-name">${n.name}${tag}</div><div class="s-sub">${b.icon} ${b.name} · ранг ${r} из ${n.max}</div></div></div>
+    <div class="s-desc">${n.desc}</div>
+    <div class="s-eff">${eff}</div>
+    ${btn}`;
+}
+$('treeGrid').addEventListener('click', e => {
+  const nd = e.target.closest('.node'); if (!nd) return;
+  selNode = nd.dataset.id; SFX.click(); renderTree();
+});
+$('sheet').addEventListener('click', e => {
+  if (!e.target.closest('#btnLearn')) return;
+  if (!nodeStatus(selNode).ok) return;
+  profile.skills[selNode] = sk(selNode) + 1; saveProfile();
+  SFX.learn(); buzz([20, 40, 20]);
+  renderTree();
+  const nd = document.querySelector(`.node[data-id="${selNode}"]`);
+  if (nd){ nd.classList.remove('can'); nd.classList.add('pop'); }
+});
+$('btnResetSkills').onclick = () => {
+  const b = $('btnResetSkills');
+  if (!spentPts()){ SFX.deny(); return; }
+  if (!resetArmed){
+    b.classList.add('warn'); b.textContent = 'Точно?';
+    resetArmed = setTimeout(() => { resetArmed = null; b.classList.remove('warn'); b.textContent = '↺ Сброс'; }, 2500);
+    SFX.click(); return;
+  }
+  clearTimeout(resetArmed); resetArmed = null;
+  b.classList.remove('warn'); b.textContent = '↺ Сброс';
+  profile.skills = {}; saveProfile(); SFX.magic(); renderTree();
+};
 
 /* ===================== SETTINGS UI ===================== */
 function renderSettings(){
+  const L = levelInfo(profile.xp).level;
   document.querySelectorAll('#ovSettings .seg').forEach(seg => {
     seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', settings[seg.dataset.key] === b.dataset.val));
   });
   document.querySelectorAll('#ovSettings .switch').forEach(s => s.classList.toggle('on', !!settings[s.dataset.key]));
-  $('skins').innerHTML = Object.entries(SKINS).map(([id, s]) =>
-    `<button class="skin ${settings.skin === id ? 'on' : ''}" data-skin="${id}"><i style="background:linear-gradient(135deg,${s.col(0,0)},${s.col(.5,0)},${s.col(1,0)})"></i>${s.name}</button>`
-  ).join('');
+  $('skins').innerHTML = Object.entries(SKINS).map(([id, s]) => {
+    const lock = L < s.lvl;
+    return `<button class="skin ${settings.skin === id ? 'on' : ''} ${lock ? 'lock' : ''}" data-skin="${id}"><i style="background:linear-gradient(135deg,${s.col(0,0)},${s.col(.5,0)},${s.col(1,0)})"></i>${lock ? 'ур. ' + s.lvl : s.name}</button>`;
+  }).join('');
 }
 $('ovSettings').addEventListener('click', e => {
-  const segBtn = e.target.closest('.seg button'), sw2 = e.target.closest('.switch'), sk = e.target.closest('.skin');
+  const segBtn = e.target.closest('.seg button'), sw2 = e.target.closest('.switch'), sk2 = e.target.closest('.skin');
   if (segBtn){ settings[segBtn.parentElement.dataset.key] = segBtn.dataset.val; }
   else if (sw2){ settings[sw2.dataset.key] = !settings[sw2.dataset.key]; }
-  else if (sk){ settings.skin = sk.dataset.skin; }
+  else if (sk2){
+    const s = SKINS[sk2.dataset.skin];
+    if (levelInfo(profile.xp).level < s.lvl){ SFX.deny(); sk2.classList.remove('shake'); void sk2.offsetWidth; sk2.classList.add('shake'); return; }
+    settings.skin = sk2.dataset.skin;
+  }
   else return;
   saveSettings(); SFX.click(); renderSettings();
 });
@@ -1005,7 +1414,7 @@ $('btnRecords').onclick = () => { SFX.click(); renderRecords(); overlay('ovRecor
 $('btnCloseRecords').onclick = () => { SFX.click(); overlay('ovRecords', false); };
 
 /* ===================== INIT ===================== */
-renderModes();
+renderMenu();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

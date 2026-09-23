@@ -7,11 +7,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Sunset Snake</title>
+<title>Snake: Lost Worlds</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E9%81%BA%E8%B7%A1%E7%A0%82%E6%BC%A0%E8%8D%89%E5%8E%9F%E8%9B%87%E7%AB%A0&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Ruslan+Display&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
@@ -101,6 +102,57 @@ button:disabled{cursor:default}
 .badge{position:absolute;top:-7px;right:-4px;min-width:22px;height:22px;border-radius:11px;padding:0 6px;display:grid;place-items:center;
   font-size:12px;font-weight:900;background:linear-gradient(135deg,#ff7a45,#ff3d7f);box-shadow:0 0 12px rgba(255,61,127,.7);animation:bounce 1.2s ease-in-out infinite}
 @keyframes bounce{50%{transform:translateY(-3px)}}
+
+/* ---------- новое меню: Lost Worlds ---------- */
+#menu{background:#0c1208}
+.menu-bg{position:absolute;inset:-4%;background:url("img/menu.jpg") center 36%/cover no-repeat;animation:kenburns 40s ease-in-out infinite alternate}
+.menu-shade{position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(180deg,rgba(6,10,4,.55) 0%,rgba(6,10,4,.15) 22%,rgba(6,10,4,0) 34%,rgba(6,10,4,0) 46%,rgba(8,12,6,.72) 62%,rgba(8,12,6,.94) 80%,#080c06 100%)}
+.menu-rays{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.55;
+  background:repeating-conic-gradient(from 200deg at 78% -6%,rgba(255,236,170,.0) 0deg,rgba(255,236,170,.22) 3deg,rgba(255,236,170,0) 7deg,rgba(255,236,170,0) 13deg);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 60%);mask-image:linear-gradient(180deg,#000 0%,transparent 60%);
+  animation:rays 7s ease-in-out infinite alternate}
+@keyframes rays{from{opacity:.25}to{opacity:.65}}
+#leaves{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.leaf{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.55);border-radius:80% 0 80% 0;
+  background:linear-gradient(135deg,#d9f07a,#5f9e2f 70%);box-shadow:0 1px 3px rgba(0,0,0,.3);opacity:.85;animation:petal var(--d) linear var(--dl) infinite}
+#menu .hero{justify-content:flex-start;padding-top:max(2vh,6px)}
+.logo{position:relative;text-align:center;animation:sunrise 1s .1s cubic-bezier(.2,.9,.3,1) both}
+.logo-snake{position:relative;font-family:"Cinzel Decorative","Cinzel",Georgia,serif;font-weight:900;font-size:clamp(50px,16vw,86px);line-height:1;letter-spacing:.04em;
+  background:linear-gradient(180deg,#fffbe0 0%,#ffe08a 30%,#d8c25a 48%,#8fc24a 66%,#3f7a26 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px rgba(40,56,14,.55);
+  filter:drop-shadow(0 3px 0 #2c3d10) drop-shadow(0 6px 0 rgba(20,28,6,.55)) drop-shadow(0 12px 26px rgba(0,0,0,.6))}
+.logo-snake::after{content:attr(data-t);position:absolute;inset:0;color:transparent;-webkit-text-stroke:0;
+  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.85) 50%,transparent 65%) -150% 0/250% 100% no-repeat;
+  -webkit-background-clip:text;background-clip:text;animation:logoShine 5s 1.2s ease-in-out infinite}
+@keyframes logoShine{0%{background-position:-150% 0}40%,100%{background-position:250% 0}}
+.logo-lw{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;
+  font-family:"Cinzel",Georgia,serif;font-weight:900;font-size:clamp(17px,5.4vw,26px);letter-spacing:.32em;padding-left:.32em;color:#fff3cf;
+  text-shadow:0 2px 0 #2c3d10,0 0 18px rgba(0,0,0,.8)}
+.logo-lw i{display:block;height:2px;width:28px;background:linear-gradient(90deg,transparent,#ffe08a);position:relative}
+.logo-lw i:last-child{transform:scaleX(-1)}
+.logo-lw i::after{content:"";position:absolute;right:-5px;top:-4px;width:9px;height:9px;border-radius:0 80% 0 80%;background:#8fc24a;transform:rotate(-45deg)}
+.logo-ru{margin-top:6px;font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-style:italic;font-size:17px;letter-spacing:.18em;color:#e8f2c0;
+  text-shadow:0 1px 8px rgba(0,0,0,.95)}
+#menu .glass{background:rgba(10,18,8,.58);border-color:rgba(214,240,160,.16)}
+#menu .mode.active{background:linear-gradient(160deg,rgba(255,170,60,.32),rgba(120,190,60,.2));border-color:rgba(255,210,120,.75);box-shadow:0 0 24px rgba(255,190,80,.3)}
+.p-name{display:flex;align-items:center;gap:6px;min-width:0;color:#fff3dc;font-size:14px}
+.p-name span{overflow:hidden;text-overflow:ellipsis}
+.p-name em{font-style:normal;font-size:12px;opacity:.55}
+/* игроки */
+.pl-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:6px;max-height:40vh;overflow:auto}
+.pl-list li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:var(--panel);border:1px solid var(--stroke);text-align:left;cursor:pointer}
+.pl-list li.on{border-color:rgba(255,190,90,.8);background:linear-gradient(160deg,rgba(255,170,60,.22),rgba(120,190,60,.14))}
+.pl-list .av{font-size:22px}
+.pl-list b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px}
+.pl-list small{color:var(--muted);font-weight:700;font-size:12.5px;white-space:nowrap}
+.pl-list .ren{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.08);font-size:15px;flex:none}
+.pl-new{display:none;margin:6px 0 2px}
+.pl-new.on{display:block}
+.pl-new input{width:100%;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,210,120,.5);background:rgba(0,0,0,.35);color:var(--text);
+  font:inherit;font-size:18px;font-weight:800;text-align:center;outline:none;user-select:text;-webkit-user-select:text}
+.pl-new input:focus{border-color:#ffd166;box-shadow:0 0 0 3px rgba(255,209,102,.25)}
+.rec-name{font-weight:800;color:#fff3dc;max-width:7.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom}
 
 /* ---------- GAME ---------- */
 #game{gap:8px}
@@ -392,17 +444,22 @@ canvas{display:block}
 
 <!-- ===== MENU ===== -->
 <section id="menu" class="screen active">
-  <div class="stars"></div>
-  <div class="floor"></div>
+  <div class="menu-bg"></div>
+  <div class="menu-shade"></div>
+  <div class="menu-rays"></div>
+  <div id="leaves"></div>
   <div class="hero">
-    <div class="sun"></div>
-    <div class="title"><small>SUNSET</small><h1>SNAKE</h1></div>
+    <div class="logo">
+      <div class="logo-snake" data-t="SNAKE">SNAKE</div>
+      <div class="logo-lw"><i></i><span>LOST WORLDS</span><i></i></div>
+      <div class="logo-ru">затерянные миры</div>
+    </div>
   </div>
   <div class="menu-panel">
     <button class="player glass" id="btnPlayer">
       <div class="lvl-badge"><div><small>УР.</small><b id="pLvl">1</b></div></div>
       <div class="xp-info">
-        <div class="xp-row"><span id="pTitle">Змейка</span><span id="pXp">0 / 150 XP</span></div>
+        <div class="xp-row"><span class="p-name"><span id="pName">Игрок</span><em>✎</em></span><span id="pXp">0 / 150 XP</span></div>
         <div class="xpbar"><div id="pXpFill"></div></div>
       </div>
     </button>
@@ -507,6 +564,21 @@ canvas{display:block}
   </div>
 </div>
 
+<!-- ===== PLAYERS ===== -->
+<div class="overlay" id="ovPlayers">
+  <div class="card">
+    <h2 id="plTitle">Игроки</h2>
+    <p class="sub" id="plSub">У каждого игрока свои уровень, навыки и рекорды</p>
+    <ul class="pl-list" id="plList"></ul>
+    <div class="pl-new" id="plNew">
+      <input id="plName" maxlength="16" placeholder="Имя игрока" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done">
+      <button class="btn primary" id="btnPlSave">Готово</button>
+    </div>
+    <button class="btn ghost" id="btnPlAdd">＋ Новый игрок</button>
+    <button class="btn ghost" id="btnPlClose">Закрыть</button>
+  </div>
+</div>
+
 <!-- ===== SETTINGS ===== -->
 <div class="overlay" id="ovSettings">
   <div class="card">
@@ -579,6 +651,13 @@ const fmt = n => String(n).replace('.', ',');
 /* ===================== SETTINGS & STORAGE ===================== */
 const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false, music:true, mvol:'mid'}, store.get('ss_settings', {}));
 const saveSettings = () => store.set('ss_settings', settings);
+// ---- игроки: у каждого свой профиль и рекорды режимов (первый игрок — на старых ключах)
+const players = store.get('ss_players', null) || {cur:'p1', list:[{id:'p1', name:''}], fresh:true};
+if (!players.list.some(p => p.id === players.cur)) players.cur = players.list[0].id;
+const savePlayers = () => { delete players.fresh; store.set('ss_players', players); };
+const curPlayer = () => players.list.find(p => p.id === players.cur);
+const pk = (k, id = players.cur) => id === 'p1' ? k : k + '_' + id;
+const playerName = () => curPlayer().name || 'Игрок';
 let mode = store.get('ss_mode', 'classic');
 
 const MODES = {
@@ -589,13 +668,13 @@ const MODES = {
 
 // перенос рекордов из самой первой версии игры
 (function migrate(){
-  if (store.get('ss_best', null)) return;
+  if (players.cur !== 'p1' || store.get('ss_best', null)) return;
   let old = 0; try { old = parseInt(localStorage.getItem('snakeBest2')) || 0; } catch(e){}
   store.set('ss_best', {classic:old, portal:0, maze:0});
   const oldList = store.get('snakeScores', []);
   if (Array.isArray(oldList)) store.set('ss_records', oldList.filter(n => typeof n === 'number' && n > 0).map(n => ({s:n, m:'classic', d:null})));
 })();
-const getBest = m => (store.get('ss_best', {})[m] || 0);
+const getBest = m => (store.get(pk('ss_best'), {})[m] || 0);
 
 /* ===================== PROGRESSION (RPG) ===================== */
 const XP_NEED = L => 150 + 100 * (L - 1);
@@ -604,15 +683,15 @@ function levelInfo(xp){
   while (xp >= need){ xp -= need; L++; need = XP_NEED(L); }
   return {level:L, cur:xp, need};
 }
-let profile = store.get('ss_profile', null);
+let profile = store.get(pk('ss_profile'), null);
 if (!profile){
-  // опыт за уже сыгранные игры засчитывается
-  const recs = store.get('ss_records', []);
+  // опыт за уже сыгранные игры засчитывается (только первому игроку)
+  const recs = players.cur === 'p1' ? store.get('ss_records', []) : [];
   profile = {xp:Math.min(3000, recs.reduce((a, r) => a + (r.s || 0), 0)), skills:{}};
-  store.set('ss_profile', profile);
+  store.set(pk('ss_profile'), profile);
 }
 profile.skills = profile.skills || {};
-const saveProfile = () => store.set('ss_profile', profile);
+const saveProfile = () => store.set(pk('ss_profile'), profile);
 const sk = id => profile.skills[id] || 0;
 const spentPts = () => Object.values(profile.skills).reduce((a, b) => a + b, 0);
 const pointsLeft = () => Math.max(0, levelInfo(profile.xp).level - spentPts());
@@ -896,7 +975,7 @@ function renderMenu(){
   $('pLvl').textContent = i.level;
   $('pXp').textContent = `${i.cur} / ${i.need} XP`;
   $('pXpFill').style.width = (i.cur / i.need * 100) + '%';
-  $('pTitle').innerHTML = p > 0 ? `<span class="hot">🧬 ${p} ${plural(p,'очко','очка','очков')} навыков!</span>` : 'Уровень змейки';
+  $('pName').textContent = playerName();
   $('treeBadge').textContent = p;
   $('treeBadge').style.display = p > 0 ? '' : 'none';
   $('btnTree').classList.toggle('hot', p > 0);
@@ -1227,12 +1306,12 @@ function die(win = false){
     G.snake.forEach((s, i) => burst(s.x, s.y, [HSL(skinOf().col(i / G.snake.length, G.anim))], i === 0 ? 30 : 4));
     SFX.crash(); buzz([60, 40, 120]);
   } else buzz([30, 40, 30, 40, 80]);
-  const bests = store.get('ss_best', {});
+  const bests = store.get(pk('ss_best'), {});
   G.newBest = G.score > (bests[mode] || 0);
-  if (G.newBest){ bests[mode] = G.score; store.set('ss_best', bests); }
+  if (G.newBest){ bests[mode] = G.score; store.set(pk('ss_best'), bests); }
   if (G.score > 0){
     const recs = store.get('ss_records', []);
-    recs.push({s:G.score, m:mode, d:Date.now()});
+    recs.push({s:G.score, m:mode, d:Date.now(), n:playerName()});
     recs.sort((a, b) => b.s - a.s);
     store.set('ss_records', recs.slice(0, 30));
   }
@@ -2251,7 +2330,8 @@ $('btnRestart').onclick = () => { SFX.click(); startGame(); };
 $('btnAgain').onclick = () => { SFX.click(); startGame(); };
 $('btnGoTree').onclick = () => { SFX.click(); openTree(); };
 $('btnToMenu1').onclick = $('btnToMenu2').onclick = () => { SFX.click(); toMenu(); };
-$('btnTree').onclick = $('btnPlayer').onclick = () => { SFX.click(); openTree(); };
+$('btnTree').onclick = () => { SFX.click(); openTree(); };
+$('btnPlayer').onclick = () => { SFX.click(); openPlayers('list'); };
 $('btnTreeBack').onclick = () => { SFX.click(); toMenu(); };
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && G && G.state === 'play') pause();
@@ -2263,6 +2343,7 @@ window.addEventListener('resize', () => { if (G) resize(); });
 
 /* ===================== CONTROLS ===================== */
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.tagName === 'INPUT') return;
   const map = {ArrowUp:'u', w:'u', W:'u', 'ц':'u', ArrowDown:'d', s:'d', S:'d', 'ы':'d',
                ArrowLeft:'l', a:'l', A:'l', 'ф':'l', ArrowRight:'r', d:'r', D:'r', 'в':'r'};
   if (map[e.key] && G){ e.preventDefault(); queueDir(DIRS[map[e.key]]); return; }
@@ -2413,15 +2494,76 @@ function renderRecords(){
   const list = store.get('ss_records', []).filter(r => recFilter === 'all' || r.m === recFilter).slice(0, 7);
   $('recList').innerHTML = list.length ? list.map((r, i) => {
     const d = r.d ? new Date(r.d).toLocaleDateString('ru-RU', {day:'numeric', month:'short'}) : '';
-    return `<li><span class="n">${i + 1}</span><span>${(MODES[r.m] || MODES.classic).icon} <span class="d">${d}</span></span><span class="s">${r.s}</span></li>`;
+    const who = r.n ? `<span class="rec-name">${esc(r.n)}</span> ` : '';
+    return `<li><span class="n">${i + 1}</span><span>${(MODES[r.m] || MODES.classic).icon} ${who}<span class="d">${d}</span></span><span class="s">${r.s}</span></li>`;
   }).join('') : '<li class="empty">Пока пусто — самое время сыграть!</li>';
 }
 $('recTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; recFilter = b.dataset.val; SFX.click(); renderRecords(); });
 $('btnRecords').onclick = () => { SFX.click(); renderRecords(); overlay('ovRecords', true); };
 $('btnCloseRecords').onclick = () => { SFX.click(); overlay('ovRecords', false); };
 
+/* ===================== PLAYERS UI ===================== */
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let plMode = 'list', plEdit = null;
+function openPlayers(m, id = null){
+  plMode = m; plEdit = id;
+  const first = m === 'first';
+  $('plTitle').textContent = first ? 'Добро пожаловать!' : m === 'new' ? 'Новый игрок' : m === 'rename' ? 'Имя игрока' : 'Игроки';
+  $('plSub').textContent = first ? 'Как зовут того, кто отправится в затерянные миры?' :
+    m === 'new' ? 'Начнёт с первого уровня, со своими навыками и рекордами' : m === 'rename' ? 'Прогресс сохранится' : 'У каждого игрока свои уровень, навыки и рекорды';
+  const editing = m !== 'list';
+  $('plList').style.display = editing ? 'none' : '';
+  $('plNew').classList.toggle('on', editing);
+  $('btnPlAdd').style.display = editing ? 'none' : '';
+  $('btnPlClose').textContent = editing && !first ? 'Отмена' : 'Закрыть';
+  $('btnPlClose').style.display = first ? 'none' : '';
+  if (!editing){
+    $('plList').innerHTML = players.list.map(p => {
+      const pr = store.get(pk('ss_profile', p.id), null), L = levelInfo(pr ? pr.xp : 0).level;
+      return `<li data-id="${p.id}" class="${p.id === players.cur ? 'on' : ''}"><span class="av">🐍</span><b>${esc(p.name || 'Игрок')}</b><small>Ур. ${L}</small><button class="ren" data-ren="${p.id}" aria-label="Переименовать">✎</button></li>`;
+    }).join('');
+  } else {
+    const inp = $('plName');
+    inp.value = m === 'rename' ? (players.list.find(p => p.id === id) || {}).name || '' : '';
+    setTimeout(() => inp.focus(), 60);
+  }
+  overlay('ovPlayers', true);
+}
+function savePlayerName(){
+  const name = $('plName').value.replace(/\s+/g, ' ').trim().slice(0, 16);
+  if (!name){ $('plName').focus(); SFX.deny(); return; }
+  if (plMode === 'new'){
+    const id = 'p' + Date.now().toString(36);
+    players.list.push({id, name}); players.cur = id; savePlayers();
+    SFX.learn(); location.reload(); return;
+  }
+  const p = plMode === 'first' ? curPlayer() : players.list.find(q => q.id === plEdit);
+  if (p) p.name = name;
+  savePlayers(); SFX.click();
+  overlay('ovPlayers', false); renderMenu();
+  if (plMode !== 'first') openPlayers('list');
+}
+$('plList').addEventListener('click', e => {
+  const ren = e.target.closest('[data-ren]');
+  if (ren){ SFX.click(); openPlayers('rename', ren.dataset.ren); return; }
+  const li = e.target.closest('li[data-id]'); if (!li) return;
+  if (li.dataset.id === players.cur){ SFX.click(); overlay('ovPlayers', false); return; }
+  players.cur = li.dataset.id; savePlayers(); SFX.click(); location.reload();
+});
+$('btnPlAdd').onclick = () => { SFX.click(); openPlayers('new'); };
+$('btnPlSave').onclick = savePlayerName;
+$('plName').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') savePlayerName(); });
+$('btnPlClose').onclick = () => { SFX.click(); if (plMode === 'list') overlay('ovPlayers', false); else openPlayers('list'); };
+// падающие листья в меню
+(function(){
+  let h = '';
+  for (let i = 0; i < 10; i++) h += `<span class="leaf" style="left:${Math.random() * 100}%;--s:${9 + Math.random() * 8}px;--d:${11 + Math.random() * 9}s;--dl:${-Math.random() * 20}s;--x:${(Math.random() * 2 - 1) * 90 + 30}px"></span>`;
+  $('leaves').innerHTML = h;
+})();
+
 /* ===================== INIT ===================== */
 renderMenu();
+if (players.fresh) setTimeout(() => openPlayers('first'), 700);
 Music.play('menu');
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>

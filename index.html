@@ -103,6 +103,27 @@ button:disabled{cursor:default}
   font-size:12px;font-weight:900;background:linear-gradient(135deg,#ff7a45,#ff3d7f);box-shadow:0 0 12px rgba(255,61,127,.7);animation:bounce 1.2s ease-in-out infinite}
 @keyframes bounce{50%{transform:translateY(-3px)}}
 
+/* ---------- древо: вкладки веток + путь навыков ---------- */
+.b-tabs{width:100%;max-width:520px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:none}
+.b-tab{position:relative;padding:8px 2px 7px;border-radius:14px;background:var(--panel);border:1px solid var(--stroke);
+  display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10.5px;font-weight:800;color:var(--muted);line-height:1.1}
+.b-tab i{font-style:normal;font-size:20px}
+.b-tab small{font-size:9.5px;font-weight:700;opacity:.8}
+.b-tab.on{color:#fff;border-color:var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 30%,transparent),rgba(255,255,255,.03));box-shadow:0 0 16px color-mix(in srgb,var(--c) 45%,transparent)}
+.b-tab.can::after{content:"";position:absolute;top:5px;right:7px;width:8px;height:8px;border-radius:50%;background:#ffd166;box-shadow:0 0 8px #ffd166}
+#treeGrid.path{display:block;padding:6px 10px 12px}
+.path-row{position:relative;display:flex;align-items:center;gap:14px;padding:6px 0 18px}
+.path-row::before{content:"";position:absolute;left:25px;top:-12px;width:3px;height:22px;background:rgba(255,255,255,.12);border-radius:3px}
+.path-row.first::before{display:none}
+.path-row.linked::before{background:var(--c);box-shadow:0 0 8px var(--c)}
+.path-row .node{flex:none}
+.path-txt{flex:1;min-width:0;text-align:left;cursor:pointer}
+.path-txt b{display:block;font-size:14.5px;font-weight:800;color:#fff}
+.path-txt small{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+.path-row.locked .path-txt b{color:var(--muted)}
+.path-row.sel .path-txt b{color:var(--c)}
+.path-tier{font-size:10px;font-weight:800;color:var(--muted);border:1px solid var(--stroke);border-radius:8px;padding:2px 6px;white-space:nowrap}
+.path-total{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin:2px 0 4px}
 /* ---------- новое меню: Lost Worlds ---------- */
 #menu{background:#0c1208}
 .menu-bg{position:absolute;inset:-4%;background:url("img/menu.jpg") center 36%/cover no-repeat;animation:kenburns 40s ease-in-out infinite alternate}
@@ -526,6 +547,7 @@ canvas{display:block}
     </div>
     <button class="reset" id="btnResetSkills">↺ Сброс</button>
   </div>
+  <div class="b-tabs" id="bTabs"></div>
   <div class="tree-scroll"><div class="tree" id="treeGrid"></div></div>
   <div class="sheet" id="sheet"></div>
 </section>
@@ -694,38 +716,64 @@ profile.skills = profile.skills || {};
 const saveProfile = () => store.set(pk('ss_profile'), profile);
 const sk = id => profile.skills[id] || 0;
 const spentPts = () => Object.values(profile.skills).reduce((a, b) => a + b, 0);
-const pointsLeft = () => Math.max(0, levelInfo(profile.xp).level - spentPts());
+const pointsLeft = () => Math.max(0, levelInfo(profile.xp).level + 2 * sk('ancient') - spentPts());
 const DIFF_XP = {easy:.75, normal:1, hard:1.25, insane:1.5};
 
 const ACTIVES = {
   slowmo:{icon:'⏳', name:'Время', power:'slow',  dur:4000, cd:30000, key:'Q'},
-  phase: {icon:'👻', name:'Фаза',  power:'ghost', dur:2500, cd:25000, key:'E'}
+  phase: {icon:'👻', name:'Фаза',  power:'ghost', dur:2500, cd:25000, key:'E'},
+  summon:{icon:'🍎', name:'Призыв', power:null,    dur:0,    cd:20000, key:'R'}
 };
 const cdMult = (m = sk('mastery')) => 1 - 0.2 * m;
 const cdSec = id => Math.round(ACTIVES[id].cd * cdMult() / 1000);
 
-const TIER_LVL = [1, 2, 4, 6, 9];
+const TIER_LVL = [1, 2, 4, 6, 9, 12, 15, 19];
 const TREE = [
   {id:'glutton', name:'Обжора', icon:'🍎', color:'#ff8a4c', nodes:[
     {id:'juicy',    icon:'🍎', name:'Сочные яблоки', max:3, desc:'Каждое яблоко приносит больше очков.', eff:r => `+${15*r}% очков за яблоко`},
     {id:'memory',   icon:'🧠', name:'Цепкая память', max:3, desc:'Больше времени, чтобы не сорвать комбо.', eff:r => `окно комбо +${fmt((0.6*r).toFixed(1))} с`},
     {id:'gamble',   icon:'🎲', name:'Азарт', max:2, desc:'Комбо разгоняется до большего множителя.', eff:r => `комбо до ×${5+r}`},
     {id:'goldrush', icon:'⭐', name:'Золотая лихорадка', max:2, desc:'Звёзды появляются чаще и стоят дороже.', eff:r => `⭐ в ${fmt(1+0.5*r)} раза чаще, ${50+25*r} очков`},
-    {id:'feast',    icon:'🍗', name:'Пир', max:1, ult:true, desc:'Каждое 10-е яблоко за игру превращается в пиршество.', eff:() => 'каждое 10-е яблоко даёт ×5 очков'}
+    {id:'feast',    icon:'🍗', name:'Пир', max:1, ult:true, desc:'Каждое 10-е яблоко за игру превращается в пиршество.', eff:() => 'каждое 10-е яблоко даёт ×5 очков'},
+    {id:'bigbite',  icon:'🍏', name:'Сытный укус', max:3, desc:'Иногда яблоко оказывается особенно сытным и засчитывается дважды.', eff:r => `${8*r}% шанс на ×2 очков`},
+    {id:'combokeep',icon:'🔗', name:'Непрерывность', max:2, desc:'Если опоздал к яблоку, комбо не сгорает полностью.', eff:r => `сохраняется ${25*r}% комбо`},
+    {id:'midas',    icon:'👑', name:'Царь Мидас', max:1, ult:true, desc:'Когда комбо доходит до предела, на поле появляется золотая звезда.', eff:() => 'максимальное комбо → ⭐'}
   ]},
   {id:'survival', name:'Выживание', icon:'🛡️', color:'#34d399', nodes:[
     {id:'calm',      icon:'🍃', name:'Хладнокровие', max:3, desc:'Змейка движется чуть спокойнее — легче успеть среагировать.', eff:r => `скорость −${5*r}%`},
     {id:'longfx',    icon:'⏱️', name:'Долгие эффекты', max:3, desc:'Бонусы с поля (❄️ 👻 💎) действуют дольше.', eff:r => `+${20*r}% к длительности`},
     {id:'lives',     icon:'❤️', name:'Вторая жизнь', max:2, desc:'Удар отнимает жизнь, а не всю игру. После удара — 2 секунды неуязвимости.', eff:r => `+${r} ${plural(r,'жизнь','жизни','жизней')} в каждой игре`},
     {id:'autophagy', icon:'🐍', name:'Самоед', max:1, desc:'Укус собственного хвоста больше не убивает — хвост просто откусывается.', eff:() => 'хвост откусывается вместо проигрыша'},
-    {id:'regen',     icon:'💖', name:'Регенерация', max:1, ult:true, desc:'Каждая третья волна восстанавливает одну жизнь.', eff:() => '+1 ❤️ каждые 3 волны'}
+    {id:'regen',     icon:'💖', name:'Регенерация', max:1, ult:true, desc:'Каждая третья волна восстанавливает одну жизнь.', eff:() => '+1 ❤️ каждые 3 волны'},
+    {id:'shield',    icon:'🛡️', name:'Чешуйчатый щит', max:2, desc:'Съев несколько яблок подряд, змейка покрывается щитом, который выдержит один удар.', eff:r => `щит за каждые ${[0,12,8][r]} яблок`},
+    {id:'secondwind',icon:'🌬️', name:'Второе дыхание', max:2, desc:'После потери жизни дольше неуязвима, а время ненадолго замедляется.', eff:r => `+${r} с неуязвимости и ${2*r} с замедления`},
+    {id:'phoenix',   icon:'🔥', name:'Феникс', max:1, ult:true, desc:'Один раз за игру змейка восстаёт из пепла вместо проигрыша.', eff:() => '1 воскрешение за игру'}
   ]},
   {id:'magic', name:'Магия', icon:'✨', color:'#a78bfa', nodes:[
     {id:'slowmo',  icon:'⏳', name:'Замедление', max:1, active:true, desc:'Кнопка во время игры: на 4 секунды время замедляется.', eff:() => `4 с замедления, перезарядка ${cdSec('slowmo')} с`},
     {id:'luck',    icon:'🍀', name:'Удача', max:3, desc:'Бонусы появляются на поле чаще.', eff:r => `+${20*r}% к шансу бонусов`},
     {id:'magnet',  icon:'🧲', name:'Магнит', max:2, desc:'Яблоки поблизости сами прилетают к голове.', eff:r => `радиус ${r} ${plural(r,'клетка','клетки','клеток')}`},
     {id:'phase',   icon:'👻', name:'Фазовый рывок', max:1, active:true, desc:'Кнопка во время игры: 2,5 секунды проходишь сквозь стены, хвост и преграды.', eff:() => `2,5 с неуязвимости, перезарядка ${cdSec('phase')} с`},
-    {id:'mastery', icon:'💫', name:'Мастер магии', max:2, ult:true, desc:'Способности ⏳ и 👻 перезаряжаются быстрее.', eff:r => `перезарядка −${20*r}%`}
+    {id:'mastery', icon:'💫', name:'Мастер магии', max:2, ult:true, desc:'Все способности-кнопки перезаряжаются быстрее.', eff:r => `перезарядка −${20*r}%`},
+    {id:'arcane',  icon:'🔮', name:'Чародейство', max:2, desc:'Способности ⏳ и 👻 действуют дольше.', eff:r => `+${25*r}% к длительности`},
+    {id:'echo',    icon:'🌀', name:'Эхо заклинаний', max:1, desc:'Каждое применение способности вызывает на поле случайный бонус.', eff:() => 'способность → бонус на поле'},
+    {id:'summon',  icon:'🍎', name:'Призыв яблока', max:1, active:true, ult:true, desc:'Кнопка во время игры: яблоко переносится прямо перед носом змейки.', eff:() => `перезарядка ${cdSec('summon')} с`}
+  ]},
+  {id:'wander', name:'Странник', icon:'🧭', color:'#38bdf8', nodes:[
+    {id:'scholar',   icon:'📜', name:'Учёный', max:3, desc:'За каждую игру змейка получает больше опыта.', eff:r => `+${10*r}% опыта`},
+    {id:'sandwalker',icon:'🏜️', name:'Песчаный ходок', max:2, desc:'Пустыня: зыбучие пески дольше предупреждают о себе и появляются реже.', eff:r => `+${fmt((0.8*r).toFixed(1))} с на реакцию, воронок −${20*r}%`},
+    {id:'stonemason',icon:'🗿', name:'Каменщик', max:2, desc:'Лабиринт: преград в начале меньше, и новые растут не каждую волну.', eff:r => `−${r} ${plural(r,'преграда','преграды','преград')} в начале, ${30*r}% волн без новых`},
+    {id:'bounce',    icon:'↩️', name:'Рикошет', max:1, desc:'Удар о стену не убивает — змейка отскакивает в сторону. Не чаще раза в 10 секунд.', eff:() => 'отскок от стены раз в 10 с'},
+    {id:'explorer',  icon:'🗺️', name:'Первооткрыватель', max:2, desc:'Каждая пройденная волна приносит дополнительный опыт.', eff:r => `+${20*r} XP за волну`},
+    {id:'supply',    icon:'🎒', name:'Походный рюкзак', max:2, desc:'В начале каждой игры змейка получает бонус «Очки ×2».', eff:r => `💎 ×2 очков первые ${5*r} с`},
+    {id:'ancient',   icon:'🏛️', name:'Древнее знание', max:1, ult:true, desc:'Мудрость затерянных миров: дарит 2 очка навыков (одно сразу окупается).', eff:() => '+2 🧬 очка навыков'}
+  ]},
+  {id:'predator', name:'Хищник', icon:'🐉', color:'#f43f5e', nodes:[
+    {id:'hunter', icon:'🏹', name:'Охотничий азарт', max:3, desc:'Чем дальше волна, тем дороже каждое яблоко.', eff:r => `+${3*r}% очков за каждую волну`},
+    {id:'swift',  icon:'⚡', name:'Стремительность', max:3, desc:'Риск ради награды: змейка быстрее, но и очков больше.', eff:r => `скорость +${4*r}%, очки +${12*r}%`},
+    {id:'coil',   icon:'➰', name:'Кольца удава', max:2, desc:'Чем длиннее змейка (от 10 клеток), тем больше очков за яблоко.', eff:r => `+${r}% очков за клетку длины (до +50%)`},
+    {id:'venom',  icon:'☠️', name:'Яд', max:1, desc:'Бонусы на поле живут дольше и не успевают исчезнуть.', eff:() => 'бонусы держатся в 1,5 раза дольше'},
+    {id:'apex',   icon:'🐉', name:'Высший хищник', max:1, ult:true, desc:'Комбо ×5 впадает в ярость: 3 секунды двойных очков.', eff:() => 'комбо ×5 → ярость ×2 очков'}
   ]}
 ];
 const NODE = {};
@@ -1012,6 +1060,7 @@ function newGame(){
     snake:[{x:9,y:10},{x:8,y:10},{x:7,y:10}],
     dir:{x:1,y:0}, queue:[], grow:0,
     food:null, special:null, obstacles:new Map(), sands:[], sandT:4000, won:false,
+    shield:0, shieldProg:0, phoenix:false, bounceCd:0, bonusXp:0,
     score:0, eaten:0, level:1, combo:0, maxCombo:0, lastEat:-1e9,
     powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
     state:'ready', acc:0, clock:0, anim:0,
@@ -1019,7 +1068,7 @@ function newGame(){
     headAng:0, overShown:false, wave:0, gulps:[], tongue:0, tongueT:800
   };
   G.from = G.snake.map(s => ({...s}));
-  if (mode === 'maze') for (let i = 0; i < 3; i++) addCluster();
+  if (mode === 'maze') for (let i = 0; i < Math.max(1, 3 - sk('stonemason')); i++) addCluster();
   placeFood();
   $('board').className = 'board ' + mode;
   $('hint').style.display = '';
@@ -1051,14 +1100,15 @@ function freeCell(minDist = 2){
 }
 function placeFood(){ const c = freeCell(3); G.food = c ? {...c, born:G.anim} : null; }
 
-function spawnSpecial(){
+function spawnSpecial(forceId){
+  if (forceId){ const c = freeCell(4); if (c) G.special = {...c, type:SPECIALS.find(s => s.id === forceId), life:SPECIAL_LIFE * (1 + .5 * sk('venom')), born:G.anim}; return; }
   const pool = SPECIALS.filter(s => s.id !== 'shrink' || G.snake.length > 9)
     .map(s => ({s, w: s.id === 'gold' ? s.w * (1 + 0.5 * sk('goldrush')) : s.w}));
   const total = pool.reduce((a, p) => a + p.w, 0);
   let r = Math.random() * total, pick = pool[0].s;
   for (const p of pool){ if ((r -= p.w) < 0){ pick = p.s; break; } }
   const c = freeCell(4); if (!c) return;
-  G.special = {...c, type:pick, life:SPECIAL_LIFE, born:G.anim};
+  G.special = {...c, type:pick, life:SPECIAL_LIFE * (1 + .5 * sk('venom')), born:G.anim};
 }
 
 function addCluster(){
@@ -1087,6 +1137,7 @@ function stepMs(){
   const base = {easy:150, normal:115, hard:85, insane:62}[settings.diff] || 115;
   let ms = Math.max(base * 0.55, base - (G.snake.length - 3) * 1.2 - (G.level - 1) * 3);
   ms /= (1 - 0.05 * sk('calm'));
+  ms /= (1 + 0.04 * sk('swift'));
   if (G.powers.slow) ms *= 1.6;
   return ms;
 }
@@ -1110,6 +1161,15 @@ function step(){
   let nx = h.x + G.dir.x, ny = h.y + G.dir.y;
   if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS){
     if (mode === 'portal' || ghost){ nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+    else if (sk('bounce') && G.bounceCd <= 0){
+      // рикошет: разворачиваемся вдоль стены туда, где свободно
+      const opts = [{x:G.dir.y, y:-G.dir.x}, {x:-G.dir.y, y:G.dir.x}].sort(() => Math.random() - .5)
+        .filter(d => { const x = h.x + d.x, y = h.y + d.y; return x >= 0 && y >= 0 && x < COLS && y < ROWS && !G.snake.some(q => q.x === x && q.y === y) && !G.obstacles.has(key(x, y)); });
+      if (!opts.length) return crash();
+      G.dir = opts[0]; G.queue = []; nx = h.x + G.dir.x; ny = h.y + G.dir.y;
+      G.bounceCd = 10000; G.shake = 5;
+      floatText(h.x, h.y, '↩️ Рикошет!', '#7dd3fc', .9); SFX.bonus(); buzz(15);
+    }
     else return crash();
   }
   const eatsFood = G.food && nx === G.food.x && ny === G.food.y;
@@ -1152,7 +1212,7 @@ function sandsUpdate(dt){
   for (const q of G.sands) q.t += dt;
   G.sands = G.sands.filter(q => q.t < q.warn + q.life + 600);
   if ((G.sandT -= dt) > 0) return;
-  G.sandT = Math.max(1400, 5200 - G.level * 380) * (.7 + Math.random() * .6);
+  G.sandT = Math.max(1400, 5200 - G.level * 380) * (.7 + Math.random() * .6) * (1 + .2 * sk('sandwalker'));
   const alive = G.sands.filter(q => q.t < q.warn + q.life).length;
   if (alive >= Math.min(2 + G.level, 11)) return;
   const h = G.snake[0];
@@ -1162,11 +1222,12 @@ function sandsUpdate(dt){
     const dx = Math.min(Math.abs(x - h.x), COLS - Math.abs(x - h.x)), dy = Math.min(Math.abs(y - h.y), ROWS - Math.abs(y - h.y));
     if (dx + dy < 5 || !isFree(x, y)) continue;
     const life = 6500 + Math.random() * 4000 + G.level * 250;
-    G.sands.push({x, y, t:0, warn:1800, life, spin:Math.random() < .5 ? 1 : -1});
+    const warn = 1800 + 800 * sk('sandwalker');
+    G.sands.push({x, y, t:0, warn, life, spin:Math.random() < .5 ? 1 : -1});
     // иногда — двойная воронка
     if (G.level >= 3 && Math.random() < .35){
       const [ax, ay] = [[1,0],[0,1],[-1,0],[0,-1]][rnd(4)], x2 = (x + ax + COLS) % COLS, y2 = (y + ay + ROWS) % ROWS;
-      if (isFree(x2, y2)) G.sands.push({x:x2, y:y2, t:0, warn:1800, life, spin:-G.sands[G.sands.length - 1].spin});
+      if (isFree(x2, y2)) G.sands.push({x:x2, y:y2, t:0, warn, life, spin:-G.sands[G.sands.length - 1].spin});
     }
     tone(140, .5, 'sine', .04, 70);
     return;
@@ -1220,13 +1281,29 @@ function winOasis(){
 }
 
 function crash(){
+  if (G.shield){
+    G.shield = 0; setPower('ghost', 1500); G.shake = 6; G.flash = .3;
+    floatText(G.snake[0].x, G.snake[0].y, '🛡️ Щит!', '#7dd3fc', 1.1);
+    SFX.hurt(); buzz([30, 20]); updateHud(true);
+    return;
+  }
   if (G.lives > 0){
     G.lives--;
-    setPower('ghost', 2200);
+    setPower('ghost', 2200 + 1000 * sk('secondwind'));
+    if (sk('secondwind')) setPower('slow', 2000 * sk('secondwind'));
     G.combo = 0; G.shake = 10; G.flash = .5;
     floatText(G.snake[0].x, G.snake[0].y, '−❤️', '#ff5a7a', 1.2);
     SFX.hurt(); buzz([40, 30, 40]);
     const l = $('lives'); l.classList.remove('hit'); void l.offsetWidth; l.classList.add('hit');
+    updateHud(true);
+    return;
+  }
+  if (sk('phoenix') && !G.phoenix){
+    G.phoenix = true;
+    setPower('ghost', 3000); setPower('slow', 2000);
+    G.combo = 0; G.shake = 12; G.flash = .7;
+    G.snake.forEach((q, i) => i % 2 || burst(q.x, q.y, ['#ff7a45', '#ffd166', '#ff3d7f'], 6));
+    banner('🔥 ФЕНИКС!'); SFX.level(); buzz([40, 30, 80]);
     updateHud(true);
     return;
   }
@@ -1235,12 +1312,18 @@ function crash(){
 
 function eatFood(x, y){
   const quick = G.clock - G.lastEat < comboWindow();
-  G.combo = quick ? Math.min(G.combo + 1, 4 + sk('gamble')) : 0;
+  const cap = 4 + sk('gamble');
+  G.combo = quick ? Math.min(G.combo + 1, cap) : Math.floor(G.combo * .25 * sk('combokeep'));
   G.maxCombo = Math.max(G.maxCombo, G.combo);
   G.lastEat = G.clock;
   G.eaten++;
   G.gulps.push({p:.2});
-  let pts = Math.round(10 * (1 + G.combo) * (1 + 0.15 * sk('juicy')));
+  let pts = 10 * (1 + G.combo) * (1 + 0.15 * sk('juicy'));
+  pts *= (1 + 0.03 * sk('hunter') * (G.level - 1)) * (1 + 0.12 * sk('swift'));
+  pts *= 1 + Math.min(.5, .01 * sk('coil') * Math.max(0, G.snake.length - 10));
+  const big = Math.random() < .08 * sk('bigbite');
+  if (big) pts *= 2;
+  pts = Math.round(pts);
   if (G.powers.double) pts *= 2;
   const feast = sk('feast') && G.eaten % 10 === 0;
   if (feast){ pts *= 5; banner('🍗 ПИР! ×5'); G.flash = .4; }
@@ -1248,6 +1331,12 @@ function eatFood(x, y){
   burst(x, y, feast ? ['#ffd166', '#fff', '#ff7a45'] : ['#ff5a5a', '#ffb347', '#ffd166', '#ff3d7f'], feast ? 40 : 18);
   floatText(x, y, '+' + pts, G.combo || feast ? '#ffd166' : '#fff', feast ? 1.3 : 1);
   if (G.combo >= 1) floatText(x, y - 0.9, 'КОМБО ×' + (1 + G.combo) + '!', '#ff7ab6', 0.8);
+  if (big) floatText(x + .8, y - .4, '🍏 ×2', '#bef264', .8);
+  if (quick && sk('apex') && G.combo === 4){ setPower('double', 3000); banner('🐉 ЯРОСТЬ!'); G.flash = .3; }
+  if (quick && sk('midas') && G.combo === cap && !G.special) spawnSpecial('gold');
+  if (sk('shield') && !G.shield && ++G.shieldProg >= [0, 12, 8][sk('shield')]){
+    G.shield = 1; G.shieldProg = 0; floatText(x, y - 1.4, '🛡️ Щит!', '#7dd3fc', 1);
+  }
   SFX.eat(G.combo); buzz(12);
   if (G.eaten % APPLES_PER_LEVEL === 0) levelUp();
   placeFood();
@@ -1279,7 +1368,8 @@ function levelUp(){
   if (mode === 'portal' && G.level >= OASIS_WAVE) return winOasis();
   banner(mode === 'portal' ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
   SFX.level();
-  if (mode === 'maze' && G.obstacles.size < 70) addCluster();
+  if (mode === 'maze' && G.obstacles.size < 70 && Math.random() >= .3 * sk('stonemason')) addCluster();
+  G.bonusXp += 20 * sk('explorer');
   if (sk('regen') && G.level % 3 === 0){
     G.lives++;
     floatText(G.snake[0].x, G.snake[0].y - 1, '+❤️', '#ff7ab6', 1.2);
@@ -1289,13 +1379,30 @@ function levelUp(){
 function useAbility(id){
   if (!G || G.state !== 'play' || !sk(id) || (G.cd[id] || 0) > 0){ if (G && G.state === 'play') SFX.deny(); return; }
   const a = ACTIVES[id];
-  setPower(a.power, a.dur);
+  if (a.power) setPower(a.power, a.dur * (1 + .25 * sk('arcane')));
+  if (id === 'summon') summonApple();
   G.cd[id] = G.cdMax[id] = a.cd * cdMult();
+  if (sk('echo') && !G.special) spawnSpecial();
   const h = G.snake[0];
   burst(h.x, h.y, ['#a78bfa', '#f0abfc', '#fff'], 30);
   floatText(h.x, h.y - .6, a.icon + ' ' + a.name, '#d8b4fe', 1);
   G.flash = .3; SFX.magic(); buzz(25);
   updateHud(true);
+}
+
+function summonApple(){
+  const h = G.snake[0];
+  for (let d = 2; d <= 5; d++){
+    let x = h.x + G.dir.x * d, y = h.y + G.dir.y * d;
+    if (mode === 'portal'){ x = (x + COLS) % COLS; y = (y + ROWS) % ROWS; }
+    if (x < 0 || y < 0 || x >= COLS || y >= ROWS) break;
+    if (G.food && G.food.x === x && G.food.y === y) return;
+    if (isFree(x, y)){
+      if (G.food) burst(G.food.x, G.food.y, ['#ff5a5a', '#fff'], 10);
+      G.food = {x, y, born:G.anim}; burst(x, y, ['#ff5a5a', '#ffd166', '#fff'], 16);
+      return;
+    }
+  }
 }
 
 function die(win = false){
@@ -1316,7 +1423,7 @@ function die(win = false){
     store.set('ss_records', recs.slice(0, 30));
   }
   // опыт
-  const gain = Math.round(G.score * (DIFF_XP[settings.diff] || 1));
+  const gain = Math.round(G.score * (DIFF_XP[settings.diff] || 1) * (1 + .1 * sk('scholar')) + G.bonusXp);
   const before = levelInfo(profile.xp);
   profile.xp += gain; saveProfile();
   G.xp = {gain, before, after:levelInfo(profile.xp)};
@@ -1413,7 +1520,7 @@ function updateHud(force){
       const sp = SPECIALS.find(s => s.id === id);
       return `<div class="pw" style="color:${sp.color}">${sp.emoji}<i><u style="width:${Math.max(0, G.powers[id] / (G.powerMax[id] || 1) * 100)}%"></u></i></div>`;
     }).join('');
-    $('lives').textContent = G.lives > 3 ? '❤️×' + G.lives : '❤️'.repeat(G.lives);
+    $('lives').textContent = (G.lives > 3 ? '❤️×' + G.lives : '❤️'.repeat(G.lives)) + (G.shield ? '🛡️' : '');
   }
 }
 
@@ -2018,6 +2125,7 @@ function frame(now){
     if (G.state === 'play'){
       G.clock += dt;
       for (const k in G.powers){ G.powers[k] -= dt; if (G.powers[k] <= 0) delete G.powers[k]; }
+      if (G.bounceCd > 0) G.bounceCd -= dt;
       for (const k in G.cd){ if (G.cd[k] > 0) G.cd[k] = Math.max(0, G.cd[k] - dt); }
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
       if (mode === 'portal') sandsUpdate(dt);
@@ -2298,6 +2406,7 @@ function startGame(){
   applyScene();
   resize();
   newGame();
+  if (sk('supply')) setPower('double', 5000 * sk('supply'));
   requestAnimationFrame(resize);
   showTitle();
 }
@@ -2347,7 +2456,7 @@ document.addEventListener('keydown', e => {
   const map = {ArrowUp:'u', w:'u', W:'u', 'ц':'u', ArrowDown:'d', s:'d', S:'d', 'ы':'d',
                ArrowLeft:'l', a:'l', A:'l', 'ф':'l', ArrowRight:'r', d:'r', D:'r', 'в':'r'};
   if (map[e.key] && G){ e.preventDefault(); queueDir(DIRS[map[e.key]]); return; }
-  const ab = {q:'slowmo', Q:'slowmo', 'й':'slowmo', '1':'slowmo', e:'phase', E:'phase', 'у':'phase', '2':'phase'}[e.key];
+  const ab = {q:'slowmo', Q:'slowmo', 'й':'slowmo', '1':'slowmo', e:'phase', E:'phase', 'у':'phase', '2':'phase', r:'summon', R:'summon', 'к':'summon', '3':'summon'}[e.key];
   if (ab && G){ e.preventDefault(); useAbility(ab); return; }
   if (e.key === ' ' || e.key === 'Escape' || e.key === 'p' || e.key === 'з'){
     e.preventDefault();
@@ -2401,19 +2510,26 @@ function renderTree(){
   $('tXpFill').style.width = (info.cur / info.need * 100) + '%';
   $('ptsPill').innerHTML = `🧬 <b>${pts}</b> ${plural(pts,'очко','очка','очков')}`;
   $('ptsPill').classList.toggle('glow', pts > 0);
-  $('treeGrid').innerHTML = TREE.map(b =>
-    `<div class="branch" style="--c:${b.color}"><div class="b-head">${b.icon} ${b.name}</div>` +
-    b.nodes.map((n, t) => {
-      const st = nodeStatus(n.id), r = sk(n.id), linked = t === 0 || sk(b.nodes[t-1].id) > 0;
-      const cls = ['node', r > 0 ? 'has' : '', st.max ? 'max' : '', st.ok ? 'can' : '', st.locked ? 'locked' : '',
-        selNode === n.id ? 'sel' : '', n.active ? 'act' : '', n.ult ? 'ult' : ''].join(' ');
-      return `<div class="tn ${t ? '' : 'first'} ${linked ? 'linked' : ''}">
-        <button class="${cls}" data-id="${n.id}"><span class="ico">${n.icon}</span>
-        ${n.max > 1 || r ? `<span class="rank">${r}/${n.max}</span>` : ''}
-        ${st.lvlLock ? `<span class="lk">ур.${st.lvlLock}</span>` : ''}</button>
-        <div class="nname">${n.name}</div></div>`;
-    }).join('') + '</div>'
-  ).join('');
+  const curB = NODE[selNode].b;
+  $('bTabs').innerHTML = TREE.map(b => {
+    const learned = b.nodes.reduce((a, n) => a + sk(n.id), 0), total = b.nodes.reduce((a, n) => a + n.max, 0);
+    const can = pts > 0 && b.nodes.some(n => nodeStatus(n.id).ok);
+    return `<button class="b-tab ${b === curB ? 'on' : ''} ${can ? 'can' : ''}" data-b="${b.id}" style="--c:${b.color}"><i>${b.icon}</i>${b.name}<small>${learned}/${total}</small></button>`;
+  }).join('');
+  const allL = TREE.reduce((a, b) => a + b.nodes.reduce((c, n) => c + sk(n.id), 0), 0), allT = TREE.reduce((a, b) => a + b.nodes.reduce((c, n) => c + n.max, 0), 0);
+  $('treeGrid').className = 'tree path';
+  $('treeGrid').style.setProperty('--c', curB.color);
+  $('treeGrid').innerHTML = `<div class="path-total">${curB.icon} ${curB.name} · всего изучено ${allL} из ${allT}</div>` + curB.nodes.map((n, t) => {
+    const st = nodeStatus(n.id), r = sk(n.id), linked = t === 0 || sk(curB.nodes[t-1].id) > 0;
+    const cls = ['node', r > 0 ? 'has' : '', st.max ? 'max' : '', st.ok ? 'can' : '', st.locked ? 'locked' : '',
+      selNode === n.id ? 'sel' : '', n.active ? 'act' : '', n.ult ? 'ult' : ''].join(' ');
+    const line = st.lvlLock ? `🔒 уровень змейки ${st.lvlLock}` : r ? n.eff(r) : n.eff(1);
+    return `<div class="path-row ${t ? '' : 'first'} ${linked ? 'linked' : ''} ${st.locked ? 'locked' : ''} ${selNode === n.id ? 'sel' : ''}">
+      <button class="${cls}" data-id="${n.id}"><span class="ico">${n.icon}</span>
+      ${n.max > 1 || r ? `<span class="rank">${r}/${n.max}</span>` : ''}</button>
+      <div class="path-txt" data-id="${n.id}"><b>${n.name}</b><small>${line}</small></div>
+      <span class="path-tier">ур. ${TIER_LVL[t]}</span></div>`;
+  }).join('');
   renderSheet();
 }
 function renderSheet(){
@@ -2433,8 +2549,14 @@ function renderSheet(){
     <div class="s-eff">${eff}</div>
     ${btn}`;
 }
+$('bTabs').addEventListener('click', e => {
+  const b = e.target.closest('.b-tab'); if (!b) return;
+  const br = TREE.find(x => x.id === b.dataset.b);
+  selNode = (br.nodes.find(n => nodeStatus(n.id).ok) || br.nodes.find(n => sk(n.id) < n.max) || br.nodes[0]).id;
+  SFX.click(); renderTree(); $('treeGrid').parentElement.scrollTop = 0;
+});
 $('treeGrid').addEventListener('click', e => {
-  const nd = e.target.closest('.node'); if (!nd) return;
+  const nd = e.target.closest('[data-id]'); if (!nd) return;
   selNode = nd.dataset.id; SFX.click(); renderTree();
 });
 $('sheet').addEventListener('click', e => {

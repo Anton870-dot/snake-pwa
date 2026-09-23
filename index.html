@@ -135,7 +135,7 @@ button:disabled{cursor:default}
   -webkit-mask-image:linear-gradient(#000 72%,transparent);mask-image:linear-gradient(#000 72%,transparent)}
 #game.scenic .scene{display:block;animation:fade .8s}
 #game.scenic .stage{align-items:flex-end}
-.scene-img{position:absolute;inset:-5%;background-size:cover;background-position:center 62%;animation:kenburns 38s ease-in-out infinite alternate}
+.scene-img{position:absolute;inset:-5%;background-size:cover;background-repeat:no-repeat;background-position:center 62%;animation:kenburns 38s ease-in-out infinite alternate}
 @keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1.6%,1.2%)}}
 .scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,3,18,.55) 0%,rgba(8,3,18,0) 26%,rgba(8,3,18,0) 70%,rgba(13,6,25,.35) 100%)}
 .petal{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.7);border-radius:70% 0 70% 0;opacity:.9;
@@ -1816,7 +1816,7 @@ requestAnimationFrame(frame);
 const LOCATIONS = {
   meadow:{kanji:'草原', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg'},
   dunes: {kanji:'砂漠', name:'Ночная пустыня', sub:'ПОРТАЛ',   img:'img/dunes.jpg'},
-  ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg'}
+  ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg', aspect:1.5, sky:'rgb(7,119,225)'}
 };
 const sceneState = {};   // biome -> 'ok' | 'fail' | 'loading'
 function applyScene(){
@@ -1842,7 +1842,13 @@ function applyScene(){
 function layoutScene(){
   const g = $('game').getBoundingClientRect(), b = $('board').getBoundingClientRect();
   const top = b.top - g.top;
-  $('scene').style.height = Math.max(120, top + size * .08) + 'px';
+  const sh = Math.max(120, top + size * .08);
+  $('scene').style.height = sh + 'px';
+  // широкая картинка: показываем почти всю ширину, а сверху продолжаем небо её цветом
+  const loc = LOCATIONS[BIOME[mode]] || {}, si = $('sceneImg'), W = g.width * 1.1, H = sh * 1.1, asp = loc.aspect || 1.5;
+  if (H * asp > W * 1.3){ si.style.backgroundSize = (W * 1.3) + 'px auto'; si.style.backgroundPosition = 'center bottom'; }
+  else { si.style.backgroundSize = 'cover'; si.style.backgroundPosition = 'center 62%'; }
+  si.style.backgroundColor = loc.sky || 'transparent';
   $('titleCard').style.top = Math.max(150, top * .56) + 'px';
 }
 let titleTimer = null;

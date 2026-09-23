@@ -402,6 +402,11 @@ canvas{display:block}
     </div>
     <div class="toggle-row">🔊 Звук<button class="switch" data-key="sound"></button></div>
     <div class="toggle-row">📳 Вибрация<button class="switch" data-key="vibro"></button></div>
+    <div class="toggle-row">🎵 Музыка<button class="switch" data-key="music"></button></div>
+    <div class="set-row" style="margin-bottom:10px">
+      <div class="seg" data-key="mvol"><button data-val="low">Тихо</button><button data-val="mid">Средне</button><button data-val="high">Громко</button></div>
+      <small id="musicSrc" style="color:var(--muted);font-size:11.5px">…</small>
+    </div>
     <div class="toggle-row">🎮 Кнопки на экране<button class="switch" data-key="dpad"></button></div>
     <button class="btn primary" id="btnCloseSettings">Готово</button>
   </div>
@@ -449,7 +454,7 @@ function plural(n, one, few, many){
 const fmt = n => String(n).replace('.', ',');
 
 /* ===================== SETTINGS & STORAGE ===================== */
-const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false}, store.get('ss_settings', {}));
+const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false, music:true, mvol:'mid'}, store.get('ss_settings', {}));
 const saveSettings = () => store.set('ss_settings', settings);
 let mode = store.get('ss_mode', 'classic');
 
@@ -548,12 +553,12 @@ const skinOf = () => SKINS[settings.skin] || SKINS.sunset;
 
 /* ===================== SOUND & VIBRATION ===================== */
 let ac = null;
-function audio(){
-  if (!settings.sound) return null;
+function getCtx(){
   if (!ac){ try{ ac = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; } }
-  if (ac.state === 'suspended') ac.resume();
+  if (ac.state === 'suspended' && !document.hidden) ac.resume();
   return ac;
 }
+function audio(){ return settings.sound ? getCtx() : null; }
 function tone(freq, dur, type='sine', vol=.12, slideTo=null, delay=0){
   const a = audio(); if (!a) return;
   const t = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
@@ -576,6 +581,185 @@ const SFX = {
   click: () => tone(880, .05, 'sine', .05),
   start: () => tone(440, .12, 'triangle', .09, 880)
 };
+/* ===================== MUSIC ===================== */
+// Свои треки: положи в папку music/ файлы menu.mp3, meadow.mp3, dunes.mp3, ruins.mp3
+// (или один общий game.mp3 для всех уровней). Если файла нет — играет встроенная мелодия.
+const Music = (() => {
+  const VOL = {low:.2, mid:.4, high:.7};
+  const failed = new Set(), els = {};
+  let ctx = null, master = null, lp = null, cur = null, want = null, ducked = false, wave = 1, token = 0, noiseBuf = null;
+  let statusText = 'Музыка начнётся после первого касания';
+
+  const vol = () => settings.music ? (VOL[settings.mvol] || .4) : 0;
+  function ensure(){
+    ctx = getCtx(); if (!ctx) return false;
+    if (!master){
+      master = ctx.createGain(); master.gain.value = 0;
+      lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 18000;
+      const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+      master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
+      noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    return true;
+  }
+  function apply(){
+    if (!master) return;
+    const t = ctx.currentTime;
+    master.gain.cancelScheduledValues(t);
+    master.gain.setTargetAtTime(vol() * (ducked ? .35 : 1), t, .25);
+    lp.frequency.setTargetAtTime(ducked ? 700 : 18000, t, .2);
+  }
+  function setStatus(s){ statusText = s; const el = document.getElementById('musicSrc'); if (el) el.textContent = s; }
+
+  /* ---------- свой mp3 ---------- */
+  function tryFile(src){
+    if (failed.has(src)) return Promise.resolve(null);
+    return new Promise(res => {
+      let el = els[src];
+      if (el && el._ok) return res(el);
+      el = els[src] = new Audio(); el.loop = true; el.preload = 'auto';
+      const done = ok => { clearTimeout(to); el.oncanplay = el.onerror = null; if (!ok){ failed.add(src); delete els[src]; } else el._ok = true; res(ok ? el : null); };
+      const to = setTimeout(() => done(false), 6000);
+      el.oncanplay = () => done(true); el.onerror = () => done(false);
+      el.src = src; el.load();
+    });
+  }
+  function fileSource(kind, el, src){
+    if (!el._node){ el._node = ctx.createMediaElementSource(el); }
+    const g = ctx.createGain(); g.gain.value = 0;
+    el._node.disconnect(); el._node.connect(g); g.connect(master);
+    el.currentTime = 0; el.play().catch(() => {});
+    g.gain.setTargetAtTime(1, ctx.currentTime, .4);
+    setStatus('Играет твой трек: ' + src);
+    return {kind, stop(){ g.gain.setTargetAtTime(0, ctx.currentTime, .25); setTimeout(() => { el.pause(); g.disconnect(); }, 1200); }};
+  }
+
+  /* ---------- встроенный синтвейв ---------- */
+  const SONGS = {
+    menu:  {bpm:84,  drums:0, lead:'triangle', arp:'slow', bright:1500, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]}, // Am F C G
+    meadow:{bpm:112, drums:1, lead:'square',   arp:'fast', bright:2600, prog:[[48,52,55],[55,59,62],[57,60,64],[53,57,60]]}, // C G Am F
+    dunes: {bpm:104, drums:2, lead:'sawtooth', arp:'fast', bright:1900, prog:[[50,53,57],[46,50,53],[48,52,55],[45,49,52]]}, // Dm B♭ C A
+    ruins: {bpm:96,  drums:3, lead:'triangle', arp:'slow', bright:1300, prog:[[45,48,52],[40,43,47],[41,45,48],[40,44,47]]}  // Am Em F E
+  };
+  const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  function synthSource(kind){
+    const song = SONGS[kind] || SONGS.menu;
+    const out = ctx.createGain(); out.gain.value = 0; out.connect(master);
+    out.gain.setTargetAtTime(1, ctx.currentTime, .6);
+    // эхо для арпеджио
+    const dl = ctx.createDelay(1), fb = ctx.createGain(), wet = ctx.createGain();
+    fb.gain.value = .35; wet.gain.value = .28; dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(out);
+
+    function env(node, t, a, peak, d, dest = out){
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+      node.connect(g); g.connect(dest); return g;
+    }
+    function osc(type, f, t, len){ const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.start(t); o.stop(t + len + .05); return o; }
+    function filt(type, f, q = 1){ const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; return b; }
+    function noise(t, len){ const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.start(t, Math.random() * .5); s.stop(t + len + .05); return s; }
+
+    function pad(chord, t, len){
+      const f = filt('lowpass', song.bright * .55, .7);
+      env(f, t, .5, .055, len);
+      for (const m of chord) for (const det of [-7, 7]){ const o = osc('sawtooth', hz(m), t, len + .6); o.detune.value = det; o.connect(f); }
+    }
+    function bass(m, t, len, v = .2){ const f = filt('lowpass', 520, 2); env(f, t, .01, v, len); osc('sawtooth', hz(m), t, len).connect(f); }
+    function arp(m, t, v = .05){
+      const f = filt('lowpass', song.bright, 1.5), g = env(f, t, .005, v, .22);
+      g.connect(dl); osc(song.lead, hz(m), t, .25).connect(f);
+    }
+    function kick(t, v = .7){ const o = osc('sine', 150, t, .35); o.frequency.exponentialRampToValueAtTime(42, t + .12); env(o, t, .002, v, .3); }
+    function snare(t){ const n = noise(t, .2), f = filt('bandpass', 1800, .8); n.connect(f); env(f, t, .002, .22, .16); env(osc('triangle', 190, t, .1), t, .002, .08, .08); }
+    function hat(t, v = .06, len = .04){ const n = noise(t, len + .02), f = filt('highpass', 7500); n.connect(f); env(f, t, .002, v, len); }
+    function tom(t, f0, v = .4){ const o = osc('sine', f0, t, .4); o.frequency.exponentialRampToValueAtTime(f0 * .6, t + .25); env(o, t, .003, v, .32); }
+    function click(t, v = .12){ const n = noise(t, .05), f = filt('bandpass', 3200, 3); n.connect(f); env(f, t, .001, v, .05); }
+
+    let step = 0, next = ctx.currentTime + .08;
+    function schedule(st, t, spb){
+      const bar = (st >> 4) % 4, s = st % 16, chord = song.prog[bar], root = chord[0];
+      if (s === 0) pad(chord, t, spb * 16);
+      // бас
+      if (!song.drums){ if (s === 0 || s === 8) bass(root - 12, t, spb * 7, .16); }
+      else if (s % 2 === 0) bass(root - 12 + (s === 6 || s === 14 ? 12 : 0), t, spb * 1.6, s % 4 ? .13 : .2);
+      // арпеджио
+      const every = song.arp === 'fast' ? 1 : 2;
+      if (s % every === 0){
+        const i = s / every + bar * 3;
+        const m = chord[i % 3] + 12 + 12 * (Math.floor(i / 3) % 2);
+        arp(m, t, song.arp === 'fast' ? .045 : .06);
+      }
+      // мелодия-«крючок» в меню каждые 2 такта
+      if (!song.drums && bar % 2 === 1 && (s === 4 || s === 6 || s === 10)) arp(chord[(s / 2) % 3] + 24, t, .05);
+      // ударные
+      if (song.drums === 1){                      // луг: бодрый бит
+        if (s % 4 === 0) kick(t);
+        if (s === 4 || s === 12) snare(t);
+        if (s % 2 === 0) hat(t, s % 4 ? .07 : .04);
+        if (wave >= 4 && s % 2 === 1) hat(t, .035);
+      } else if (song.drums === 2){               // пустыня: «дум-тек»
+        if (s === 0 || s === 7 || s === 10) tom(t, 90, .5);
+        if (s === 4 || s === 12) click(t, .16);
+        if (s === 2 || s === 6 || s === 14) click(t, .08);
+        if (s % 4 === 0) kick(t, .35);
+        if (s % 2 === 1) hat(t, .03);
+      } else if (song.drums === 3){               // руины: ритуальные барабаны
+        if (s === 0 || s === 3 || s === 8) tom(t, 70, .55);
+        if (s === 6 || s === 11 || s === 14) tom(t, 120, .3);
+        if (s % 4 === 2) hat(t, .05, .12);
+      }
+    }
+    function tick(){
+      if (ctx.state !== 'running') return;
+      const bpm = song.bpm + (song.drums ? Math.min(20, (wave - 1) * 2) : 0), spb = 60 / bpm / 4;
+      if (next < ctx.currentTime - .05) next = ctx.currentTime + .05;
+      while (next < ctx.currentTime + .15){ schedule(step, next, spb); next += spb; step = (step + 1) % 64; }
+    }
+    const timer = setInterval(tick, 25); tick();
+    setStatus('Играет встроенная мелодия');
+    return {kind, stop(){ clearInterval(timer); out.gain.setTargetAtTime(0, ctx.currentTime, .25); setTimeout(() => out.disconnect(), 1500); }};
+  }
+
+  async function switchTo(kind){
+    const my = ++token;
+    if (cur){ cur.stop(); cur = null; }
+    if (!settings.music){ setStatus('Музыка выключена'); return; }
+    const list = ['music/' + kind + '.mp3']; if (kind !== 'menu') list.push('music/game.mp3');
+    for (const src of list){
+      const el = await tryFile(src);
+      if (my !== token) return;
+      if (el){ cur = fileSource(kind, el, src); apply(); return; }
+    }
+    if (my !== token) return;
+    cur = synthSource(kind); apply();
+  }
+
+  return {
+    play(kind){
+      want = kind; ducked = false;
+      if (!ensure() || ctx.state !== 'running'){ return; }
+      if (cur && cur.kind === kind){ apply(); return; }
+      switchTo(kind);
+    },
+    unlock(){
+      if (!ensure()) return;
+      if (ctx.state !== 'running') ctx.resume().then(() => { if (want && !cur) switchTo(want); });
+      else if (want && !cur && settings.music) switchTo(want);
+    },
+    duck(on){ ducked = on; apply(); },
+    setWave(w){ wave = w; },
+    refresh(){
+      if (!ensure()) return;
+      if (!settings.music){ if (cur){ cur.stop(); cur = null; } setStatus('Музыка выключена'); }
+      else if (!cur && want) switchTo(want);
+      apply();
+    },
+    status(){ return settings.music ? statusText : 'Музыка выключена'; }
+  };
+})();
+
 function buzz(p){ if (settings.vibro && navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
 
 /* ===================== SCREENS ===================== */
@@ -813,6 +997,7 @@ function eatSpecial(){
 
 function levelUp(){
   G.level++;
+  Music.setWave(G.level);
   banner('Волна ' + G.level);
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70) addCluster();
@@ -835,6 +1020,7 @@ function useAbility(id){
 }
 
 function die(){
+  Music.duck(true);
   G.state = 'dying'; G.deathT = 0; G.shake = 16; G.flash = 0.6;
   G.from = G.snake.map(s => ({...s}));
   G.snake.forEach((s, i) => burst(s.x, s.y, [HSL(skinOf().col(i / G.snake.length, G.anim))], i === 0 ? 30 : 4));
@@ -1581,21 +1767,22 @@ function startGame(){
   $('abilities').classList.toggle('on', acts.length > 0);
   abButtons = [...document.querySelectorAll('.ab')];
   overlay('ovOver', false); overlay('ovPause', false);
+  Music.play(BIOME[mode]); Music.setWave(1);
   resize();
   newGame();
   requestAnimationFrame(resize);
 }
 function pause(){
   if (!G || (G.state !== 'play' && G.state !== 'ready')) return;
-  G.prevState = G.state; G.state = 'paused'; overlay('ovPause', true);
+  G.prevState = G.state; G.state = 'paused'; overlay('ovPause', true); Music.duck(true);
 }
 function resume(){
   if (!G || G.state !== 'paused') return;
-  G.state = G.prevState || 'play'; overlay('ovPause', false);
+  G.state = G.prevState || 'play'; overlay('ovPause', false); Music.duck(false);
 }
 function toMenu(){
   G = null; overlay('ovPause', false); overlay('ovOver', false);
-  renderMenu(); show('menu');
+  renderMenu(); show('menu'); Music.play('menu');
 }
 function openTree(){
   G = null; overlay('ovPause', false); overlay('ovOver', false);
@@ -1603,7 +1790,7 @@ function openTree(){
   // выбрать первый доступный для изучения навык
   const firstCan = Object.keys(NODE).find(id => nodeStatus(id).ok);
   if (firstCan && p > 0) selNode = firstCan;
-  renderTree(); show('tree');
+  renderTree(); show('tree'); Music.play('menu');
   $('treeGrid').parentElement.scrollTop = 0;
 }
 
@@ -1616,7 +1803,12 @@ $('btnGoTree').onclick = () => { SFX.click(); openTree(); };
 $('btnToMenu1').onclick = $('btnToMenu2').onclick = () => { SFX.click(); toMenu(); };
 $('btnTree').onclick = $('btnPlayer').onclick = () => { SFX.click(); openTree(); };
 $('btnTreeBack').onclick = () => { SFX.click(); toMenu(); };
-document.addEventListener('visibilitychange', () => { if (document.hidden && G && G.state === 'play') pause(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && G && G.state === 'play') pause();
+  if (ac){ if (document.hidden) ac.suspend(); else ac.resume(); }
+});
+document.addEventListener('pointerdown', () => Music.unlock(), true);
+document.addEventListener('keydown', () => Music.unlock(), true);
 window.addEventListener('resize', () => { if (G) resize(); });
 
 /* ===================== CONTROLS ===================== */
@@ -1743,6 +1935,7 @@ function renderSettings(){
     seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', settings[seg.dataset.key] === b.dataset.val));
   });
   document.querySelectorAll('#ovSettings .switch').forEach(s => s.classList.toggle('on', !!settings[s.dataset.key]));
+  $('musicSrc').textContent = Music.status();
   $('skins').innerHTML = Object.entries(SKINS).map(([id, s]) => {
     const lock = L < s.lvl;
     return `<button class="skin ${settings.skin === id ? 'on' : ''} ${lock ? 'lock' : ''}" data-skin="${id}"><i style="background:linear-gradient(135deg,${HSL(s.col(0,0))},${HSL(s.col(.5,0))},${HSL(s.col(1,0))})"></i>${lock ? 'ур. ' + s.lvl : s.name}</button>`;
@@ -1758,7 +1951,7 @@ $('ovSettings').addEventListener('click', e => {
     settings.skin = sk2.dataset.skin;
   }
   else return;
-  saveSettings(); SFX.click(); renderSettings();
+  saveSettings(); SFX.click(); renderSettings(); Music.refresh();
 });
 $('btnSettings').onclick = () => { SFX.click(); renderSettings(); overlay('ovSettings', true); };
 $('btnCloseSettings').onclick = () => { SFX.click(); overlay('ovSettings', false); };
@@ -1779,6 +1972,7 @@ $('btnCloseRecords').onclick = () => { SFX.click(); overlay('ovRecords', false);
 
 /* ===================== INIT ===================== */
 renderMenu();
+Music.play('menu');
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

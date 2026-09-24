@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E9%81%BA%E8%B7%A1%E7%A0%82%E6%BC%A0%E8%8D%89%E5%8E%9F%E8%9B%87%E7%AB%A0&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Runic&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Ruslan+Display&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
@@ -84,11 +85,11 @@ button:disabled{cursor:default}
 .xp-row .hot{color:#ffd166}
 .xpbar{height:8px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
 .xpbar div{height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#ffd166,#ff7a45,#ff3d7f);transition:width 1s cubic-bezier(.2,.8,.2,1)}
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .mode{padding:11px 4px 9px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:background .2s,border-color .2s,box-shadow .2s}
 .mode i{font-style:normal;font-size:22px}
-.mode b{font-size:14px}
-.mode small{font-size:10.5px;color:var(--muted);text-align:center}
+.mode b{font-size:13px;white-space:nowrap}
+.mode small{font-size:9.5px;color:var(--muted);text-align:center;line-height:1.15}
 .mode.active{background:linear-gradient(160deg,rgba(255,122,69,.3),rgba(255,61,127,.22));border-color:rgba(255,150,110,.75);box-shadow:0 0 24px rgba(255,90,90,.3)}
 .btn-play{width:100%;padding:17px;border-radius:22px;font-size:21px;font-weight:900;letter-spacing:.06em;
   background:linear-gradient(135deg,#ffb347,#ff7a45 45%,#ff3d7f);
@@ -215,7 +216,7 @@ button:disabled{cursor:default}
 .scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,3,18,.55) 0%,rgba(8,3,18,0) 26%,rgba(8,3,18,0) 70%,rgba(13,6,25,.35) 100%)}
 #sceneFx{position:absolute;inset:0;width:100%;height:100%;display:none}
 #game.fx #sceneFx{display:block}
-#game.fx-dunes #petals{display:none}
+#game.fx-dunes #petals,#game.fx-forest #petals{display:none}
 .petal{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.7);border-radius:70% 0 70% 0;opacity:.9;
   background:linear-gradient(135deg,#fff,#ffc8dc);box-shadow:0 1px 3px rgba(0,0,0,.25);animation:petal var(--d) linear var(--dl) infinite}
 @keyframes petal{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(calc(var(--x)*.4),30vh) rotate(160deg)}
@@ -313,11 +314,39 @@ button:disabled{cursor:default}
 .title-card.rus .tc-name i{background:linear-gradient(90deg,transparent,#e05a4a);height:1.5px;width:38px;position:relative}
 .title-card.rus .tc-name i::after{content:"";position:absolute;right:-4px;top:-3.5px;width:7px;height:7px;background:#c8102e;border:1px solid #ffd9a0;transform:rotate(45deg)}
 .title-card.rus .tc-sub{color:#ffcf8a}
+/* ---------- рунная заставка (Лихолесье) ---------- */
+.tc-moon{display:none;position:absolute;width:150px;height:150px;left:50%;top:50%;margin:-75px 0 0 -75px;overflow:visible;
+  filter:drop-shadow(0 0 22px rgba(160,255,200,.35));animation:tcSun .9s .1s cubic-bezier(.2,1.2,.4,1) both}
+.title-card.runic .tc-sun{display:none}
+.title-card.runic .tc-moon{display:block}
+.title-card.runic .tc-band{background:
+  linear-gradient(90deg,transparent,rgba(120,240,170,.7) 22%,rgba(200,255,220,.9) 50%,rgba(120,240,170,.7) 78%,transparent) top/100% 1px no-repeat,
+  linear-gradient(90deg,transparent,rgba(120,240,170,.7) 22%,rgba(200,255,220,.9) 50%,rgba(120,240,170,.7) 78%,transparent) bottom/100% 1px no-repeat,
+  radial-gradient(60% 120% at 30% 60%,rgba(140,200,170,.12),transparent 70%),
+  radial-gradient(50% 120% at 75% 40%,rgba(140,200,170,.1),transparent 70%),
+  linear-gradient(90deg,transparent,rgba(4,14,10,.78) 16%,rgba(4,14,10,.78) 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.title-card.runic .tc-kanji{flex-direction:row;font-family:"Noto Sans Runic","Segoe UI Historic","Segoe UI Symbol",serif;font-size:50px;letter-spacing:.12em;
+  color:#e6fff0;text-shadow:0 0 10px rgba(120,255,180,.9),0 0 26px rgba(60,220,140,.6),0 3px 0 rgba(0,20,10,.8);animation:none}
+.title-card.runic .tc-kanji span{display:inline-block;animation:tcRune .7s ease-out both}
+.title-card.runic .tc-kanji span:nth-child(1){animation-delay:.3s}.title-card.runic .tc-kanji span:nth-child(2){animation-delay:.4s}
+.title-card.runic .tc-kanji span:nth-child(3){animation-delay:.5s}.title-card.runic .tc-kanji span:nth-child(4){animation-delay:.6s}
+.title-card.runic .tc-kanji span:nth-child(5){animation-delay:.7s}.title-card.runic .tc-kanji span:nth-child(6){animation-delay:.8s}
+.title-card.runic .tc-kanji span:nth-child(7){animation-delay:.9s}
+@keyframes tcRune{from{opacity:0;filter:blur(8px);transform:translateY(6px) scale(1.3)}}
+.title-card.runic .tc-seal{right:-44px;bottom:2px;width:34px;height:38px;border:0;border-radius:0;font-family:"Noto Sans Runic","Segoe UI Historic",serif;
+  font-size:20px;color:#b8ffd6;background:#0c2a1c;box-shadow:none;transform:rotate(0);text-shadow:0 0 8px #6fffb0;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);animation-name:tcSealRune}
+@keyframes tcSealRune{from{opacity:0;transform:scale(2)}}
+.title-card.runic .tc-name{color:#e6fff0;letter-spacing:.2em;white-space:nowrap;font-size:25px;animation-name:tcNameA;text-shadow:0 0 14px rgba(80,220,150,.6),0 2px 8px rgba(0,0,0,.9)}
+.title-card.runic .tc-name i{background:linear-gradient(90deg,transparent,#6fe3a5);height:1px;width:38px}
+.title-card.runic .tc-sub{color:#8ff0bd}
 .title-card.out{animation:tcOut .6s ease-in forwards}
 @keyframes tcOut{to{opacity:0;transform:translateY(-60%)}}
 .board{position:relative;border-radius:20px;overflow:hidden;transition:box-shadow .3s;
   box-shadow:0 0 0 2px rgba(255,122,69,.6),0 0 34px rgba(255,61,127,.28),0 24px 60px rgba(0,0,0,.55)}
 .board.portal{box-shadow:0 0 0 2px rgba(62,230,255,.55),0 0 34px rgba(62,230,255,.3),0 24px 60px rgba(0,0,0,.55)}
+.board.forest{box-shadow:0 0 0 2px rgba(110,231,160,.55),0 0 34px rgba(52,211,153,.3),0 24px 60px rgba(0,0,0,.6)}
 .board.maze{box-shadow:0 0 0 2px rgba(167,139,250,.65),0 0 34px rgba(139,92,246,.35),0 24px 60px rgba(0,0,0,.55)}
 canvas{display:block}
 .hint{position:absolute;left:0;right:0;bottom:16%;text-align:center;font-weight:800;font-size:17px;pointer-events:none;
@@ -488,6 +517,7 @@ canvas{display:block}
       <button class="mode glass" data-mode="classic"><i>🧱</i><b>Классика</b><small>Стены опасны</small></button>
       <button class="mode glass" data-mode="portal"><i>🌀</i><b>Портал</b><small>Сквозь края</small></button>
       <button class="mode glass" data-mode="maze"><i>🗿</i><b>Лабиринт</b><small>Растут преграды</small></button>
+      <button class="mode glass" data-mode="forest"><i>🌲</i><b>Лихолесье</b><small>Тьма и паутина</small></button>
     </div>
     <button class="btn-play" id="btnPlay">ИГРАТЬ<small>Рекорд в режиме: <span id="menuBest">0</span></small></button>
     <div class="row3">
@@ -503,7 +533,7 @@ canvas{display:block}
   <div class="scene" id="scene"><div class="scene-img" id="sceneImg"><canvas id="sceneFx"></canvas></div><div id="petals"></div></div>
   <div class="title-card" id="titleCard">
     <div class="tc-band"></div>
-    <div class="tc-row"><div class="tc-sun"></div><svg class="tc-rose" viewBox="-60 -60 120 120" aria-hidden="true"><g class="tc-rose-spin"><circle r="55" fill="none" stroke="#f3c98b" stroke-width="1.2" stroke-dasharray="1.5 4.5"/><g fill="#c8102e" stroke="#ffd9a0" stroke-width="1.2"><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(0)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(30)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(60)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(90)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(120)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(150)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(180)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(210)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(240)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(270)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(300)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(330)"/></g></g><circle r="27" fill="#fff4e0" stroke="#c8102e" stroke-width="2"/><g fill="#e8a33a" stroke="#9c2a14" stroke-width="1" transform="scale(.8)"><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(0)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(60)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(120)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(180)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(240)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(300)"/></g><circle r="5" fill="#c8102e"/></svg><svg class="tc-orn" viewBox="-60 -60 120 120" aria-hidden="true"><defs><linearGradient id="tcGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c1"/><stop offset=".45" stop-color="#e8b04e"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs><g class="tc-orn-star"><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6"/><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6" transform="rotate(45)"/><circle r="54" fill="none" stroke="url(#tcGold)" stroke-width=".8" stroke-dasharray="2 4"/></g><path class="tc-orn-moon" d="M-8,-36 A36,36 0 1,0 -8,36 A29,29 0 1,1 -8,-36 Z" transform="translate(-6,0) rotate(-20)" fill="url(#tcGold)"/></svg><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
+    <div class="tc-row"><div class="tc-sun"></div><svg class="tc-moon" viewBox="-60 -60 120 120" aria-hidden="true"><defs><radialGradient id="tcMoonG" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#f4fff2"/><stop offset=".6" stop-color="#bfe8cf"/><stop offset="1" stop-color="#6fa888"/></radialGradient></defs><circle r="58" fill="none" stroke="#9ff0c0" stroke-opacity=".25" stroke-width="1" stroke-dasharray="1 5"/><circle r="44" fill="url(#tcMoonG)"/><circle cx="-12" cy="-10" r="7" fill="#9cc9ad" opacity=".45"/><circle cx="14" cy="8" r="5" fill="#9cc9ad" opacity=".4"/><g fill="#07130d"><path d="M-58,60 L-44,14 L-36,30 L-30,4 L-20,26 L-14,-2 L-6,24 L0,8 L8,28 L16,-6 L24,24 L30,10 L38,30 L46,12 L58,60Z"/></g></svg><svg class="tc-rose" viewBox="-60 -60 120 120" aria-hidden="true"><g class="tc-rose-spin"><circle r="55" fill="none" stroke="#f3c98b" stroke-width="1.2" stroke-dasharray="1.5 4.5"/><g fill="#c8102e" stroke="#ffd9a0" stroke-width="1.2"><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(0)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(30)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(60)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(90)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(120)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(150)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(180)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(210)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(240)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(270)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(300)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(330)"/></g></g><circle r="27" fill="#fff4e0" stroke="#c8102e" stroke-width="2"/><g fill="#e8a33a" stroke="#9c2a14" stroke-width="1" transform="scale(.8)"><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(0)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(60)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(120)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(180)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(240)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(300)"/></g><circle r="5" fill="#c8102e"/></svg><svg class="tc-orn" viewBox="-60 -60 120 120" aria-hidden="true"><defs><linearGradient id="tcGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c1"/><stop offset=".45" stop-color="#e8b04e"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs><g class="tc-orn-star"><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6"/><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6" transform="rotate(45)"/><circle r="54" fill="none" stroke="url(#tcGold)" stroke-width=".8" stroke-dasharray="2 4"/></g><path class="tc-orn-moon" d="M-8,-36 A36,36 0 1,0 -8,36 A29,29 0 1,1 -8,-36 Z" transform="translate(-6,0) rotate(-20)" fill="url(#tcGold)"/></svg><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
     <div class="tc-name"><i></i><span id="tcName">Древние руины</span><i></i></div>
     <div class="tc-sub" id="tcSub">ЛАБИРИНТ</div>
   </div>
@@ -635,7 +665,7 @@ canvas{display:block}
     <h2>🏆 Рекорды</h2>
     <div class="seg" id="recTabs">
       <button data-val="all">Все</button><button data-val="classic">🧱</button>
-      <button data-val="portal">🌀</button><button data-val="maze">🗿</button>
+      <button data-val="portal">🌀</button><button data-val="maze">🗿</button><button data-val="forest">🌲</button>
     </div>
     <ul class="rec-list" id="recList"></ul>
     <div class="legend">
@@ -685,7 +715,8 @@ let mode = store.get('ss_mode', 'classic');
 const MODES = {
   classic:{icon:'🧱', name:'Классика'},
   portal:{icon:'🌀', name:'Портал'},
-  maze:{icon:'🗿', name:'Лабиринт'}
+  maze:{icon:'🗿', name:'Лабиринт'},
+  forest:{icon:'🌲', name:'Лихолесье'}
 };
 
 // перенос рекордов из самой первой версии игры
@@ -890,7 +921,8 @@ const Music = (() => {
     menu:  {bpm:84,  drums:0, lead:'triangle', arp:'slow', bright:1500, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]}, // Am F C G
     meadow:{bpm:112, drums:1, lead:'square',   arp:'fast', bright:2600, prog:[[48,52,55],[55,59,62],[57,60,64],[53,57,60]]}, // C G Am F
     dunes: {bpm:104, drums:2, lead:'sawtooth', arp:'fast', bright:1900, prog:[[50,53,57],[46,50,53],[48,52,55],[45,49,52]]}, // Dm B♭ C A
-    ruins: {bpm:96,  drums:3, lead:'triangle', arp:'slow', bright:1300, prog:[[45,48,52],[40,43,47],[41,45,48],[40,44,47]]}  // Am Em F E
+    ruins: {bpm:96,  drums:3, lead:'triangle', arp:'slow', bright:1300, prog:[[45,48,52],[40,43,47],[41,45,48],[40,44,47]]}, // Am Em F E
+    forest:{bpm:78,  drums:0, lead:'sine',     arp:'slow', bright:1100, prog:[[50,53,57],[45,48,52],[46,50,53],[45,49,52]]}  // Dm Am B♭ A
   };
   const hz = m => 440 * Math.pow(2, (m - 69) / 12);
 
@@ -1060,7 +1092,7 @@ function newGame(){
     snake:[{x:9,y:10},{x:8,y:10},{x:7,y:10}],
     dir:{x:1,y:0}, queue:[], grow:0,
     food:null, special:null, obstacles:new Map(), sands:[], sandT:4000, won:false,
-    shield:0, shieldProg:0, phoenix:false, bounceCd:0, bonusXp:0,
+    shield:0, shieldProg:0, phoenix:false, bounceCd:0, bonusXp:0, webs:[], webT:5000, stuck:0,
     score:0, eaten:0, level:1, combo:0, maxCombo:0, lastEat:-1e9,
     powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
     state:'ready', acc:0, clock:0, anim:0,
@@ -1069,6 +1101,7 @@ function newGame(){
   };
   G.from = G.snake.map(s => ({...s}));
   if (mode === 'maze') for (let i = 0; i < Math.max(1, 3 - sk('stonemason')); i++) addCluster();
+  if (mode === 'forest') for (let i = 0; i < 7; i++) addTree();
   placeFood();
   $('board').className = 'board ' + mode;
   $('hint').style.display = '';
@@ -1085,6 +1118,7 @@ function isFree(x, y){
   if (G.snake.some(s => s.x === x && s.y === y)) return false;
   if (G.obstacles.has(key(x, y))) return false;
   if (G.sands.some(q => q.x === x && q.y === y)) return false;
+  if (G.webs.some(q => q.x === x && q.y === y)) return false;
   if (G.food && G.food.x === x && G.food.y === y) return false;
   if (G.special && G.special.x === x && G.special.y === y) return false;
   return true;
@@ -1188,6 +1222,13 @@ function step(){
     }
     if (G.obstacles.has(key(nx, ny))) return crash();
     if (G.sands.some(q => q.x === nx && q.y === ny && q.t >= q.warn && q.t < q.warn + q.life)) return sinkCrash(nx, ny);
+    const wi = G.webs.findIndex(w => w.x === nx && w.y === ny);
+    if (wi >= 0){
+      G.webs.splice(wi, 1); G.stuck = 900; G.combo = 0; G.shake = 4;
+      burst(nx, ny, ['#e8f4ee', '#b8c8c0'], 14); floatText(nx, ny, '🕸️ Паутина!', '#d9f5e6', .9);
+      SFX.hurt(); buzz([15, 30, 15]);
+      return;
+    }
   }
 
   const old = G.snake.map(s => ({x:s.x, y:s.y}));
@@ -1268,16 +1309,90 @@ function drawSands(c){
   }
 }
 function winOasis(){
+  const forest = mode === 'forest';
   G.won = true;
   const bonus = 500;
   G.score += bonus;
   const h = G.snake[0];
   floatText(h.x, h.y - 1, '+' + bonus, '#ffd166', 1.4);
   for (let i = 0; i < 6; i++) burst(rnd(COLS), rnd(ROWS), ['#7ee0a0', '#ffd166', '#6fd3ff', '#fff'], 30);
-  banner('🌴 ОАЗИС НАЙДЕН!');
+  banner(forest ? '🌲 ВЫХОД ИЗ ЛИХОЛЕСЬЯ!' : '🌴 ОАЗИС НАЙДЕН!');
+  G.webs.length = 0;
   G.sands.length = 0;
   [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, 'triangle', .1, null, i * .11));
   die(true);
+}
+
+/* ---------- Лихолесье: деревья, паутина, тьма ---------- */
+function addTree(){
+  const h = G.snake[0];
+  for (let tries = 0; tries < 80; tries++){
+    const x = 1 + rnd(COLS - 2), y = 1 + rnd(ROWS - 2);
+    if (!isFree(x, y) || Math.abs(x - h.x) + Math.abs(y - h.y) < 5) continue;
+    if ((G.dir.x && y === h.y) || (G.dir.y && x === h.x)) continue;
+    let near = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (G.obstacles.has(key(x + dx, y + dy))) near++;
+    if (near > 1) continue;
+    G.obstacles.set(key(x, y), G.anim); return;
+  }
+}
+function websUpdate(dt){
+  for (const w of G.webs) w.t += dt;
+  G.webs = G.webs.filter(w => w.t < w.life);
+  if ((G.webT -= dt) > 0) return;
+  G.webT = Math.max(2200, 5200 - G.level * 300) * (.7 + Math.random() * .6);
+  if (G.webs.length >= Math.min(1 + G.level, 9)) return;
+  const h = G.snake[0];
+  for (let tries = 0; tries < 50; tries++){
+    const x = rnd(COLS), y = rnd(ROWS);
+    if (!isFree(x, y) || Math.abs(x - h.x) + Math.abs(y - h.y) < 4) continue;
+    G.webs.push({x, y, t:0, life:11000 + Math.random() * 6000, rot:Math.random() * 6.28}); return;
+  }
+}
+function drawWebs(c){
+  const S = cell;
+  for (const w of G.webs){
+    const a = Math.min(1, w.t / 500, (w.life - w.t) / 500), cx = (w.x + .5) * S, cy = (w.y + .5) * S, R = S * .55;
+    c.save(); c.translate(cx, cy); c.rotate(w.rot); c.globalAlpha = a * .75;
+    c.strokeStyle = '#e8f4ee'; c.lineWidth = Math.max(.6, S * .025);
+    c.beginPath();
+    for (let k = 0; k < 8; k++){ const an = k * Math.PI / 4; c.moveTo(0, 0); c.lineTo(Math.cos(an) * R, Math.sin(an) * R); }
+    for (let ring = 1; ring <= 3; ring++){
+      const rr = R * ring / 3.4;
+      for (let k = 0; k <= 8; k++){ const an = k * Math.PI / 4, px = Math.cos(an) * rr, py = Math.sin(an) * rr; k ? c.lineTo(px, py) : c.moveTo(px, py); }
+    }
+    c.stroke(); c.restore();
+  }
+}
+// тьма: вокруг головы — круг света от фонаря, яблоко и светлячки чуть светятся
+let darkCv = null;
+function drawDarkness(c){
+  if (!darkCv) darkCv = document.createElement('canvas');
+  const W = size, S = cell;
+  if (darkCv.width !== Math.round(W * dpr)){ darkCv.width = darkCv.height = Math.round(W * dpr); }
+  const d = darkCv.getContext('2d');
+  d.setTransform(dpr, 0, 0, dpr, 0, 0);
+  d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, W, W);
+  d.fillStyle = 'rgba(2,8,5,.86)'; d.fillRect(0, 0, W, W);
+  d.globalCompositeOperation = 'destination-out';
+  const hole = (x, y, r, k = 1) => {
+    const g = d.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(0,0,0,${k})`); g.addColorStop(.55, `rgba(0,0,0,${k * .8})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    d.fillStyle = g; d.fillRect(x - r, y - r, r * 2, r * 2);
+  };
+  const h = G.snake[0], flick = 1 + Math.sin(G.anim / 90) * .02 + Math.sin(G.anim / 37) * .015;
+  const lr = Math.max(3, 5.6 - .25 * (G.level - 1)) * S * flick * (G.state === 'dying' ? 1.5 : 1);
+  hole((h.x + .5) * S, (h.y + .5) * S, lr);
+  G.snake.forEach((q, i) => { if (i && i % 3 === 0) hole((q.x + .5) * S, (q.y + .5) * S, S * 1.1, .5); });
+  if (G.food) hole((G.food.x + .5) * S, (G.food.y + .5) * S, S * (1.1 + .15 * Math.sin(G.anim / 300)), .75);
+  if (G.special) hole((G.special.x + .5) * S, (G.special.y + .5) * S, S * 1.1, .7);
+  for (const m of motes) hole(m.x, m.y, m.r * 7, .55 * (.5 + .5 * Math.sin(G.anim / m.tw + m.ph)));
+  c.drawImage(darkCv, 0, 0, W, W);
+  // тёплый свет фонаря
+  c.save(); c.globalCompositeOperation = 'lighter';
+  const g = c.createRadialGradient((h.x + .5) * S, (h.y + .5) * S, 0, (h.x + .5) * S, (h.y + .5) * S, lr * .8);
+  g.addColorStop(0, 'rgba(255,190,110,.16)'); g.addColorStop(1, 'rgba(255,190,110,0)');
+  c.fillStyle = g; c.fillRect(0, 0, W, W); c.restore();
 }
 
 function crash(){
@@ -1365,8 +1480,10 @@ function eatSpecial(){
 function levelUp(){
   G.level++;
   Music.setWave(G.level);
-  if (mode === 'portal' && G.level >= OASIS_WAVE) return winOasis();
-  banner(mode === 'portal' ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
+  const goal = mode === 'portal' || mode === 'forest';
+  if (goal && G.level >= OASIS_WAVE) return winOasis();
+  banner(goal ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
+  if (mode === 'forest' && G.obstacles.size < 45 && Math.random() < .8) addTree();
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70 && Math.random() >= .3 * sk('stonemason')) addCluster();
   G.bonusXp += 20 * sk('explorer');
@@ -1431,7 +1548,7 @@ function die(win = false){
 
 function showGameOver(){
   G.state = 'over';
-  $('goTitle').textContent = G.won ? '🌴 Оазис найден!' : 'Игра окончена';
+  $('goTitle').textContent = G.won ? (mode === 'forest' ? '🌲 Выход найден!' : '🌴 Оазис найден!') : 'Игра окончена';
   $('stLen').textContent = G.snake.length;
   $('stApples').textContent = G.eaten;
   $('stCombo').textContent = '×' + (1 + G.maxCombo);
@@ -1529,7 +1646,7 @@ function mulberry32(a){
   return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
     t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-const BIOME = {classic:'meadow', portal:'dunes', maze:'ruins'};
+const BIOME = {classic:'meadow', portal:'dunes', maze:'ruins', forest:'forest'};
 let decor = [], motes = [];
 
 function resize(){
@@ -1671,14 +1788,58 @@ function ruins(b, R, rr, S, W){
   for (let i = 0; i < 9; i++) decor.push({type:'tuft', x:rr(0, W), y:rr(0, W), n:(rr(3, 6)) | 0, h:S * rr(.22, .38), ph:R() * 6, col:[rr(85, 105), rr(35, 50), rr(28, 38)]});
 }
 
+function forestFloor(b, R, rr, S, W){
+  const g = b.createLinearGradient(0, 0, W, W);
+  g.addColorStop(0, '#1d3322'); g.addColorStop(1, '#122117');
+  b.fillStyle = g; b.fillRect(0, 0, W, W);
+  blotches(b, R, rr, W, S, 70, ['60,90,40', '20,40,25', '70,55,30'], .2);
+  cellChecker(b, S, 'rgba(180,255,200,.025)', 'rgba(0,0,0,.04)');
+  // мох
+  for (let i = 0; i < 40; i++){
+    const cx = rr(0, W), cy = rr(0, W);
+    for (let k = 0; k < 9; k++){ b.fillStyle = `hsla(${rr(95, 125)},40%,${rr(18, 28)}%,.55)`; b.beginPath(); b.arc(cx + rr(-S*.5, S*.5), cy + rr(-S*.5, S*.5), S * rr(.06, .14), 0, 7); b.fill(); }
+  }
+  // корни
+  b.lineCap = 'round';
+  for (let i = 0; i < 9; i++){
+    let x = rr(0, W), y = rr(0, W), a = R() * 6.28;
+    b.strokeStyle = 'rgba(45,30,18,.75)'; b.lineWidth = S * rr(.08, .16); b.beginPath(); b.moveTo(x, y);
+    for (let k = 0; k < 6; k++){ a += rr(-.6, .6); x += Math.cos(a) * S * .7; y += Math.sin(a) * S * .7; b.lineTo(x, y); }
+    b.stroke();
+  }
+  // опавшие листья
+  const lc = ['#5a3a1c', '#6b4a22', '#3e2a14', '#7a5a2a', '#44522a'];
+  for (let i = 0; i < 160; i++){
+    const x = rr(0, W), y = rr(0, W), r = S * rr(.08, .15), an = R() * 6.28;
+    b.save(); b.translate(x, y); b.rotate(an); b.fillStyle = lc[(R() * lc.length) | 0]; b.globalAlpha = rr(.5, .9);
+    b.beginPath(); b.ellipse(0, 0, r, r * .45, 0, 0, 7); b.fill();
+    b.strokeStyle = 'rgba(0,0,0,.3)'; b.lineWidth = .6; b.beginPath(); b.moveTo(-r, 0); b.lineTo(r, 0); b.stroke(); b.restore();
+  }
+  b.globalAlpha = 1;
+  // светящиеся грибы
+  for (let i = 0; i < 12; i++){
+    const x = rr(0, W), y = rr(0, W);
+    for (let k = 0; k < (rr(1, 4) | 0); k++){
+      const mx = x + rr(-S*.3, S*.3), my = y + rr(-S*.3, S*.3), r = S * rr(.05, .09);
+      const gl = b.createRadialGradient(mx, my, 0, mx, my, r * 4);
+      gl.addColorStop(0, 'rgba(120,255,200,.35)'); gl.addColorStop(1, 'rgba(120,255,200,0)');
+      b.fillStyle = gl; b.fillRect(mx - r * 4, my - r * 4, r * 8, r * 8);
+      b.fillStyle = '#9fffd6'; b.beginPath(); b.arc(mx, my, r, Math.PI, 0); b.fill();
+      b.fillStyle = '#d8fff0'; b.fillRect(mx - r * .25, my, r * .5, r * .8);
+    }
+  }
+  for (let i = 0; i < 14; i++) decor.push({type:'tuft', x:rr(0, W), y:rr(0, W), n:(rr(4, 8)) | 0, h:S * rr(.3, .5), ph:R() * 6, col:[rr(120, 150), rr(30, 45), rr(18, 26)]});
+}
+
 function buildBg(){
   const b = bg.getContext('2d'), S = cell, W = size, biome = BIOME[mode] || 'meadow';
-  const R = mulberry32(biome === 'meadow' ? 7 : biome === 'dunes' ? 21 : 99);
+  const R = mulberry32(biome === 'meadow' ? 7 : biome === 'dunes' ? 21 : biome === 'forest' ? 33 : 99);
   const rr = (a, c) => a + R() * (c - a);
   b.setTransform(dpr, 0, 0, dpr, 0, 0);
   decor = [];
   if (biome === 'meadow') meadow(b, R, rr, S, W);
   else if (biome === 'dunes') dunes(b, R, rr, S, W);
+  else if (biome === 'forest') forestFloor(b, R, rr, S, W);
   else ruins(b, R, rr, S, W);
   // закатный свет, прохладная тень, виньетка
   let g = b.createRadialGradient(W * 1.05, -W * .1, 0, W * 1.05, -W * .1, W * 1.35);
@@ -1693,7 +1854,8 @@ function buildBg(){
   // частицы в воздухе
   const cfg = {meadow:{n:14, c:'255,240,150', r:.07, vx:.004, vy:-.004},
                dunes: {n:26, c:'255,226,176', r:.035, vx:.03, vy:.002},
-               ruins: {n:18, c:'255,215,170', r:.04, vx:.003, vy:-.002}}[biome];
+               ruins: {n:18, c:'255,215,170', r:.04, vx:.003, vy:-.002},
+               forest:{n:22, c:'170,255,200', r:.05, vx:.005, vy:-.004}}[biome];
   motes = [];
   for (let i = 0; i < cfg.n; i++) motes.push({x:rr(0, W), y:rr(0, W), vx:cfg.vx * rr(.5, 1.5) * (biome === 'dunes' ? 1 : (R() < .5 ? -1 : 1)),
     vy:cfg.vy * rr(.5, 1.5), r:S * cfg.r * rr(.6, 1.3), c:cfg.c, ph:R() * 6, tw:rr(300, 900), a:rr(.4, .9)});
@@ -1718,7 +1880,7 @@ function drawGround(c){
 }
 function drawAtmosphere(c, dt){
   const A = G.anim, W = size, S = cell, biome = BIOME[mode];
-  if (biome !== 'ruins'){        // тени от облаков
+  if (biome !== 'ruins' && biome !== 'forest'){        // тени от облаков
     for (let k = 0; k < 2; k++){
       const x = ((A * .01 + k * W * 1.1) % (W * 2.2)) - W * .6, y = W * (.25 + .5 * k), r = W * (.42 + .1 * k);
       const g = c.createRadialGradient(x, y, 0, x, y, r);
@@ -1750,7 +1912,29 @@ function drawAtmosphere(c, dt){
 }
 
 /* ---------- препятствия: каменные блоки ---------- */
+function drawTrees(c){
+  const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
+  for (const [k, born] of list){
+    const x = k % COLS, y = (k / COLS) | 0, cx = (x + .5) * S, cy = (y + .5) * S;
+    const a = Math.min(1, (G.anim - born) / 500), e = 1 - Math.pow(1 - a, 3), R = mulberry32(k * 97 + 3);
+    const sway = Math.sin(G.anim / 1400 + k) * S * .03;
+    // тень и ствол
+    c.fillStyle = `rgba(0,0,0,${.5 * e})`; c.beginPath(); c.ellipse(cx + S * .18, cy + S * .22, S * .55 * e, S * .42 * e, 0, 0, 7); c.fill();
+    c.fillStyle = '#2b1d12'; c.beginPath(); c.arc(cx, cy + S * .1, S * .16 * e, 0, 7); c.fill();
+    // крона из нескольких «облаков» листвы
+    const hu = 120 + R() * 30, blobs = 6;
+    for (let i = 0; i < blobs; i++){
+      const an = i / blobs * 6.28 + R(), rr = S * (.22 + R() * .1) * e;
+      const bx = cx + Math.cos(an) * S * .2 * e + sway, by = cy - S * .08 + Math.sin(an) * S * .18 * e;
+      c.fillStyle = `hsl(${hu},${32 + R() * 10}%,${12 + R() * 6}%)`; c.beginPath(); c.arc(bx, by, rr, 0, 7); c.fill();
+    }
+    const g = c.createRadialGradient(cx - S * .15 + sway, cy - S * .3, 0, cx + sway, cy - S * .1, S * .55 * e);
+    g.addColorStop(0, `hsla(${hu},45%,34%,.9)`); g.addColorStop(1, `hsla(${hu},40%,16%,0)`);
+    c.fillStyle = g; c.beginPath(); c.arc(cx + sway, cy - S * .1, S * .45 * e, 0, 7); c.fill();
+  }
+}
 function drawObstacles(c){
+  if (mode === 'forest') return drawTrees(c);
   const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
   for (const [k, born] of list){
     const x = k % COLS, y = (k / COLS) | 0;
@@ -2104,6 +2288,7 @@ function render(dt){
   drawGround(c);
   if (G.powers.slow){ c.fillStyle = 'rgba(125,211,252,.1)'; c.fillRect(0, 0, size, size); }
   drawSands(c);
+  if (mode === 'forest') drawWebs(c);
   drawObstacles(c);
   drawApple(c);
   drawSpecial(c);
@@ -2112,6 +2297,7 @@ function render(dt){
   else if (G.state === 'ready') t = 0;
   drawSnake(c, t, dt);
   drawAtmosphere(c, dt);
+  if (mode === 'forest') drawDarkness(c);
   drawEffects(c, dt);
   c.restore();
 }
@@ -2129,12 +2315,14 @@ function frame(now){
       for (const k in G.cd){ if (G.cd[k] > 0) G.cd[k] = Math.max(0, G.cd[k] - dt); }
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
       if (mode === 'portal') sandsUpdate(dt);
+      if (mode === 'forest') websUpdate(dt);
       G.wave += dt / stepMs() * 2.4;
       for (const g of G.gulps) g.p += dt / stepMs();
       G.gulps = G.gulps.filter(g => g.p < G.snake.length + 1);
       G.acc += dt;
       let guard = 0;
-      while (G.state === 'play' && G.acc >= stepMs() && guard++ < 5){ G.acc -= stepMs(); step(); }
+      if (G.stuck > 0){ G.stuck -= dt; G.acc = 0; }
+      else while (G.state === 'play' && G.acc >= stepMs() && guard++ < 5){ G.acc -= stepMs(); step(); }
     } else if (G.state === 'dying'){
       G.deathT += dt;
       if (G.deathT > 900 && !G.overShown){ G.overShown = true; showGameOver(); }
@@ -2151,6 +2339,7 @@ requestAnimationFrame(frame);
 const LOCATIONS = {
   meadow:{kanji:'草原', rus:'ЛУГЪ', seal:'З', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg', aspect:1.5, sky:'rgb(125,112,172)', fx:'meadow'},
   dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ · НАЙДИ ОАЗИС',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
+  forest:{kanji:'森', runes:'ᛚᛁᚺᛟᛚᛖᛋ', seal:'ᛉ', name:'Лихолесье', sub:'ТЬМА · НАЙДИ ВЫХОД', img:'img/forest.jpg', aspect:1.5, sky:'rgb(10,22,16)', fx:'forest'},
   ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg', aspect:1.5, sky:'rgb(7,119,225)'}
 };
 /* ---------- живой пейзаж пустыни: песок с гребней + падающие звёзды ---------- */
@@ -2216,8 +2405,41 @@ const SceneFx = (() => {
     }
     ctx.globalCompositeOperation = 'source-over';
   }
+  const fog = [];
+  function stepForest(dt){
+    t += dt;
+    while (flies.length < 22) flies.push({x: Math.random() * 1536, y: 480 + Math.random() * 520, a: Math.random() * 6.28,
+      sp: 10 + Math.random() * 18, ph: Math.random() * 6.28, fr: .4 + Math.random() * .8, r: 1.6 + Math.random() * 1.8});
+    for (const f of flies){
+      f.a += (Math.random() - .5) * 2 * dt; f.x += Math.cos(f.a) * f.sp * dt; f.y += Math.sin(f.a) * f.sp * .5 * dt;
+      if (f.y < 460 || f.y > 1015) f.a = -f.a;
+      if (f.x < -20) f.x += 1576; else if (f.x > 1556) f.x -= 1576;
+    }
+    while (fog.length < 7) fog.push({x: Math.random() * 1900 - 200, y: 560 + Math.random() * 420, r: 240 + Math.random() * 260, v: 8 + Math.random() * 14});
+    for (const f of fog){ f.x += f.v * dt; if (f.x - f.r > 1600) { f.x = -f.r; f.y = 560 + Math.random() * 420; } }
+  }
+  function drawForest(){
+    ctx.setTransform(pr, 0, 0, pr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    for (const f of fog){
+      const x = X(f.x), y = Y(f.y), r = f.r * sc;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, 'rgba(190,230,210,.16)'); g.addColorStop(1, 'rgba(190,230,210,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .35, 0, 0, 7); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (const f of flies){
+      const k = Math.max(0, Math.sin(t * f.fr * 2 + f.ph)), x = X(f.x), y = Y(f.y);
+      if (k < .05) continue;
+      const fg = ctx.createRadialGradient(x, y, 0, x, y, f.r * 6);
+      fg.addColorStop(0, `rgba(210,255,230,${.9 * k})`); fg.addColorStop(.3, `rgba(110,240,180,${.35 * k})`); fg.addColorStop(1, 'rgba(80,220,160,0)');
+      ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(x, y, f.r * 6, 0, 7); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
   function step(dt){
     if (kind === 'meadow') return stepMeadow(dt);
+    if (kind === 'forest') return stepForest(dt);
     t += dt;
     // порывы ветра: то затишье, то песок срывается струями
     const gust = Math.max(0, Math.sin(t * .55) * .6 + Math.sin(t * 1.37 + 1) * .4);
@@ -2256,6 +2478,7 @@ const SceneFx = (() => {
   }
   function draw(){
     if (kind === 'meadow') return drawMeadow();
+    if (kind === 'forest') return drawForest();
     ctx.setTransform(pr, 0, 0, pr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.globalCompositeOperation = 'lighter';
@@ -2294,7 +2517,7 @@ const SceneFx = (() => {
   }
   return {
     set(k){
-      if (k !== kind){ sand.length = stars.length = glints.length = flies.length = 0; ctx.clearRect(0, 0, cvs.width, cvs.height); }
+      if (k !== kind){ sand.length = stars.length = glints.length = flies.length = fog.length = 0; ctx.clearRect(0, 0, cvs.width, cvs.height); }
       kind = k;
       if (k && !raf){ last = 0; raf = requestAnimationFrame(loop); }
     },
@@ -2310,6 +2533,7 @@ function applyScene(){
   const on = st === 'ok';
   $('game').classList.toggle('scenic', on);
   $('game').classList.toggle('fx-dunes', on && loc.fx === 'dunes');
+  $('game').classList.toggle('fx-forest', on && loc.fx === 'forest');
   $('game').classList.toggle('fx', on && !!loc.fx);
   SceneFx.set(on && loc.fx ? loc.fx : null);
   if (on) $('sceneImg').style.backgroundImage = `url("${loc.img}")`;
@@ -2349,12 +2573,12 @@ function layoutScene(){
 let titleTimer = null;
 function showTitle(){
   const loc = LOCATIONS[BIOME[mode]], tc = $('titleCard');
-  const arab = !!loc.arabic, rus = !!loc.rus;
-  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus);
+  const arab = !!loc.arabic, rus = !!loc.rus, runic = !!loc.runes;
+  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus); tc.classList.toggle('runic', runic);
   // арабскую вязь не режем на буквы — иначе рассыплются соединения
   if (arab) $('tcKanji').textContent = loc.arabic;
-  else $('tcKanji').innerHTML = [...(rus ? loc.rus : loc.kanji)].map(ch => `<span>${ch}</span>`).join('');
-  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : arab ? loc.seal : '蛇';
+  else $('tcKanji').innerHTML = [...(rus ? loc.rus : runic ? loc.runes : loc.kanji)].map(ch => `<span>${ch}</span>`).join('');
+  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : (arab || runic) ? loc.seal : '蛇';
   $('tcName').textContent = loc.name; $('tcSub').textContent = loc.sub;
   clearTimeout(titleTimer);
   tc.classList.remove('show', 'out'); void tc.offsetWidth; tc.classList.add('show');
@@ -2367,6 +2591,11 @@ function showTitle(){
       tone(f, .42, 'sawtooth', .025, null, d); tone(f * 2, .25, 'triangle', .03, null, d);
     });
     tone(146.8, 1.6, 'sine', .07, null, 1.5);
+  } else if (runic){
+    // лес: низкий гул, флейта в ля-миноре, крик совы
+    tone(55, 2.6, 'sine', .1, 52); tone(82.4, 2.4, 'sine', .05, null, .2);
+    [440, 523.3, 587.3, 659.3, 587.3, 523.3].forEach((f, i) => tone(f, .7, 'sine', .045, f * .985, .35 + i * .26));
+    tone(392, .28, 'sine', .05, 360, 2.0); tone(370, .45, 'sine', .05, 330, 2.35);
   } else if (rus){
     // гусли: перебор по ре-мажорной пентатонике + колокольчик
     [293.7, 329.6, 370, 440, 493.9, 587.3, 659.3, 740, 880].forEach((f, i) => {

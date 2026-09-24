@@ -125,6 +125,46 @@ button:disabled{cursor:default}
 .path-row.sel .path-txt b{color:var(--c)}
 .path-tier{font-size:10px;font-weight:800;color:var(--muted);border:1px solid var(--stroke);border-radius:8px;padding:2px 6px;white-space:nowrap}
 .path-total{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin:2px 0 4px}
+/* ---------- карта затерянных миров ---------- */
+#map{gap:10px;background:#0a1108}
+#map .tree-head h2{font-size:19px;white-space:nowrap}
+.map-bg{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(60% 40% at 20% 20%,rgba(120,180,90,.12),transparent 70%),radial-gradient(50% 40% at 80% 70%,rgba(255,190,90,.08),transparent 70%),
+  repeating-radial-gradient(circle at 30% 60%,rgba(214,240,160,.035) 0 2px,transparent 2px 26px),linear-gradient(180deg,#0e1a0c,#070c06)}
+#map>*:not(.map-bg){position:relative;z-index:1}
+.map-scroll{flex:1;min-height:0;width:100%;max-width:520px;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.map-path{position:relative;margin:0 auto}
+.map-path svg{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.wnode{position:absolute;width:112px;margin-left:-56px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.wnode .orb{position:relative;width:92px;height:92px;border-radius:50%;background:#1a2414 center/cover no-repeat;border:3px solid rgba(214,240,160,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.6),inset 0 0 0 2px rgba(0,0,0,.35);transition:transform .2s}
+.wnode.sel .orb{transform:scale(1.1);border-color:#ffd166;box-shadow:0 0 0 4px rgba(255,209,102,.25),0 0 30px rgba(255,209,102,.45)}
+.wnode.done .orb{border-color:#e8c46a}
+.wnode.fresh .orb{animation:canpulse 1.4s ease-in-out infinite}
+.wnode.locked .orb{filter:grayscale(1) brightness(.35)}
+.wnode .lock{position:absolute;inset:0;display:grid;place-items:center;font-size:30px;filter:drop-shadow(0 2px 6px #000)}
+.wnode b{font-size:13px;font-weight:900;color:#fff3dc;text-shadow:0 1px 6px #000;line-height:1.1}
+.wnode.locked b{color:rgba(255,255,255,.45)}
+.wstars{font-size:15px;letter-spacing:1px;color:rgba(255,255,255,.18);text-shadow:0 1px 4px #000;line-height:1}
+.wstars .on{color:#ffd166;text-shadow:0 0 8px rgba(255,209,102,.8)}
+.wnum{position:absolute;top:-6px;left:-6px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;
+  background:linear-gradient(135deg,#ffd166,#ff7a45);color:#2a1200;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.map-card{width:100%;max-width:520px;padding:14px 16px 4px;border-radius:24px;flex:none;background:rgba(10,18,8,.86);border:1px solid rgba(214,240,160,.18);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mc-top{display:flex;align-items:center;gap:12px;text-align:left}
+.mc-img{width:58px;height:58px;border-radius:16px;background:#1a2414 center/cover;flex:none;border:2px solid rgba(214,240,160,.25)}
+.mc-name{font-size:19px;font-weight:900}
+.mc-sub{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:2px}
+.mc-desc{font-size:13.5px;color:rgba(255,244,236,.8);margin:10px 0 2px;text-align:left}
+.mc-goal{font-size:12px;color:#d9f0a8;font-weight:700;text-align:left}
+.map-card .btn{margin:10px 0 12px;padding:14px}
+/* звёзды на экране победы */
+.go-stars{display:flex;justify-content:center;gap:8px;font-size:40px;line-height:1;margin:2px 0 6px}
+.go-stars span{color:rgba(255,255,255,.14);animation:starPop .5s cubic-bezier(.2,1.6,.4,1) both}
+.go-stars span.on{color:#ffd166;text-shadow:0 0 18px rgba(255,209,102,.9)}
+@keyframes starPop{from{transform:scale(0) rotate(-40deg);opacity:0}}
+.go-unlock{margin:0 auto 10px;padding:8px 12px;border-radius:14px;font-weight:800;font-size:14px;color:#1c2a0c;background:linear-gradient(135deg,#d9f99d,#86efac);
+  animation:pop .5s .8s cubic-bezier(.2,1.4,.4,1) both}
 /* ---------- новое меню: Lost Worlds ---------- */
 #menu{background:#0c1208}
 .menu-bg{position:absolute;inset:-4%;background:url("img/menu.jpg") center 36%/cover no-repeat;animation:kenburns 40s ease-in-out infinite alternate}
@@ -513,19 +553,25 @@ canvas{display:block}
         <div class="xpbar"><div id="pXpFill"></div></div>
       </div>
     </button>
-    <div class="modes" id="modes">
-      <button class="mode glass" data-mode="classic"><i>🧱</i><b>Классика</b><small>Стены опасны</small></button>
-      <button class="mode glass" data-mode="portal"><i>🌀</i><b>Портал</b><small>Сквозь края</small></button>
-      <button class="mode glass" data-mode="maze"><i>🗿</i><b>Лабиринт</b><small>Растут преграды</small></button>
-      <button class="mode glass" data-mode="forest"><i>🌲</i><b>Лихолесье</b><small>Тьма и паутина</small></button>
-    </div>
-    <button class="btn-play" id="btnPlay">ИГРАТЬ<small>Рекорд в режиме: <span id="menuBest">0</span></small></button>
+    <button class="btn-play" id="btnPlay">ИГРАТЬ<small>🗺️ Карта затерянных миров · <span id="menuStars">★ 0</span></small></button>
     <div class="row3">
       <button class="tile glass" id="btnTree"><i>🧬</i>Навыки<span class="badge" id="treeBadge">1</span></button>
       <button class="tile glass" id="btnRecords"><i>🏆</i>Рекорды</button>
       <button class="tile glass" id="btnSettings"><i>⚙️</i>Настройки</button>
     </div>
   </div>
+</section>
+
+<!-- ===== WORLD MAP ===== -->
+<section id="map" class="screen">
+  <div class="map-bg"></div>
+  <div class="tree-head">
+    <button class="icon-btn" id="btnMapBack" aria-label="Назад" style="letter-spacing:0;font-size:20px">←</button>
+    <h2>Затерянные миры</h2>
+    <div class="pts" id="mapStars">★ 0</div>
+  </div>
+  <div class="map-scroll" id="mapScroll"><div class="map-path" id="mapPath"></div></div>
+  <div class="map-card" id="mapCard"></div>
 </section>
 
 <!-- ===== GAME ===== -->
@@ -597,6 +643,8 @@ canvas{display:block}
 <div class="overlay" id="ovOver">
   <div class="card">
     <h2 id="goTitle">Игра окончена</h2>
+    <div class="go-stars" id="goStars" style="display:none"></div>
+    <div class="go-unlock" id="goUnlock" style="display:none"></div>
     <div class="big-score" id="finalScore">0</div>
     <div class="record" id="newRecord">🏆 Новый рекорд!</div>
     <div class="stats">
@@ -610,7 +658,9 @@ canvas{display:block}
       <div class="xpbar"><div id="goXpFill"></div></div>
       <div class="lvlup" id="goLvlUp"></div>
     </div>
+    <button class="btn primary" id="btnNextWorld" style="display:none">Следующий мир ▶</button>
     <button class="btn primary" id="btnAgain">Ещё раз</button>
+    <button class="btn ghost" id="btnGoMap">🗺️ Карта миров</button>
     <button class="btn magic" id="btnGoTree" style="display:none">🧬 Прокачать змейку</button>
     <button class="btn ghost" id="btnToMenu2">Главное меню</button>
   </div>
@@ -1050,7 +1100,7 @@ function overlay(id, on){ $(id).classList.toggle('active', on); }
 
 function renderMenu(){
   document.querySelectorAll('.mode').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-  $('menuBest').textContent = getBest(mode);
+  $('menuStars').textContent = `★ ${WORLDS.reduce((a, w) => a + worldStars(w.id), 0)} из ${WORLDS.length * 3}`;
   const i = levelInfo(profile.xp), p = pointsLeft();
   $('pLvl').textContent = i.level;
   $('pXp').textContent = `${i.cur} / ${i.need} XP`;
@@ -1060,15 +1110,29 @@ function renderMenu(){
   $('treeBadge').style.display = p > 0 ? '' : 'none';
   $('btnTree').classList.toggle('hot', p > 0);
 }
-$('modes').addEventListener('click', e => {
-  const b = e.target.closest('.mode'); if (!b) return;
-  mode = b.dataset.mode; store.set('ss_mode', mode); SFX.click(); renderMenu();
-});
 
 /* ===================== GAME CORE ===================== */
 const COLS = 20, ROWS = 20;
 const COMBO_WINDOW = 3000, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
-const OASIS_WAVE = 10;   // «Портал»: дойди до этой волны — найдёшь оазис (победа)
+const OASIS_WAVE = 10;   // в каждом мире: дойди до этой волны — мир пройден
+// ---- карта затерянных миров: каждый следующий открывается после прохождения предыдущего
+const WORLDS = [
+  {id:'meadow', mode:'classic', name:'Закатный луг',   desc:'Стены опасны. Ёжики колючие, мыши вкусные.', win:'🌅 ЛУГ ПРОЙДЕН!',          title:'🌅 Луг пройден!'},
+  {id:'dunes',  mode:'portal',  name:'Ночная пустыня', desc:'Сквозь края — но берегись зыбучих песков и скорпионов.', win:'🌴 ОАЗИС НАЙДЕН!', title:'🌴 Оазис найден!'},
+  {id:'ruins',  mode:'maze',    name:'Древние руины',  desc:'С каждой волной растут каменные преграды.', win:'🗿 РУИНЫ ПОКОРЕНЫ!',      title:'🗿 Руины покорены!'},
+  {id:'forest', mode:'forest',  name:'Лихолесье',      desc:'Тьма, деревья, пауки и паутина.',          win:'🌲 ВЫХОД ИЗ ЛИХОЛЕСЬЯ!', title:'🌲 Выход найден!'}
+];
+const STAR_SCORE = [0, 1800, 3000];   // ★ — пройти мир, ★★ и ★★★ — набрать столько очков
+const worldOf = m => WORLDS.find(w => w.mode === m) || WORLDS[0];
+const worldProg = () => store.get(pk('ss_worlds'), {});
+const worldStars = id => (worldProg()[id] || {}).stars || 0;
+function worldOpen(i){
+  if (i <= 0) return true;
+  if (i >= WORLDS.length) return false;
+  // игрокам, которые уже играли в этом мире до появления карты, он остаётся открытым
+  return worldStars(WORLDS[i - 1].id) > 0 || getBest(WORLDS[i].mode) > 0;
+}
+const starsFor = score => 1 + (score >= STAR_SCORE[1]) + (score >= STAR_SCORE[2]);
 const SPECIALS = [
   {id:'gold',   emoji:'⭐', w:3, color:'#ffd166'},
   {id:'slow',   emoji:'❄️', w:2, color:'#7dd3fc', dur:6000, label:'Замедление'},
@@ -1093,6 +1157,7 @@ function newGame(){
     dir:{x:1,y:0}, queue:[], grow:0,
     food:null, special:null, obstacles:new Map(), sands:[], sandT:4000, won:false,
     shield:0, shieldProg:0, phoenix:false, bounceCd:0, bonusXp:0, webs:[], webT:5000, stuck:0,
+    critters:[], preyT:9000, hazT:12000, thiefT:18000, key:null, chest:null, keys:0, chestMsg:0,
     score:0, eaten:0, level:1, combo:0, maxCombo:0, lastEat:-1e9,
     powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
     state:'ready', acc:0, clock:0, anim:0,
@@ -1119,6 +1184,8 @@ function isFree(x, y){
   if (G.obstacles.has(key(x, y))) return false;
   if (G.sands.some(q => q.x === x && q.y === y)) return false;
   if (G.webs.some(q => q.x === x && q.y === y)) return false;
+  if (G.critters.some(q => q.kind !== 'thief' && q.x === x && q.y === y)) return false;
+  if ((G.key && G.key.x === x && G.key.y === y) || (G.chest && G.chest.x === x && G.chest.y === y)) return false;
   if (G.food && G.food.x === x && G.food.y === y) return false;
   if (G.special && G.special.x === x && G.special.y === y) return false;
   return true;
@@ -1132,7 +1199,12 @@ function freeCell(minDist = 2){
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (isFree(x, y)) return {x, y};
   return null;
 }
-function placeFood(){ const c = freeCell(3); G.food = c ? {...c, born:G.anim} : null; }
+function placeFood(){
+  const c = freeCell(3); if (!c){ G.food = null; return; }
+  const r = Math.random(), L = G.level;
+  const kind = L >= 3 && r < .05 ? 'rainbow' : L >= 2 && r < .15 ? 'pepper' : L >= 2 && r < .23 ? 'rotten' : 'apple';
+  G.food = {...c, born:G.anim, kind};
+}
 
 function spawnSpecial(forceId){
   if (forceId){ const c = freeCell(4); if (c) G.special = {...c, type:SPECIALS.find(s => s.id === forceId), life:SPECIAL_LIFE * (1 + .5 * sk('venom')), born:G.anim}; return; }
@@ -1172,6 +1244,7 @@ function stepMs(){
   let ms = Math.max(base * 0.55, base - (G.snake.length - 3) * 1.2 - (G.level - 1) * 3);
   ms /= (1 - 0.05 * sk('calm'));
   ms /= (1 + 0.04 * sk('swift'));
+  if (G.powers.fast) ms *= .72;
   if (G.powers.slow) ms *= 1.6;
   return ms;
 }
@@ -1221,6 +1294,8 @@ function step(){
       } else return crash();
     }
     if (G.obstacles.has(key(nx, ny))) return crash();
+    const hz = G.critters.find(q => q.kind === 'hazard' && q.x === nx && q.y === ny);
+    if (hz){ floatText(nx, ny, critInfo('hazard')[0] + ' ' + critInfo('hazard')[1] + '!', '#fca5a5', .9); return crash(); }
     if (G.sands.some(q => q.x === nx && q.y === ny && q.t >= q.warn && q.t < q.warn + q.life)) return sinkCrash(nx, ny);
     const wi = G.webs.findIndex(w => w.x === nx && w.y === ny);
     if (wi >= 0){
@@ -1237,6 +1312,9 @@ function step(){
   G.from = G.snake.map((s, i) => i === 0 ? old[0] : (old[i - 1] || s));
 
   if (eatsFood) eatFood(nx, ny);
+  const prey = G.critters.find(q => q.kind === 'prey' && q.x === nx && q.y === ny);
+  if (prey) eatPrey(prey);
+  treasureStep(nx, ny);
   if (G.special && nx === G.special.x && ny === G.special.y) eatSpecial();
 
   // магнит
@@ -1309,18 +1387,205 @@ function drawSands(c){
   }
 }
 function winOasis(){
-  const forest = mode === 'forest';
+  const W = worldOf(mode), idx = WORLDS.indexOf(W);
   G.won = true;
   const bonus = 500;
   G.score += bonus;
   const h = G.snake[0];
   floatText(h.x, h.y - 1, '+' + bonus, '#ffd166', 1.4);
   for (let i = 0; i < 6; i++) burst(rnd(COLS), rnd(ROWS), ['#7ee0a0', '#ffd166', '#6fd3ff', '#fff'], 30);
-  banner(forest ? '🌲 ВЫХОД ИЗ ЛИХОЛЕСЬЯ!' : '🌴 ОАЗИС НАЙДЕН!');
-  G.webs.length = 0;
+  banner(W.win);
+  G.webs.length = 0; G.critters.length = 0; G.key = G.chest = null;
+  // звёзды и открытие следующего мира
+  const wasOpen = worldOpen(idx + 1), prog = worldProg(), prev = (prog[W.id] || {}).stars || 0, got = starsFor(G.score);
+  prog[W.id] = {stars:Math.max(prev, got)}; store.set(pk('ss_worlds'), prog);
+  G.result = {stars:got, prev, next: WORLDS[idx + 1] && !wasOpen ? WORLDS[idx + 1] : null};
   G.sands.length = 0;
   [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, 'triangle', .1, null, i * .11));
   die(true);
+}
+
+/* ---------- живность ---------- */
+const CRIT = {
+  meadow:{prey:['🐭', 'Мышь'],     hazard:['🦔', 'Ёж'],      thief:['🐦', 'Воробей']},
+  dunes: {prey:['🦎', 'Ящерица'],  hazard:['🦂', 'Скорпион'], thief:['🦅', 'Гриф']},
+  ruins: {prey:['🐭', 'Мышь'],     hazard:['🦇', 'Летучая мышь'], thief:['🐒', 'Мартышка']},
+  forest:{prey:['🐇', 'Заяц'],     hazard:['🕷️', 'Паук'],     thief:['🦉', 'Сова']}
+};
+const critInfo = kind => (CRIT[BIOME[mode]] || CRIT.meadow)[kind];
+const inB = (x, y) => x >= 0 && y >= 0 && x < COLS && y < ROWS;
+function critFree(x, y, self){
+  if (!inB(x, y) || G.obstacles.has(key(x, y))) return false;
+  if (G.snake.some((q, i) => i && q.x === x && q.y === y)) return false;
+  return !G.critters.some(q => q !== self && q.kind !== 'thief' && q.x === x && q.y === y);
+}
+function spawnCritter(kind){
+  const h = G.snake[0];
+  if (kind === 'thief'){
+    const side = rnd(4), t = Math.random() * (COLS - 1);
+    const [x, y] = [[t, -1], [COLS, t], [t, ROWS], [-1, t]][side];
+    G.critters.push({kind, x, y, px:x, py:y, born:G.anim, life:18000, state:'hunt', vx:0});
+    return;
+  }
+  for (let tries = 0; tries < 60; tries++){
+    const x = rnd(COLS), y = rnd(ROWS);
+    if (!isFree(x, y) || Math.abs(x - h.x) + Math.abs(y - h.y) < 6) continue;
+    G.critters.push({kind, x, y, px:x, py:y, mt:0, born:G.anim, life:kind === 'prey' ? 16000 : 22000,
+      dir:[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}][rnd(4)], vx:0});
+    return;
+  }
+}
+function eatPrey(q){
+  G.critters.splice(G.critters.indexOf(q), 1);
+  const pts = 50 * (G.powers.double ? 2 : 1);
+  G.score += pts; G.grow++; G.bonusXp += 15;
+  burst(q.x, q.y, ['#ffd166', '#fff', '#f0abfc'], 22);
+  floatText(q.x, q.y, `${critInfo('prey')[0]} +${pts}`, '#ffd166', 1.1);
+  SFX.chomp(); buzz([15, 20, 15]); updateHud(true);
+}
+function crittersUpdate(dt){
+  const L = G.level, h = G.snake[0];
+  if ((G.preyT -= dt) <= 0){ G.preyT = 11000 + Math.random() * 8000; if (!G.critters.some(q => q.kind === 'prey')) spawnCritter('prey'); }
+  if (L >= 2 && (G.hazT -= dt) <= 0){
+    G.hazT = 9000 + Math.random() * 7000;
+    if (G.critters.filter(q => q.kind === 'hazard').length < Math.min(3, 1 + Math.floor((L - 2) / 3))) spawnCritter('hazard');
+  }
+  if (L >= 3 && (G.thiefT -= dt) <= 0){ G.thiefT = 16000 + Math.random() * 12000; if (!G.critters.some(q => q.kind === 'thief')) spawnCritter('thief'); }
+  for (const q of [...G.critters]){
+    q.life -= dt;
+    if (q.kind === 'thief'){
+      // вор летит к яблоку, крадёт его и улетает
+      const tx = q.state === 'hunt' && G.food ? G.food.x : (q.x < COLS / 2 ? -3 : COLS + 2), ty = q.state === 'hunt' && G.food ? G.food.y : q.y - 2;
+      const dx = tx - q.x, dy = ty - q.y, d = Math.hypot(dx, dy) || 1, sp = (q.state === 'hunt' ? 2.4 : 4) * dt / 1000;
+      q.vx = dx; q.x += dx / d * Math.min(sp, d); q.y += dy / d * Math.min(sp, d);
+      if (q.state === 'hunt' && G.food && d < .3){
+        burst(G.food.x, G.food.y, ['#ff5a5a', '#fff'], 12);
+        floatText(G.food.x, G.food.y, `${critInfo('thief')[0]} Утащил!`, '#fca5a5', .9);
+        SFX.deny(); placeFood(); q.state = 'flee';
+      }
+      if (Math.hypot(h.x - q.x, h.y - q.y) < .8){
+        G.critters.splice(G.critters.indexOf(q), 1);
+        const pts = 40 * (G.powers.double ? 2 : 1); G.score += pts; G.bonusXp += 10;
+        burst(q.x, q.y, ['#fff', '#ffd166'], 18); floatText(q.x, q.y, `Поймал! +${pts}`, '#ffd166', 1); SFX.bonus(); updateHud(true);
+        continue;
+      }
+      if (q.state === 'flee' && (q.x < -2.5 || q.x > COLS + 1.5 || q.y < -2.5)) G.critters.splice(G.critters.indexOf(q), 1);
+      if (q.life <= 0 && q.state === 'hunt') q.state = 'flee';
+      continue;
+    }
+    if (q.life <= 0){ burst(q.x, q.y, ['#ddd'], 8); G.critters.splice(G.critters.indexOf(q), 1); continue; }
+    q.mt += dt;
+    const every = q.kind === 'prey' ? 340 : 700;
+    if (q.mt < every) continue;
+    q.mt = 0; q.px = q.x; q.py = q.y;
+    let opts = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}].filter(d => critFree(q.x + d.x, q.y + d.y, q));
+    if (!opts.length) continue;
+    let d;
+    if (q.kind === 'prey'){
+      const dist = Math.abs(h.x - q.x) + Math.abs(h.y - q.y);
+      if (dist <= 5) opts.sort((a, b) => (Math.abs(h.x - q.x - b.x) + Math.abs(h.y - q.y - b.y)) - (Math.abs(h.x - q.x - a.x) + Math.abs(h.y - q.y - a.y)));
+      else opts.sort(() => Math.random() - .5);
+      d = Math.random() < .15 ? opts[rnd(opts.length)] : opts[0];
+    } else {
+      const same = opts.find(o => o.x === q.dir.x && o.y === q.dir.y);
+      d = same && Math.random() > .25 ? same : opts[rnd(opts.length)];
+      q.dir = d;
+      if (BIOME[mode] === 'forest' && Math.random() < .25 && G.webs.length < 9 && !G.webs.some(w => w.x === q.x && w.y === q.y))
+        G.webs.push({x:q.x, y:q.y, t:0, life:12000, rot:Math.random() * 6.28});
+    }
+    q.vx = d.x || q.vx;
+    q.x += d.x; q.y += d.y;
+    if (q.x === h.x && q.y === h.y){
+      if (q.kind === 'prey'){ eatPrey(q); continue; }
+      if (!G.powers.ghost){ floatText(h.x, h.y, critInfo('hazard')[0] + ' ' + critInfo('hazard')[1] + '!', '#fca5a5', .9); crash(); }
+    }
+  }
+}
+function drawCritters(c){
+  const S = cell, font = `"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const q of G.critters){
+    const info = critInfo(q.kind), every = q.kind === 'prey' ? 340 : 700;
+    const t = q.kind === 'thief' ? 1 : Math.min(1, q.mt / every * 1.6);
+    const x = (q.kind === 'thief' ? q.x : q.px + (q.x - q.px) * t) + .5, y = (q.kind === 'thief' ? q.y : q.py + (q.y - q.py) * t) + .5;
+    const fly = q.kind === 'thief', blink = q.life < 2500 && q.kind !== 'thief' && Math.floor(q.life / 150) % 2;
+    if (blink) continue;
+    const hop = fly ? 0 : Math.abs(Math.sin(G.anim / 90)) * S * .08;
+    groundShadow(c, x * S + (fly ? S * .5 : S * .05), y * S + S * (fly ? .7 : .3), S * .3, S * .1, fly ? .2 : .3);
+    if (q.kind === 'hazard'){
+      c.strokeStyle = `rgba(255,80,80,${.35 + .2 * Math.sin(G.anim / 200)})`; c.lineWidth = S * .05;
+      c.beginPath(); c.arc(x * S, y * S, S * .5, 0, 7); c.stroke();
+    }
+    c.save(); c.translate(x * S, y * S - hop - (fly ? S * .2 : 0));
+    if (q.vx > 0) c.scale(-1, 1);
+    if (fly) c.scale(1, 1 + Math.sin(G.anim / 60) * .08);
+    c.font = `${S * (q.kind === 'prey' ? .72 : .8)}px ${font}`;
+    c.fillText(info[0], 0, 0);
+    c.restore();
+  }
+}
+
+/* ---------- ключи и сундуки ---------- */
+function spawnTreasure(){
+  const k = freeCell(5); if (!k) return;
+  G.key = {...k, born:G.anim, life:15000};
+  const ch = freeCell(6); if (!ch){ G.key = null; return; }
+  G.chest = {...ch, born:G.anim};
+  floatText(k.x, k.y - .6, '🗝️ Ключ!', '#ffd166', .9);
+}
+function openChest(){
+  const {x, y} = G.chest; G.chest = null; G.keys = 0;
+  const rewards = [
+    ['💰 +150 очков', () => { G.score += 150 * (G.powers.double ? 2 : 1); }],
+    ['❤️ +1 жизнь', () => { G.lives++; }],
+    ['🛡️ Щит', () => { G.shield = 1; }],
+    ['📜 +40 опыта', () => { G.bonusXp += 40; }],
+    ['💎 Очки ×2', () => { setPower('double', 8000); }],
+    ['👻 Призрак', () => { setPower('ghost', 6000); }]
+  ];
+  const [label, fn] = rewards[rnd(rewards.length)]; fn();
+  for (let i = 0; i < 3; i++) burst(x, y, ['#ffd166', '#fff4c2', '#b8740a', '#fff'], 18);
+  banner('🧰 ' + label); G.flash = .4; SFX.level(); buzz([20, 30, 20, 30]); updateHud(true);
+}
+function treasureUpdate(dt){
+  if (G.key && (G.key.life -= dt) <= 0){ G.key = null; if (!G.keys) G.chest = null; }
+  if (G.chestMsg > 0) G.chestMsg -= dt;
+}
+function treasureStep(x, y){
+  if (G.key && G.key.x === x && G.key.y === y){
+    G.keys = 1; G.key = null; burst(x, y, ['#ffd166', '#fff'], 16);
+    floatText(x, y, '🗝️ Теперь к сундуку!', '#ffd166', .9); SFX.bonus(); updateHud(true);
+  }
+  if (G.chest && G.chest.x === x && G.chest.y === y){
+    if (G.keys) openChest();
+    else if (G.chestMsg <= 0){ floatText(x, y, 'Нужен ключ 🗝️', '#fde68a', .8); G.chestMsg = 1500; }
+  }
+}
+function drawTreasure(c){
+  const S = cell;
+  if (G.chest){
+    const ch = G.chest, x = ch.x * S, y = ch.y * S, a = Math.min(1, (G.anim - ch.born) / 400);
+    c.save(); c.translate(x + S / 2, y + S / 2); c.scale(a, a); c.translate(-S / 2, -S / 2);
+    if (G.keys){ const gl = c.createRadialGradient(S/2, S/2, 0, S/2, S/2, S * 1.2); gl.addColorStop(0, `rgba(255,209,102,${.45 + .2 * Math.sin(G.anim / 150)})`); gl.addColorStop(1, 'rgba(255,209,102,0)'); c.fillStyle = gl; c.fillRect(-S * .7, -S * .7, S * 2.4, S * 2.4); }
+    groundShadow(c, S * .55, S * .9, S * .42, S * .1, .35);
+    const wood = c.createLinearGradient(0, S * .35, 0, S * .88); wood.addColorStop(0, '#9a5a24'); wood.addColorStop(1, '#5a3010');
+    c.fillStyle = wood; c.beginPath(); c.roundRect(S * .1, S * .38, S * .8, S * .5, S * .06); c.fill();
+    const lid = c.createLinearGradient(0, S * .12, 0, S * .4); lid.addColorStop(0, '#b8743a'); lid.addColorStop(1, '#7a4418');
+    c.fillStyle = lid; c.beginPath(); c.moveTo(S * .1, S * .4); c.lineTo(S * .1, S * .3); c.quadraticCurveTo(S * .5, S * .02, S * .9, S * .3); c.lineTo(S * .9, S * .4); c.closePath(); c.fill();
+    c.fillStyle = '#ffd166';
+    c.fillRect(S * .2, S * .2, S * .07, S * .68); c.fillRect(S * .73, S * .2, S * .07, S * .68); c.fillRect(S * .1, S * .37, S * .8, S * .05);
+    c.fillStyle = '#ffe9a8'; c.beginPath(); c.roundRect(S * .42, S * .42, S * .16, S * .18, S * .03); c.fill();
+    c.fillStyle = '#3a2008'; c.beginPath(); c.arc(S * .5, S * .49, S * .03, 0, 7); c.fill(); c.fillRect(S * .49, S * .49, S * .02, S * .07);
+    c.restore();
+  }
+  if (G.key && !(G.key.life < 3000 && Math.floor(G.key.life / 140) % 2)){
+    const k = G.key, cx = (k.x + .5) * S, cy = (k.y + .5) * S - S * .06 + Math.sin(G.anim / 200) * S * .06;
+    const gl = c.createRadialGradient(cx, cy, 0, cx, cy, S); gl.addColorStop(0, 'rgba(255,209,102,.55)'); gl.addColorStop(1, 'rgba(255,209,102,0)');
+    c.fillStyle = gl; c.beginPath(); c.arc(cx, cy, S, 0, 7); c.fill();
+    c.save(); c.translate(cx, cy); c.rotate(Math.sin(G.anim / 300) * .25);
+    c.font = `${S * .66}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('🗝️', 0, 0); c.restore();
+  }
 }
 
 /* ---------- Лихолесье: деревья, паутина, тьма ---------- */
@@ -1385,6 +1650,8 @@ function drawDarkness(c){
   hole((h.x + .5) * S, (h.y + .5) * S, lr);
   G.snake.forEach((q, i) => { if (i && i % 3 === 0) hole((q.x + .5) * S, (q.y + .5) * S, S * 1.1, .5); });
   if (G.food) hole((G.food.x + .5) * S, (G.food.y + .5) * S, S * (1.1 + .15 * Math.sin(G.anim / 300)), .75);
+  if (G.key) hole((G.key.x + .5) * S, (G.key.y + .5) * S, S, .7);
+  if (G.chest && G.keys) hole((G.chest.x + .5) * S, (G.chest.y + .5) * S, S * 1.2, .7);
   if (G.special) hole((G.special.x + .5) * S, (G.special.y + .5) * S, S * 1.1, .7);
   for (const m of motes) hole(m.x, m.y, m.r * 7, .55 * (.5 + .5 * Math.sin(G.anim / m.tw + m.ph)));
   c.drawImage(darkCv, 0, 0, W, W);
@@ -1426,6 +1693,7 @@ function crash(){
 }
 
 function eatFood(x, y){
+  const kind = (G.food && G.food.kind) || 'apple';
   const quick = G.clock - G.lastEat < comboWindow();
   const cap = 4 + sk('gamble');
   G.combo = quick ? Math.min(G.combo + 1, cap) : Math.floor(G.combo * .25 * sk('combokeep'));
@@ -1438,7 +1706,22 @@ function eatFood(x, y){
   pts *= 1 + Math.min(.5, .01 * sk('coil') * Math.max(0, G.snake.length - 10));
   const big = Math.random() < .08 * sk('bigbite');
   if (big) pts *= 2;
-  pts = Math.round(pts);
+  if (kind === 'pepper') pts *= 1.5;
+  else if (kind === 'rotten') pts *= .3;
+  else if (kind === 'rainbow') pts *= 3;
+  pts = Math.max(1, Math.round(pts));
+  if (kind === 'pepper'){ setPower('fast', 4000); floatText(x, y - 1.4, '🌶️ Остро!', '#ff8a4c', .9); }
+  if (kind === 'rotten'){
+    G.combo = 0;
+    const cut = Math.min(2, G.snake.length - 3);
+    for (let i = 0; i < cut; i++){ const q = G.snake.pop(); G.from.pop(); burst(q.x, q.y, ['#8a7a3a', '#5a4a20'], 5); }
+    floatText(x, y - 1.4, 'Фу! 🤢', '#b5a55a', .9);
+  }
+  if (kind === 'rainbow'){
+    const pw = ['double', 'slow', 'ghost'][rnd(3)]; setPower(pw, 6000);
+    for (let i = 0; i < 3; i++) burst(x, y, ['#ff5a5a', '#ffd166', '#7ee0a0', '#6fd3ff', '#c4b5fd'], 14);
+    floatText(x, y - 1.4, '🌈 Радуга ×3!', '#fff', 1); G.flash = .35;
+  }
   if (G.powers.double) pts *= 2;
   const feast = sk('feast') && G.eaten % 10 === 0;
   if (feast){ pts *= 5; banner('🍗 ПИР! ×5'); G.flash = .4; }
@@ -1456,6 +1739,7 @@ function eatFood(x, y){
   if (G.eaten % APPLES_PER_LEVEL === 0) levelUp();
   placeFood();
   if (!G.special && G.eaten >= 3 && Math.random() < 0.33 * (1 + 0.2 * sk('luck'))) spawnSpecial();
+  if (G.level >= 2 && !G.key && !G.chest && !G.keys && Math.random() < .09) spawnTreasure();
   updateHud(true);
 }
 
@@ -1480,7 +1764,7 @@ function eatSpecial(){
 function levelUp(){
   G.level++;
   Music.setWave(G.level);
-  const goal = mode === 'portal' || mode === 'forest';
+  const goal = true;
   if (goal && G.level >= OASIS_WAVE) return winOasis();
   banner(goal ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
   if (mode === 'forest' && G.obstacles.size < 45 && Math.random() < .8) addTree();
@@ -1516,7 +1800,7 @@ function summonApple(){
     if (G.food && G.food.x === x && G.food.y === y) return;
     if (isFree(x, y)){
       if (G.food) burst(G.food.x, G.food.y, ['#ff5a5a', '#fff'], 10);
-      G.food = {x, y, born:G.anim}; burst(x, y, ['#ff5a5a', '#ffd166', '#fff'], 16);
+      G.food = {x, y, born:G.anim, kind:G.food ? G.food.kind : 'apple'}; burst(x, y, ['#ff5a5a', '#ffd166', '#fff'], 16);
       return;
     }
   }
@@ -1548,7 +1832,16 @@ function die(win = false){
 
 function showGameOver(){
   G.state = 'over';
-  $('goTitle').textContent = G.won ? (mode === 'forest' ? '🌲 Выход найден!' : '🌴 Оазис найден!') : 'Игра окончена';
+  $('goTitle').textContent = G.won ? worldOf(mode).title : 'Игра окончена';
+  const R = G.won && G.result;
+  $('goStars').innerHTML = R ? [1, 2, 3].map(i => `<span class="${i <= R.stars ? 'on' : ''}" style="animation-delay:${.3 + i * .25}s">★</span>`).join('') : '';
+  $('goStars').style.display = R ? '' : 'none';
+  $('goUnlock').style.display = R && R.next ? '' : 'none';
+  if (R && R.next) $('goUnlock').textContent = `🗺️ Открыт новый мир: ${R.next.name}!`;
+  const hasNext = !!(R && WORLDS[WORLDS.indexOf(worldOf(mode)) + 1]);
+  $('btnNextWorld').style.display = hasNext ? '' : 'none';
+  $('btnAgain').className = 'btn ' + (hasNext ? 'ghost' : 'primary');
+  if (R && R.next) setTimeout(() => SFX.learn(), 900);
   $('stLen').textContent = G.snake.length;
   $('stApples').textContent = G.eaten;
   $('stCombo').textContent = '×' + (1 + G.maxCombo);
@@ -1634,10 +1927,10 @@ function updateHud(force){
   if (force || hudTimer <= 0){
     hudTimer = 120;
     $('powers').innerHTML = Object.keys(G.powers).map(id => {
-      const sp = SPECIALS.find(s => s.id === id);
+      const sp = SPECIALS.find(s => s.id === id) || {fast:{emoji:'🌶️', color:'#ff8a4c'}}[id] || {emoji:'✨', color:'#fff'};
       return `<div class="pw" style="color:${sp.color}">${sp.emoji}<i><u style="width:${Math.max(0, G.powers[id] / (G.powerMax[id] || 1) * 100)}%"></u></i></div>`;
     }).join('');
-    $('lives').textContent = (G.lives > 3 ? '❤️×' + G.lives : '❤️'.repeat(G.lives)) + (G.shield ? '🛡️' : '');
+    $('lives').textContent = (G.lives > 3 ? '❤️×' + G.lives : '❤️'.repeat(G.lives)) + (G.shield ? '🛡️' : '') + (G.keys ? '🗝️' : '');
   }
 }
 
@@ -1975,16 +2268,35 @@ function drawApple(c){
   if (r <= 0) return;
   groundShadow(c, cx + S * .08, cy0 + S * .3, r * (.9 - bob / S), r * .35, .32);
   const feastNext = sk('feast') && (G.eaten + 1) % 10 === 0;
+  if (f.kind === 'pepper'){
+    const pg = c.createRadialGradient(cx, cy, 0, cx, cy, r * 2.4);
+    pg.addColorStop(0, 'rgba(255,120,40,.5)'); pg.addColorStop(1, 'rgba(255,80,20,0)');
+    c.fillStyle = pg; c.beginPath(); c.arc(cx, cy, r * 2.4, 0, 7); c.fill();
+    c.save(); c.translate(cx, cy); c.rotate(Math.sin(G.anim / 200) * .15);
+    c.font = `${r * 2.1}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('🌶️', 0, 0); c.restore();
+    return;
+  }
+  const rot = f.kind === 'rotten', rain = f.kind === 'rainbow', hh = G.anim / 8;
   const gl = c.createRadialGradient(cx, cy, 0, cx, cy, r * 2.4);
-  gl.addColorStop(0, feastNext ? 'rgba(255,209,102,.7)' : 'rgba(255,90,80,.38)'); gl.addColorStop(1, 'rgba(255,80,80,0)');
+  gl.addColorStop(0, rain ? `hsla(${hh},90%,65%,.6)` : rot ? 'rgba(140,130,60,.3)' : feastNext ? 'rgba(255,209,102,.7)' : 'rgba(255,90,80,.38)'); gl.addColorStop(1, 'rgba(255,80,80,0)');
   c.fillStyle = gl; c.beginPath(); c.arc(cx, cy, r * 2.4, 0, 7); c.fill();
   const g = c.createRadialGradient(cx - r*.35, cy - r*.35, r*.1, cx, cy, r*1.1);
-  if (feastNext){ g.addColorStop(0, '#fff4c2'); g.addColorStop(.45, '#ffc93b'); g.addColorStop(1, '#b8740a'); }
+  if (rain){ g.addColorStop(0, `hsl(${hh + 60},95%,80%)`); g.addColorStop(.45, `hsl(${hh},90%,58%)`); g.addColorStop(1, `hsl(${hh - 80},80%,38%)`); }
+  else if (rot){ g.addColorStop(0, '#c9b36a'); g.addColorStop(.45, '#8a7434'); g.addColorStop(1, '#4a3a18'); }
+  else if (feastNext){ g.addColorStop(0, '#fff4c2'); g.addColorStop(.45, '#ffc93b'); g.addColorStop(1, '#b8740a'); }
   else { g.addColorStop(0, '#ff9a8a'); g.addColorStop(.45, '#e8282f'); g.addColorStop(1, '#8e0c24'); }
   c.fillStyle = g; c.beginPath(); c.ellipse(cx, cy + r*.05, r*1.04, r*.96, 0, 0, 7); c.fill();
   c.fillStyle = 'rgba(255,220,120,.18)';
   for (let i = 0; i < 6; i++){ const an = i * 1.1 + 1; c.beginPath(); c.arc(cx + Math.cos(an) * r * .55, cy + Math.sin(an) * r * .5, r * .05, 0, 7); c.fill(); }
   c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(cx - r*.38, cy - r*.35, r*.26, r*.15, -.6, 0, 7); c.fill();
+  if (rot){
+    c.fillStyle = 'rgba(40,28,10,.75)';
+    [[.3, .2, .22], [-.25, .35, .15], [.05, -.1, .12]].forEach(([dx, dy, rr]) => { c.beginPath(); c.arc(cx + dx * r, cy + dy * r, rr * r, 0, 7); c.fill(); });
+    const fx = cx + Math.cos(G.anim / 160) * r * 1.2, fy = cy - r * 1.1 + Math.sin(G.anim / 110) * r * .4;   // муха
+    c.fillStyle = '#111'; c.beginPath(); c.arc(fx, fy, S * .04, 0, 7); c.fill();
+    c.fillStyle = 'rgba(220,230,255,.6)'; c.beginPath(); c.ellipse(fx - S * .03, fy - S * .03, S * .035, S * .02, .5, 0, 7); c.fill();
+  }
   c.strokeStyle = '#5a321c'; c.lineWidth = S * .07; c.lineCap = 'round';
   c.beginPath(); c.moveTo(cx, cy - r*.8); c.quadraticCurveTo(cx + r*.05, cy - r*1.2, cx + r*.22, cy - r*1.3); c.stroke();
   const lg = c.createLinearGradient(cx + r*.2, cy - r*1.3, cx + r*.8, cy - r);
@@ -2290,8 +2602,10 @@ function render(dt){
   drawSands(c);
   if (mode === 'forest') drawWebs(c);
   drawObstacles(c);
+  drawTreasure(c);
   drawApple(c);
   drawSpecial(c);
+  drawCritters(c);
   let t = 1;
   if (G.state === 'play' || G.state === 'paused') t = Math.min(1, G.acc / stepMs());
   else if (G.state === 'ready') t = 0;
@@ -2316,6 +2630,7 @@ function frame(now){
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
       if (mode === 'portal') sandsUpdate(dt);
       if (mode === 'forest') websUpdate(dt);
+      crittersUpdate(dt); treasureUpdate(dt);
       G.wave += dt / stepMs() * 2.4;
       for (const g of G.gulps) g.p += dt / stepMs();
       G.gulps = G.gulps.filter(g => g.p < G.snake.length + 1);
@@ -2661,7 +2976,7 @@ function openTree(){
   $('treeGrid').parentElement.scrollTop = 0;
 }
 
-$('btnPlay').onclick = () => { SFX.click(); startGame(); };
+$('btnPlay').onclick = () => { SFX.click(); openMap(); };
 $('btnPause').onclick = () => { SFX.click(); pause(); };
 $('btnResume').onclick = () => { SFX.click(); resume(); };
 $('btnRestart').onclick = () => { SFX.click(); startGame(); };
@@ -2692,7 +3007,7 @@ document.addEventListener('keydown', e => {
     if (!G) return;
     if (G.state === 'paused') resume(); else pause();
   }
-  if (e.key === 'Enter' && $('menu').classList.contains('active')) startGame();
+  if (e.key === 'Enter' && $('menu').classList.contains('active')) openMap();
   else if (e.key === 'Enter' && G && G.state === 'over') startGame();
 });
 
@@ -2852,6 +3167,73 @@ function renderRecords(){
 $('recTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; recFilter = b.dataset.val; SFX.click(); renderRecords(); });
 $('btnRecords').onclick = () => { SFX.click(); renderRecords(); overlay('ovRecords', true); };
 $('btnCloseRecords').onclick = () => { SFX.click(); overlay('ovRecords', false); };
+
+/* ===================== WORLD MAP ===================== */
+let mapSel = null;
+function openMap(){
+  G = null; hideTitle(); overlay('ovPause', false); overlay('ovOver', false);
+  if (mapSel === null){
+    // по умолчанию — первый открытый, но ещё не пройденный мир (или последний открытый)
+    let i = WORLDS.findIndex((w, k) => worldOpen(k) && !worldStars(w.id));
+    if (i < 0) i = WORLDS.map((w, k) => worldOpen(k)).lastIndexOf(true);
+    mapSel = i;
+  }
+  show('map'); renderMap(); Music.play('menu');
+  requestAnimationFrame(() => { const n = document.querySelector('.wnode.sel'); if (n) n.scrollIntoView({block:'center'}); });
+}
+function renderMap(){
+  const total = WORLDS.reduce((a, w) => a + worldStars(w.id), 0);
+  $('mapStars').textContent = `★ ${total} / ${WORLDS.length * 3}`;
+  const box = $('mapPath'), wBox = Math.min(520, $('mapScroll').clientWidth || 360), rowH = 150, n = WORLDS.length + 1;
+  const H = n * rowH + 40;
+  box.style.width = wBox + 'px'; box.style.height = H + 'px';
+  // путь снизу вверх: первый мир внизу
+  const pos = i => ({x: wBox * (i % 2 ? .7 : .3), y: H - 90 - i * rowH});
+  let d = '';
+  for (let i = 0; i < n; i++){ const p = pos(i); if (!i){ d += `M${p.x},${p.y}`; continue; } const q = pos(i - 1); d += ` C${q.x},${q.y - rowH * .55} ${p.x},${p.y + rowH * .55} ${p.x},${p.y}`; }
+  const done = WORLDS.filter((w, i) => worldOpen(i + 1) || worldStars(w.id)).length;
+  let dDone = '';
+  for (let i = 1; i <= Math.min(done, n - 1); i++){ const p = pos(i), q = pos(i - 1); dDone += `${i === 1 ? `M${q.x},${q.y}` : ''} C${q.x},${q.y - rowH * .55} ${p.x},${p.y + rowH * .55} ${p.x},${p.y}`; }
+  let html = `<svg width="${wBox}" height="${H}"><path d="${d}" fill="none" stroke="rgba(214,240,160,.18)" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>` +
+    (dDone ? `<path d="${dDone}" fill="none" stroke="#e8c46a" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(255,209,102,.7))"/>` : '') + '</svg>';
+  WORLDS.forEach((w, i) => {
+    const p = pos(i), open = worldOpen(i), st = worldStars(w.id);
+    const cls = ['wnode', i === mapSel ? 'sel' : '', open ? '' : 'locked', st ? 'done' : '', open && !st ? 'fresh' : ''].join(' ');
+    html += `<div class="${cls}" data-w="${i}" style="left:${p.x}px;top:${p.y - 46}px">
+      <div class="orb" style="background-image:url('img/${w.id}.jpg')"><span class="wnum">${i + 1}</span>${open ? '' : '<span class="lock">🔒</span>'}</div>
+      <div class="wstars">${[1, 2, 3].map(k => `<span class="${k <= st ? 'on' : ''}">★</span>`).join('')}</div>
+      <b>${w.name}</b></div>`;
+  });
+  const p = pos(WORLDS.length);
+  html += `<div class="wnode locked" style="left:${p.x}px;top:${p.y - 46}px"><div class="orb"><span class="lock">❔</span></div><b>Скоро новые миры…</b></div>`;
+  box.innerHTML = html;
+  renderMapCard();
+}
+function renderMapCard(){
+  const w = WORLDS[mapSel], open = worldOpen(mapSel), st = worldStars(w.id), best = getBest(w.mode);
+  const prev = WORLDS[mapSel - 1];
+  $('mapCard').innerHTML = `
+    <div class="mc-top"><div class="mc-img" style="background-image:url('img/${w.id}.jpg')"></div>
+      <div><div class="mc-name">${w.name}</div><div class="mc-sub">Мир ${mapSel + 1} · ${MODES[w.mode].icon} ${MODES[w.mode].name} · рекорд ${best}</div></div></div>
+    <div class="mc-desc">${w.desc}</div>
+    <div class="mc-goal">★ дойти до ${OASIS_WAVE}-й волны · ★★ ${STAR_SCORE[1]} очков · ★★★ ${STAR_SCORE[2]} очков</div>
+    ${open ? `<button class="btn primary" id="btnMapGo">${st ? '▶ Сыграть снова' : '▶ В путь!'}</button>`
+           : `<button class="btn ghost" disabled>🔒 Сначала пройди «${prev.name}»</button>`}`;
+}
+$('mapPath').addEventListener('click', e => {
+  const n = e.target.closest('.wnode[data-w]'); if (!n) return;
+  mapSel = +n.dataset.w; SFX.click(); renderMap();
+});
+$('mapCard').addEventListener('click', e => {
+  if (!e.target.closest('#btnMapGo')) return;
+  mode = WORLDS[mapSel].mode; store.set('ss_mode', mode); SFX.click(); startGame();
+});
+$('btnMapBack').onclick = () => { SFX.click(); toMenu(); };
+$('btnGoMap').onclick = () => { SFX.click(); mapSel = WORLDS.indexOf(worldOf(mode)); openMap(); };
+$('btnNextWorld').onclick = () => {
+  const i = WORLDS.indexOf(worldOf(mode)) + 1; if (!WORLDS[i]) return;
+  mapSel = i; SFX.click(); openMap();
+};
 
 /* ===================== PLAYERS UI ===================== */
 const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

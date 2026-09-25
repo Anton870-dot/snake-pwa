@@ -96,7 +96,7 @@ button:disabled{cursor:default}
   box-shadow:0 12px 32px rgba(255,80,80,.45),inset 0 1px 0 rgba(255,255,255,.45);animation:glow 2.2s ease-in-out infinite}
 .btn-play small{display:block;font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.85;margin-top:2px}
 @keyframes glow{50%{box-shadow:0 12px 44px rgba(255,80,80,.7),inset 0 1px 0 rgba(255,255,255,.45)}}
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.row3{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .tile{position:relative;padding:10px 4px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;font-size:13px}
 .tile i{font-style:normal;font-size:22px}
 .tile.hot{border-color:rgba(167,139,250,.8);box-shadow:0 0 20px rgba(139,92,246,.35)}
@@ -124,7 +124,25 @@ button:disabled{cursor:default}
 .path-row.locked .path-txt b{color:var(--muted)}
 .path-row.sel .path-txt b{color:var(--c)}
 .path-tier{font-size:10px;font-weight:800;color:var(--muted);border:1px solid var(--stroke);border-radius:8px;padding:2px 6px;white-space:nowrap}
+.path-txt .price{color:#ffd166;font-weight:800;white-space:nowrap}
 .path-total{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin:2px 0 4px}
+/* ---------- кошелёк и магазин ---------- */
+.wallet{display:flex;gap:10px;margin-top:6px;font-size:12px;font-weight:800;color:#fff3dc}
+.shop h2{margin-bottom:8px}
+.shop-wal{display:flex;justify-content:center;gap:14px;font-size:17px;font-weight:900;margin-bottom:6px}
+.shop-sec{text-align:left;font-size:13px;font-weight:800;color:var(--muted);margin:14px 0 8px}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.shop-grid.two{grid-template-columns:1fr 1fr}
+.offer{padding:12px 4px 10px;border-radius:16px;background:var(--panel);border:1px solid var(--stroke);display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:900;font-size:15px}
+.offer small{font-size:11px;font-weight:700;color:var(--muted)}
+.offer b{font-size:12px;color:#ffd166}
+.offer:disabled{opacity:.45}
+.offer.best{border-color:rgba(255,209,102,.7);box-shadow:0 0 16px rgba(255,209,102,.25)}
+.shop-note{font-size:11.5px;color:var(--muted);margin-top:8px}
+.shop-soon{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.shop-soon span{padding:7px 10px;border-radius:12px;border:1px dashed var(--stroke);font-size:12.5px;font-weight:700;color:var(--muted)}
+.go-loot{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;font-size:13px;font-weight:800}
+.go-loot .wal{flex-basis:100%;color:var(--muted);font-weight:700}
 /* ---------- карта затерянных миров ---------- */
 #map{gap:10px;background:#0a1108}
 #map .tree-head h2{font-size:19px;white-space:nowrap}
@@ -554,12 +572,14 @@ canvas{display:block}
       <div class="lvl-badge"><div><small>УР.</small><b id="pLvl">1</b></div></div>
       <div class="xp-info">
         <div class="xp-row"><span class="p-name"><span id="pName">Игрок</span><em>✎</em></span><span id="pXp">0 / 150 XP</span></div>
+        <div class="wallet" id="wallet"></div>
         <div class="xpbar"><div id="pXpFill"></div></div>
       </div>
     </button>
     <button class="btn-play" id="btnPlay">ИГРАТЬ<small>🗺️ Карта затерянных миров · <span id="menuStars">★ 0</span></small></button>
     <div class="row3">
       <button class="tile glass" id="btnTree"><i>🧬</i>Навыки<span class="badge" id="treeBadge">1</span></button>
+      <button class="tile glass" id="btnShop"><i>🛒</i>Магазин</button>
       <button class="tile glass" id="btnRecords"><i>🏆</i>Рекорды</button>
       <button class="tile glass" id="btnSettings"><i>⚙️</i>Настройки</button>
     </div>
@@ -661,10 +681,12 @@ canvas{display:block}
       <div class="xp-row"><span id="goLvl">Уровень змейки 1</span><b id="goXp">+0 XP</b></div>
       <div class="xpbar"><div id="goXpFill"></div></div>
       <div class="lvlup" id="goLvlUp"></div>
+      <div class="go-loot" id="goLoot"></div>
     </div>
     <button class="btn primary" id="btnNextWorld" style="display:none">Следующий мир ▶</button>
     <button class="btn primary" id="btnAgain">Ещё раз</button>
     <button class="btn ghost" id="btnGoMap">🗺️ Карта миров</button>
+    <button class="btn ghost" id="btnAdDouble" style="display:none">📺 Удвоить яблоки</button>
     <button class="btn magic" id="btnGoTree" style="display:none">🧬 Прокачать змейку</button>
     <button class="btn ghost" id="btnToMenu2">Главное меню</button>
   </div>
@@ -682,6 +704,22 @@ canvas{display:block}
     </div>
     <button class="btn ghost" id="btnPlAdd">＋ Новый игрок</button>
     <button class="btn ghost" id="btnPlClose">Закрыть</button>
+  </div>
+</div>
+
+<!-- ===== SHOP ===== -->
+<div class="overlay" id="ovShop">
+  <div class="card shop">
+    <h2>🛒 Магазин</h2>
+    <div class="shop-wal" id="shopWal"></div>
+    <div class="shop-sec">🍎 → 🪙 Обмен яблок на золото</div>
+    <div class="shop-grid" id="shopExchange"></div>
+    <div class="shop-sec">📺 Награда за рекламу</div>
+    <div class="shop-grid" id="shopAds"></div>
+    <div class="shop-note" id="shopAdNote"></div>
+    <div class="shop-sec">✨ Скоро</div>
+    <div class="shop-soon"><span>🎩 Украшения</span><span>🎨 Скины</span><span>🎵 Мелодии</span></div>
+    <button class="btn ghost" id="btnCloseShop">Закрыть</button>
   </div>
 </div>
 
@@ -784,7 +822,7 @@ const MODES = {
 const getBest = (m, f = false) => (store.get(pk('ss_best'), {})[f ? m + '_free' : m] || 0);
 
 /* ===================== PROGRESSION (RPG) ===================== */
-const XP_NEED = L => 150 + 100 * (L - 1);
+const XP_NEED = L => Math.round(300 * Math.pow(L, 1.6));   // жёсткая прокачка: каждый уровень заметно дороже
 function levelInfo(xp){
   let L = 1, need = XP_NEED(1);
   while (xp >= need){ xp -= need; L++; need = XP_NEED(L); }
@@ -801,7 +839,18 @@ profile.skills = profile.skills || {};
 const saveProfile = () => store.set(pk('ss_profile'), profile);
 const sk = id => profile.skills[id] || 0;
 const spentPts = () => Object.values(profile.skills).reduce((a, b) => a + b, 0);
-const pointsLeft = () => Math.max(0, levelInfo(profile.xp).level + 2 * sk('ancient') - spentPts());
+// ---- кошелёк: 🍎 яблоки (копятся за игры) → 🪙 золото (обычные навыки), 💠 кристаллы (редкие, для ульт)
+if (profile.econ !== 1){ profile.econ = 1; profile.apples = profile.apples || 0; profile.gold = (profile.gold || 0) + 30; profile.crystals = profile.crystals || 0; profile.paid = {gold:0, cr:0}; store.set(pk('ss_profile'), profile); }
+profile.paid = profile.paid || {gold:0, cr:0};
+const XP_RATE = .3;   // сколько опыта даёт одно очко
+const TIER_GOLD = [15, 25, 40, 60, 85, 115, 150, 200];
+function nodePrice(id, r = sk(id)){
+  const {n, t} = NODE[id];
+  if (n.ult) return {cr:2 + Math.floor(t / 3) + r};
+  return {gold:Math.round(TIER_GOLD[t] * (1 + r * .6) * (1 - .15 * sk('ancient')))};
+}
+const priceText = pr => pr.cr ? `${pr.cr} 💠` : `${pr.gold} 🪙`;
+const pointsLeft = () => Object.keys(NODE).filter(id => nodeStatus(id).ok).length;   // сколько навыков можно купить прямо сейчас
 const DIFF_XP = {easy:.75, normal:1, hard:1.25, insane:1.5};
 
 const ACTIVES = {
@@ -851,7 +900,7 @@ const TREE = [
     {id:'bounce',    icon:'↩️', name:'Рикошет', max:1, desc:'Удар о стену не убивает — змейка отскакивает в сторону. Не чаще раза в 10 секунд.', eff:() => 'отскок от стены раз в 10 с'},
     {id:'explorer',  icon:'🗺️', name:'Первооткрыватель', max:2, desc:'Каждая пройденная волна приносит дополнительный опыт.', eff:r => `+${20*r} XP за волну`},
     {id:'supply',    icon:'🎒', name:'Походный рюкзак', max:2, desc:'В начале каждой игры змейка получает бонус «Очки ×2».', eff:r => `💎 ×2 очков первые ${5*r} с`},
-    {id:'ancient',   icon:'🏛️', name:'Древнее знание', max:1, ult:true, desc:'Мудрость затерянных миров: дарит 2 очка навыков (одно сразу окупается).', eff:() => '+2 🧬 очка навыков'}
+    {id:'ancient',   icon:'🏛️', name:'Древнее знание', max:1, ult:true, desc:'Мудрость затерянных миров: все навыки за золото становятся дешевле.', eff:() => 'навыки за 🪙 дешевле на 15%'}
   ]},
   {id:'tracker', name:'Следопыт', icon:'🐾', color:'#f59e0b', nodes:[
     {id:'tracking',  icon:'🐾', name:'Чутьё', max:2, desc:'Добыча (мыши, ящерицы, зайцы) появляется чаще.', eff:r => `добыча в ${fmt(1 + .3 * r)} раза чаще`},
@@ -879,8 +928,10 @@ function nodeStatus(id){
   if (r >= n.max) return {max:true};
   if (lvl < TIER_LVL[t]) return {locked:true, lvlLock:TIER_LVL[t], reason:`🔒 Откроется на уровне змейки ${TIER_LVL[t]}`};
   if (t > 0 && sk(b.nodes[t-1].id) < 1) return {locked:true, reason:`🔒 Сначала изучи «${b.nodes[t-1].name}»`};
-  if (pointsLeft() < 1) return {reason:'Нет очков — играй, чтобы набрать опыт'};
-  return {ok:true};
+  const pr = nodePrice(id);
+  if (pr.gold && (profile.gold || 0) < pr.gold) return {price:pr, reason:`Не хватает ${pr.gold - (profile.gold || 0)} 🪙 — загляни в магазин`};
+  if (pr.cr && (profile.crystals || 0) < pr.cr) return {price:pr, reason:`Нужно ${pr.cr} 💠 — кристаллы редкие`};
+  return {ok:true, price:pr};
 }
 
 const hue = h => ((h % 360) + 360) % 360;
@@ -1120,6 +1171,7 @@ function renderMenu(){
   $('pXp').textContent = `${i.cur} / ${i.need} XP`;
   $('pXpFill').style.width = (i.cur / i.need * 100) + '%';
   $('pName').textContent = playerName();
+  $('wallet').innerHTML = `<span>🍎 ${profile.apples}</span><span>🪙 ${profile.gold}</span><span>💠 ${profile.crystals}</span>`;
   $('treeBadge').textContent = p;
   $('treeBadge').style.display = p > 0 ? '' : 'none';
   $('btnTree').classList.toggle('hot', p > 0);
@@ -1418,7 +1470,8 @@ function winOasis(){
   // звёзды и открытие следующего мира
   const wasOpen = worldOpen(idx + 1), prog = worldProg(), prev = (prog[W.id] || {}).stars || 0, got = starsFor(G.score);
   prog[W.id] = {stars:Math.max(prev, got)}; store.set(pk('ss_worlds'), prog);
-  G.result = {stars:got, prev, next: WORLDS[idx + 1] && !wasOpen ? WORLDS[idx + 1] : null};
+  const newStars = Math.max(0, got - prev); profile.crystals += newStars; saveProfile();
+  G.result = {stars:got, prev, cr:newStars, next: WORLDS[idx + 1] && !wasOpen ? WORLDS[idx + 1] : null};
   G.sands.length = 0;
   [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, 'triangle', .1, null, i * .11));
   die(true);
@@ -1701,12 +1754,14 @@ function openChest(){
     ['❤️ +1 жизнь', () => { G.lives++; }],
     ['🛡️ Щит', () => { G.shield = 1; }],
     ['📜 +40 опыта', () => { G.bonusXp += 40; }],
+    ['🪙 +10 золота', () => { profile.gold += 10; saveProfile(); }],
     ['💎 Очки ×2', () => { setPower('double', 8000); }],
     ['👻 Призрак', () => { setPower('ghost', 6000); }]
   ];
   const picks = rewards.sort(() => Math.random() - .5).slice(0, sk('goldchest') ? 2 : 1);
   picks.forEach(([, fn]) => fn());
-  const label = picks.map(p => p[0]).join(' + ');
+  let label = picks.map(p => p[0]).join(' + ');
+  if (Math.random() < .03){ profile.crystals++; saveProfile(); label += ' + 💠 КРИСТАЛЛ!'; }
   for (let i = 0; i < 3; i++) burst(x, y, ['#ffd166', '#fff4c2', '#b8740a', '#fff'], 18);
   fxRing(x, y, '#ffd166', 3.5, .18, 1.2); fxRing(x, y, '#fff', 2, .06, .8);
   banner('🧰 ' + label); G.flash = .4; SFX.level(); buzz([20, 30, 20, 30]); updateHud(true);
@@ -1994,10 +2049,17 @@ function die(win = false){
     store.set('ss_records', recs.slice(0, 30));
   }
   // опыт
-  const gain = Math.round(G.score * (DIFF_XP[settings.diff] || 1) * (1 + .1 * sk('scholar')) + G.bonusXp);
+  const gain = Math.round(G.score * XP_RATE * (DIFF_XP[settings.diff] || 1) * (1 + .1 * sk('scholar')) + G.bonusXp);
   const before = levelInfo(profile.xp);
-  profile.xp += gain; saveProfile();
-  G.xp = {gain, before, after:levelInfo(profile.xp)};
+  profile.xp += gain;
+  const after = levelInfo(profile.xp);
+  // награды за новые уровни: золото, а каждый 5-й уровень — кристалл
+  let lvGold = 0, lvCr = 0;
+  for (let L = before.level + 1; L <= after.level; L++){ lvGold += 20 * L; if (L % 5 === 0) lvCr++; }
+  profile.gold += lvGold; profile.crystals += lvCr;
+  profile.apples += G.eaten;
+  saveProfile();
+  G.xp = {gain, before, after, lvGold, lvCr, apples:G.eaten};
 }
 
 function showGameOver(){
@@ -2029,10 +2091,14 @@ function showGameOver(){
   setTimeout(() => { fill.style.width = (after.cur / after.need * 100) + '%'; }, 250);
   const lu = $('goLvlUp');
   lu.classList.toggle('on', up > 0);
-  if (up > 0) lu.textContent = `🎉 Новый уровень! +${up} ${plural(up,'очко','очка','очков')} навыков`;
+  if (up > 0) lu.textContent = `🎉 Новый уровень! +${G.xp.lvGold} 🪙` + (G.xp.lvCr ? ` +${G.xp.lvCr} 💠` : '');
+  const cr = (G.result && G.result.cr) || 0;
+  $('goLoot').innerHTML = `<span>🍎 +${G.xp.apples}</span>` + (cr ? `<span>💠 +${cr} за звёзды</span>` : '') + `<span class="wal">🍎 ${profile.apples} · 🪙 ${profile.gold} · 💠 ${profile.crystals}</span>`;
+  $('btnAdDouble').style.display = Ads.ready() && G.xp.apples > 0 ? '' : 'none';
+  $('btnAdDouble').disabled = false; $('btnAdDouble').textContent = `📺 Удвоить яблоки (+${G.xp.apples} 🍎)`;
   const pts = pointsLeft();
   $('btnGoTree').style.display = pts > 0 ? '' : 'none';
-  $('btnGoTree').textContent = `🧬 Прокачать змейку (${pts})`;
+  $('btnGoTree').textContent = `🧬 Прокачать змейку (можно купить: ${pts})`;
   overlay('ovOver', true);
   const target = G.score, t0 = performance.now();
   (function count(now){
@@ -3231,12 +3297,12 @@ function renderTree(){
   $('tLvl').textContent = info.level;
   $('tXp').textContent = `${info.cur} / ${info.need} XP`;
   $('tXpFill').style.width = (info.cur / info.need * 100) + '%';
-  $('ptsPill').innerHTML = `🧬 <b>${pts}</b> ${plural(pts,'очко','очка','очков')}`;
+  $('ptsPill').innerHTML = `🪙 <b>${profile.gold}</b> · 💠 <b>${profile.crystals}</b>`;
   $('ptsPill').classList.toggle('glow', pts > 0);
   const curB = NODE[selNode].b;
   $('bTabs').innerHTML = TREE.map(b => {
     const learned = b.nodes.reduce((a, n) => a + sk(n.id), 0), total = b.nodes.reduce((a, n) => a + n.max, 0);
-    const can = pts > 0 && b.nodes.some(n => nodeStatus(n.id).ok);
+    const can = b.nodes.some(n => nodeStatus(n.id).ok);
     return `<button class="b-tab ${b === curB ? 'on' : ''} ${can ? 'can' : ''}" data-b="${b.id}" style="--c:${b.color}"><i>${b.icon}</i>${b.short || b.name}<small>${learned}/${total}</small></button>`;
   }).join('');
   const allL = TREE.reduce((a, b) => a + b.nodes.reduce((c, n) => c + sk(n.id), 0), 0), allT = TREE.reduce((a, b) => a + b.nodes.reduce((c, n) => c + n.max, 0), 0);
@@ -3246,7 +3312,7 @@ function renderTree(){
     const st = nodeStatus(n.id), r = sk(n.id), linked = t === 0 || sk(curB.nodes[t-1].id) > 0;
     const cls = ['node', r > 0 ? 'has' : '', st.max ? 'max' : '', st.ok ? 'can' : '', st.locked ? 'locked' : '',
       selNode === n.id ? 'sel' : '', n.active ? 'act' : '', n.ult ? 'ult' : ''].join(' ');
-    const line = st.lvlLock ? `🔒 уровень змейки ${st.lvlLock}` : r ? n.eff(r) : n.eff(1);
+    const line = st.lvlLock ? `🔒 уровень змейки ${st.lvlLock}` : (r ? n.eff(r) : n.eff(1)) + (st.max ? '' : ` · <span class="price">${priceText(nodePrice(n.id))}</span>`);
     return `<div class="path-row ${t ? '' : 'first'} ${linked ? 'linked' : ''} ${st.locked ? 'locked' : ''} ${selNode === n.id ? 'sel' : ''}">
       <button class="${cls}" data-id="${n.id}"><span class="ico">${n.icon}</span>
       ${n.max > 1 || r ? `<span class="rank">${r}/${n.max}</span>` : ''}</button>
@@ -3262,7 +3328,7 @@ function renderSheet(){
   if (r < n.max) eff += `<div><span>${r ? 'Следующий ранг' : 'Эффект'}</span><b>${n.eff(r + 1)}</b></div>`;
   const tag = n.active ? '<span class="tag">КНОПКА</span>' : n.ult ? '<span class="tag">УЛЬТА</span>' : '';
   const btn = st.ok
-    ? `<button class="btn primary" id="btnLearn">${r ? 'Улучшить' : 'Изучить'} · 1 🧬</button>`
+    ? `<button class="btn ${st.price.cr ? 'magic' : 'primary'}" id="btnLearn">${r ? 'Улучшить' : 'Изучить'} · ${priceText(st.price)}</button>`
     : `<button class="btn ghost" disabled>${st.max ? '✓ Изучено полностью' : st.reason}</button>`;
   $('sheet').style.setProperty('--c', b.color);
   $('sheet').innerHTML = `
@@ -3284,7 +3350,9 @@ $('treeGrid').addEventListener('click', e => {
 });
 $('sheet').addEventListener('click', e => {
   if (!e.target.closest('#btnLearn')) return;
-  if (!nodeStatus(selNode).ok) return;
+  const st = nodeStatus(selNode); if (!st.ok) return;
+  if (st.price.gold){ profile.gold -= st.price.gold; profile.paid.gold += st.price.gold; }
+  if (st.price.cr){ profile.crystals -= st.price.cr; profile.paid.cr += st.price.cr; }
   profile.skills[selNode] = sk(selNode) + 1; saveProfile();
   SFX.learn(); buzz([20, 40, 20]);
   renderTree();
@@ -3295,12 +3363,13 @@ $('btnResetSkills').onclick = () => {
   const b = $('btnResetSkills');
   if (!spentPts()){ SFX.deny(); return; }
   if (!resetArmed){
-    b.classList.add('warn'); b.textContent = 'Точно?';
+    b.classList.add('warn'); b.textContent = 'Вернуть всё?';
     resetArmed = setTimeout(() => { resetArmed = null; b.classList.remove('warn'); b.textContent = '↺ Сброс'; }, 2500);
     SFX.click(); return;
   }
   clearTimeout(resetArmed); resetArmed = null;
   b.classList.remove('warn'); b.textContent = '↺ Сброс';
+  profile.gold += profile.paid.gold; profile.crystals += profile.paid.cr; profile.paid = {gold:0, cr:0};
   profile.skills = {}; saveProfile(); SFX.magic(); renderTree();
 };
 
@@ -3346,6 +3415,58 @@ function renderRecords(){
 $('recTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; recFilter = b.dataset.val; SFX.click(); renderRecords(); });
 $('btnRecords').onclick = () => { SFX.click(); renderRecords(); overlay('ovRecords', true); };
 $('btnCloseRecords').onclick = () => { SFX.click(); overlay('ovRecords', false); };
+
+/* ===================== ADS (Яндекс Игры) =====================
+   На GitHub Pages рекламы нет. В версии для Яндекс Игр в <head> подключается их SDK:
+   скрипт SDK по адресу /sdk.js — тогда кнопки «📺» начнут работать сами. */
+const Ads = {
+  sdk:null,
+  ready(){ return !!(this.sdk && this.sdk.adv); },
+  rewarded(onReward){
+    if (!this.ready()) return false;
+    Music.duck(true);
+    this.sdk.adv.showRewardedVideo({callbacks:{ onRewarded:() => onReward(), onClose:() => Music.duck(false), onError:() => Music.duck(false) }});
+    return true;
+  }
+};
+if (window.YaGames) YaGames.init().then(s => { Ads.sdk = s; }).catch(() => {});
+const today = () => new Date().toISOString().slice(0, 10);
+function adQuota(){ if (!profile.ads || profile.ads.d !== today()) profile.ads = {d:today(), gold:0, cr:0}; return profile.ads; }
+
+/* ===================== SHOP ===================== */
+const EXCHANGE = [{a:30, g:3}, {a:100, g:11}, {a:300, g:36, best:true}];
+function renderShop(){
+  $('shopWal').innerHTML = `<span>🍎 ${profile.apples}</span><span>🪙 ${profile.gold}</span><span>💠 ${profile.crystals}</span>`;
+  $('shopExchange').innerHTML = EXCHANGE.map((x, i) => `<button class="offer ${x.best ? 'best' : ''}" data-ex="${i}" ${profile.apples < x.a ? 'disabled' : ''}>
+    ${x.g} 🪙<small>за ${x.a} 🍎</small>${x.best ? '<b>выгодно</b>' : ''}</button>`).join('');
+  const q = adQuota(), ok = Ads.ready();
+  $('shopAds').className = 'shop-grid two';
+  $('shopAds').innerHTML = `<button class="offer" data-ad="gold" ${!ok || q.gold >= 8 ? 'disabled' : ''}>+15 🪙<small>осталось сегодня: ${8 - q.gold}</small></button>
+    <button class="offer" data-ad="cr" ${!ok || q.cr >= 1 ? 'disabled' : ''}>+1 💠<small>раз в день</small></button>`;
+  $('shopAdNote').textContent = ok ? 'Посмотри короткий ролик — и получи награду.' : 'Реклама за награду заработает в версии игры на Яндекс Играх.';
+}
+$('btnShop').onclick = () => { SFX.click(); renderShop(); overlay('ovShop', true); };
+$('btnCloseShop').onclick = () => { SFX.click(); overlay('ovShop', false); renderMenu(); };
+$('shopExchange').addEventListener('click', e => {
+  const b = e.target.closest('[data-ex]'); if (!b) return;
+  const x = EXCHANGE[+b.dataset.ex]; if (profile.apples < x.a){ SFX.deny(); return; }
+  profile.apples -= x.a; profile.gold += x.g; saveProfile(); SFX.bonus(); buzz(15); renderShop();
+});
+$('shopAds').addEventListener('click', e => {
+  const b = e.target.closest('[data-ad]'); if (!b) return;
+  const kind = b.dataset.ad, q = adQuota();
+  Ads.rewarded(() => {
+    if (kind === 'gold'){ q.gold++; profile.gold += 15; } else { q.cr++; profile.crystals++; }
+    saveProfile(); SFX.learn(); renderShop();
+  });
+});
+$('btnAdDouble').onclick = () => {
+  const n = G && G.xp ? G.xp.apples : 0; if (!n) return;
+  Ads.rewarded(() => {
+    profile.apples += n; saveProfile(); SFX.learn();
+    $('btnAdDouble').disabled = true; $('btnAdDouble').textContent = `✓ Яблоки удвоены (+${n} 🍎)`;
+  });
+};
 
 /* ===================== WORLD MAP ===================== */
 let mapSel = null;

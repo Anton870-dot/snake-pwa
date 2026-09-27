@@ -18,6 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&text=%D0%92%D0%9E%D0%A1%D0%A2%D0%A7%D0%9D%D0%95%D0%90%D0%9F%D0%A0%D0%9B%D0%98%E2%86%920123456789&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@700&text=%CE%A3%CE%9A%CE%A5%CE%98%CE%99%CE%91&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -280,7 +281,7 @@ button:disabled{cursor:default}
 .scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,3,18,.55) 0%,rgba(8,3,18,0) 26%,rgba(8,3,18,0) 70%,rgba(13,6,25,.35) 100%)}
 #sceneFx{position:absolute;inset:0;width:100%;height:100%;display:none}
 #game.fx #sceneFx{display:block}
-#game.fx-dunes #petals,#game.fx-forest #petals,#game.fx-steppe #petals,#game.fx-yard #petals{display:none}
+#game.fx-dunes #petals,#game.fx-forest #petals,#game.fx-steppe #petals,#game.fx-yard #petals,#game.fx-road #petals{display:none}
 .petal{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.7);border-radius:70% 0 70% 0;opacity:.9;
   background:linear-gradient(135deg,#fff,#ffc8dc);box-shadow:0 1px 3px rgba(0,0,0,.25);animation:petal var(--d) linear var(--dl) infinite}
 @keyframes petal{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(calc(var(--x)*.4),30vh) rotate(160deg)}
@@ -463,12 +464,31 @@ button:disabled{cursor:default}
 .title-card.stencil .tc-name{color:#fffdf2;letter-spacing:.14em;white-space:nowrap;font-size:25px;animation-name:tcNameA;text-shadow:0 2px 8px rgba(0,0,0,.85)}
 .title-card.stencil .tc-name i{background:#f2c230;height:3px;width:34px}
 .title-card.stencil .tc-sub{color:#f2c230;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+/* ---------- тропа на восток: зелёный дорожный щит богов ---------- */
+.title-card.road .tc-sun{background:radial-gradient(circle at 42% 40%,#ffe9a0,#ffb347 60%,#f08a24);box-shadow:0 0 34px rgba(255,180,70,.6);opacity:.55}
+.title-card.road .tc-band{background:
+  linear-gradient(90deg,transparent,rgba(255,255,255,.85) 20%,#fff 50%,rgba(255,255,255,.85) 80%,transparent) center 88%/100% 2px no-repeat,
+  repeating-linear-gradient(90deg,rgba(255,214,90,.9) 0 26px,transparent 26px 46px) center 94%/100% 3px no-repeat,
+  linear-gradient(90deg,transparent,rgba(40,44,48,.8) 16%,rgba(48,52,56,.8) 50%,rgba(40,44,48,.8) 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.title-card.road .tc-row{margin:6px 0 4px}
+.title-card.road .tc-kanji{flex-direction:column;align-items:flex-start;font-family:"Roboto Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;font-size:27px;letter-spacing:.04em;
+  color:#fff;background:#0e6b3a;border:3px solid #fff;outline:3px solid #0e6b3a;border-radius:10px;padding:6px 18px 5px;line-height:1.15;
+  box-shadow:0 8px 20px rgba(0,0,0,.45);text-shadow:none;animation:tcSign .7s .25s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes tcSign{from{opacity:0;transform:rotate(-8deg) translateY(-30px) scale(.8)}}
+.title-card.road .tc-kanji span{display:inline-block}
+.title-card.road .tc-seal{right:-50px;bottom:4px;width:40px;height:42px;border:0;border-radius:0;background:none;box-shadow:none;padding:0;transform:none;animation-name:tcSealR}
+.title-card.road .tc-seal svg{width:40px;height:42px;display:block}
+.title-card.road .tc-name{color:#fffaf0;letter-spacing:.14em;white-space:nowrap;font-size:25px;animation-name:tcNameA;text-shadow:0 2px 8px rgba(0,0,0,.85)}
+.title-card.road .tc-name i{background:linear-gradient(90deg,transparent,#ffd65a);height:2px;width:34px}
+.title-card.road .tc-sub{color:#ffd65a;text-shadow:0 1px 4px rgba(0,0,0,.8)}
 .title-card.out{animation:tcOut .6s ease-in forwards}
 @keyframes tcOut{to{opacity:0;transform:translateY(-60%)}}
 .board{position:relative;border-radius:20px;overflow:hidden;transition:box-shadow .3s;
   box-shadow:0 0 0 2px rgba(255,122,69,.6),0 0 34px rgba(255,61,127,.28),0 24px 60px rgba(0,0,0,.55)}
 .board.portal{box-shadow:0 0 0 2px rgba(62,230,255,.55),0 0 34px rgba(62,230,255,.3),0 24px 60px rgba(0,0,0,.55)}
 .board.forest{box-shadow:0 0 0 2px rgba(110,231,160,.55),0 0 34px rgba(52,211,153,.3),0 24px 60px rgba(0,0,0,.6)}
+.board.road{box-shadow:0 0 0 2px rgba(255,214,110,.65),0 0 34px rgba(255,190,90,.3),0 24px 60px rgba(0,0,0,.5)}
 .board.yard{box-shadow:0 0 0 2px rgba(190,240,150,.7),0 0 34px rgba(255,240,170,.35),0 24px 60px rgba(0,0,0,.45)}
 .board.steppe{box-shadow:0 0 0 2px rgba(240,180,90,.6),0 0 34px rgba(200,110,170,.3),0 24px 60px rgba(0,0,0,.55)}
 .board.maze{box-shadow:0 0 0 2px rgba(167,139,250,.65),0 0 34px rgba(139,92,246,.35),0 24px 60px rgba(0,0,0,.55)}
@@ -818,7 +838,7 @@ canvas{display:block}
   <div class="card">
     <h2>🏆 Рекорды</h2>
     <div class="seg" id="recTabs">
-      <button data-val="all">Все</button><button data-val="yard">☀️</button><button data-val="classic">🧱</button><button data-val="steppe">🌾</button>
+      <button data-val="all">Все</button><button data-val="yard">☀️</button><button data-val="road">🛣️</button><button data-val="classic">🧱</button><button data-val="steppe">🌾</button>
       <button data-val="portal">🌀</button><button data-val="forest">🌲</button><button data-val="maze">🗿</button>
     </div>
     <ul class="rec-list" id="recList"></ul>
@@ -868,6 +888,7 @@ let mode = store.get('ss_mode', 'classic');
 
 const MODES = {
   yard:{icon:'☀️', name:'Без стен'},
+  road:{icon:'🛣️', name:'Дорога'},
   classic:{icon:'🧱', name:'Классика'},
   steppe:{icon:'🌾', name:'Ветер'},
   portal:{icon:'🌀', name:'Портал'},
@@ -1042,7 +1063,7 @@ const SFX = {
   start: () => tone(440, .12, 'triangle', .09, 880)
 };
 /* ===================== MUSIC ===================== */
-// Свои треки: положи в папку music/ файлы menu.mp3, yard.mp3, meadow.mp3, steppe.mp3, dunes.mp3, forest.mp3, ruins.mp3
+// Свои треки: положи в папку music/ файлы menu.mp3, yard.mp3, road.mp3, meadow.mp3, steppe.mp3, dunes.mp3, forest.mp3, ruins.mp3
 // (или один общий game.mp3 для всех уровней). Если файла нет — играет встроенная мелодия.
 const Music = (() => {
   const VOL = {low:.2, mid:.4, high:.7};
@@ -1098,6 +1119,7 @@ const Music = (() => {
   /* ---------- встроенный синтвейв ---------- */
   const SONGS = {
     menu:  {bpm:84,  drums:0, lead:'triangle', arp:'slow', bright:1500, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]}, // Am F C G
+    road:  {bpm:110, drums:1, lead:'square',   arp:'fast', bright:2400, prog:[[55,59,62],[52,55,59],[48,52,55],[50,54,57]]}, // G Em C D
     yard:  {bpm:118, drums:1, lead:'triangle', arp:'fast', bright:3000, prog:[[53,57,60],[48,52,55],[50,53,57],[46,50,53]]}, // F C Dm B♭
     meadow:{bpm:112, drums:1, lead:'square',   arp:'fast', bright:2600, prog:[[48,52,55],[55,59,62],[57,60,64],[53,57,60]]}, // C G Am F
     steppe:{bpm:100, drums:2, lead:'sawtooth', arp:'slow', bright:1700, prog:[[52,55,59],[50,55,59],[48,52,55],[50,54,57]]}, // Em G C D
@@ -1248,9 +1270,10 @@ const COLS = 20, ROWS = 20;
 const COMBO_WINDOW = 3000, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
 const OASIS_WAVE = 10;   // в каждом мире: дойди до этой волны — мир пройден
 // ---- карта затерянных миров: каждый следующий открывается после прохождения предыдущего
-// путь идёт сквозь сутки: полдень → вечер → сумерки → ночь → глубокая ночь → рассвет
+// путь идёт на восток, навстречу рассвету: полдень → после полудня → вечер → сумерки → ночь → глубокая ночь → рассвет
 const WORLDS = [
   {id:'yard',   mode:'yard',    name:'Двор убежища',     desc:'Полдень. Первый выход наверх: стен нет — ползи сквозь края. Лёгкое начало пути.', win:'🚪 ПУТЬ ОТКРЫТ!', title:'🚪 Путь открыт!'},
+  {id:'road',   mode:'road',    name:'Навстречу рассвету', desc:'После полудня. Дорога уходит за края, а сверху и снизу — кусты и канавы: стены только там.', win:'🛣️ ДОРОГА ПРОЙДЕНА!', title:'🛣️ Дорога пройдена!'},
   {id:'meadow', mode:'classic', name:'Закатный луг',     desc:'Вечер. Стены опасны. Ёжики колючие, мыши вкусные.', win:'🌅 ЛУГ ПРОЙДЕН!',          title:'🌅 Луг пройден!'},
   {id:'steppe', mode:'steppe',  name:'Сумеречная степь', desc:'Сумерки. Ветер сносит змейку, катится перекати-поле, гадюки в ковыле.', win:'🏺 КУРГАН НАЙДЕН!', title:'🏺 Курган найден!'},
   {id:'dunes',  mode:'portal',  name:'Ночная пустыня',   desc:'Ночь. Сквозь края — но берегись зыбучих песков и скорпионов.', win:'🌴 ОАЗИС НАЙДЕН!', title:'🌴 Оазис найден!'},
@@ -1270,6 +1293,7 @@ function worldOpen(i){
 }
 const starsFor = score => 1 + (score >= STAR_SCORE[1]) + (score >= STAR_SCORE[2]);
 const wraps = () => mode === 'portal' || mode === 'yard';   // миры без стен
+const wrapsX = () => wraps() || mode === 'road';             // дорога: края слева и справа открыты
 let freePlay = false;   // свободная игра: без волн и без финиша, только очки
 const bestKey = (m = mode, f = freePlay) => f ? m + '_free' : m;
 const SPECIALS = [
@@ -1309,6 +1333,7 @@ function newGame(){
   if (mode === 'maze') for (let i = 0; i < Math.max(1, 3 - sk('stonemason')); i++) addCluster();
   if (mode === 'forest') for (let i = 0; i < 7; i++) addTree();
   if (mode === 'steppe') for (let i = 0; i < 2; i++) addTree();   // каменные бабы
+  if (mode === 'road') addTree();                                   // верстовой столб
   placeFood();
   $('board').className = 'board ' + mode;
   $('hint').style.display = '';
@@ -1423,6 +1448,7 @@ function step(){
   let nx = h.x + mv.x, ny = h.y + mv.y;
   if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS){
     if (wraps() || ghost){ nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+    else if (wrapsX() && ny >= 0 && ny < ROWS) nx = (nx + COLS) % COLS;
     else if (drift){ floatText(h.x, h.y, '💨 Сдуло!', '#fde68a', .9); return crash(); }
     else if (sk('bounce') && G.bounceCd <= 0){
       // рикошет: разворачиваемся вдоль стены туда, где свободно
@@ -1682,6 +1708,28 @@ function drawWind(c, dt){
   }
   c.restore();
 }
+// верстовые столбики у дороги: белый бетон, чёрная полоса, номер километра
+function drawPosts(c){
+  const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
+  let n = 0;
+  for (const [k, born] of list){
+    n++;
+    const x = k % COLS, y = (k / COLS) | 0, cx = (x + .5) * S, by = (y + .9) * S;
+    const a = Math.min(1, (G.anim - born) / 450), e = 1 - Math.pow(1 - a, 3), w = S * .44, h = S * 1.05 * e;
+    groundShadow(c, cx + S * .2, by - S * .02, S * .38, S * .12, .38 * e);
+    const g = c.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0);
+    g.addColorStop(0, '#fbfaf4'); g.addColorStop(.65, '#dcdad0'); g.addColorStop(1, '#a9a79c');
+    c.fillStyle = g; c.beginPath(); c.roundRect(cx - w / 2, by - h, w, h, [S * .12, S * .12, S * .02, S * .02]); c.fill();
+    c.fillStyle = '#222'; c.fillRect(cx - w / 2, by - h * .42, w, h * .16);                       // чёрная полоса, как на картинке
+    c.fillStyle = 'rgba(150,90,40,.35)'; c.beginPath(); c.arc(cx - w * .15, by - h * .8, S * .06, 0, 7); c.arc(cx + w * .2, by - h * .25, S * .05, 0, 7); c.fill();
+    c.fillStyle = 'rgba(0,0,0,.1)'; c.fillRect(cx + w * .2, by - h, w * .3, h);
+    if (e > .9){
+      c.fillStyle = '#2b2b2b'; c.font = `700 ${S * .3}px "Roboto Condensed",Arial,sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(String(n), cx - w * .05, by - h * .7);
+      c.fillStyle = 'rgba(90,130,50,.7)'; c.beginPath(); c.arc(cx - w * .3, by - S * .08, S * .07, 0, 7); c.arc(cx + w * .25, by - S * .05, S * .06, 0, 7); c.fill();
+    }
+  }
+}
 // каменные бабы — скифские изваяния, стоят в степи преградами
 function drawIdols(c){
   const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
@@ -1755,7 +1803,7 @@ function drawRings(c, dt){
   c.restore();
 }
 // пыль/пыльца из-под змейки — обычное смешивание, чтобы не светилась
-const DUST = {yard:['230,225,210', .35, 1], meadow:['225,240,160', .25, 1], steppe:['214,190,140', .5, 1], dunes:['226,186,128', 1, 2], ruins:['190,170,150', .55, 1], forest:['110,140,100', .35, 1]};
+const DUST = {road:['200,190,170', .45, 1], yard:['230,225,210', .35, 1], meadow:['225,240,160', .25, 1], steppe:['214,190,140', .5, 1], dunes:['226,186,128', 1, 2], ruins:['190,170,150', .55, 1], forest:['110,140,100', .35, 1]};
 function kickDust(x, y){
   const d = DUST[BIOME[mode]] || DUST.meadow;
   for (let i = 0; i < d[2]; i++){
@@ -1776,7 +1824,7 @@ function drawDust(c, dt){
   }
 }
 // лучи света по полю
-const RAYS = {yard:'255,250,215', meadow:'255,214,150', steppe:'255,170,200', ruins:'255,210,160', dunes:'200,220,255'};
+const RAYS = {road:'255,230,180', yard:'255,250,215', meadow:'255,214,150', steppe:'255,170,200', ruins:'255,210,160', dunes:'200,220,255'};
 function drawRays(c){
   const col = RAYS[BIOME[mode]]; if (!col) return;
   const W = size, A = G.anim;
@@ -1877,6 +1925,7 @@ function updateParallax(){
 
 /* ---------- живность ---------- */
 const CRIT = {
+  road:  {prey:['🦎', 'Ящерица'],  hazard:['🦔', 'Ёж'],      thief:['🐦', 'Сорока']},
   yard:  {prey:['🦗', 'Кузнечик'], hazard:['🐝', 'Оса'],     thief:['🕊️', 'Голубь']},
   meadow:{prey:['🐭', 'Мышь'],     hazard:['🦔', 'Ёж'],      thief:['🐦', 'Воробей']},
   steppe:{prey:['🐿️', 'Суслик'],   hazard:['🐍', 'Гадюка'],  thief:['🦅', 'Орёл']},
@@ -1919,8 +1968,8 @@ function eatPrey(q){
 function crittersUpdate(dt){
   const L = G.level, h = G.snake[0];
   if ((G.preyT -= dt) <= 0){ G.preyT = (11000 + Math.random() * 8000) / (1 + .3 * sk('tracking')); if (!G.critters.some(q => q.kind === 'prey')) spawnCritter('prey'); }
-  const easy = mode === 'yard';   // первый мир: опасность появляется поздно и одна
-  if (L >= (easy ? 4 : 2) && (G.hazT -= dt) <= 0){
+  const easy = mode === 'yard' || mode === 'road';   // первые миры: опасность появляется позже и одна
+  if (L >= (mode === 'yard' ? 4 : easy ? 3 : 2) && (G.hazT -= dt) <= 0){
     G.hazT = (9000 + Math.random() * 7000) * (1 + .25 * sk('tamer')) * (easy ? 1.5 : 1);
     if (G.critters.filter(q => q.kind === 'hazard').length < (easy ? 1 : Math.min(3, 1 + Math.floor((L - 2) / 3)))) spawnCritter('hazard');
   }
@@ -2252,6 +2301,7 @@ function levelUp(){
   fxRing(G.snake[0].x, G.snake[0].y, '#fff4c2', COLS * .9, .25, 1.4);
   if (mode === 'forest' && G.obstacles.size < 45 && Math.random() < .8) addTree();
   if (mode === 'steppe' && G.level % 3 === 0 && G.obstacles.size < 6) addTree();
+  if (mode === 'road' && G.level % 2 === 1 && G.obstacles.size < 5) addTree();
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70 && Math.random() >= .3 * sk('stonemason')) addCluster();
   G.bonusXp += 20 * sk('explorer');
@@ -2280,6 +2330,7 @@ function summonApple(){
   for (let d = 2; d <= 5; d++){
     let x = h.x + G.dir.x * d, y = h.y + G.dir.y * d;
     if (wraps()){ x = (x + COLS) % COLS; y = (y + ROWS) % ROWS; }
+    else if (wrapsX()) x = (x + COLS) % COLS;
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) break;
     if (G.food && G.food.x === x && G.food.y === y) return;
     if (isFree(x, y)){
@@ -2436,7 +2487,7 @@ function mulberry32(a){
   return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
     t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-const BIOME = {yard:'yard', classic:'meadow', steppe:'steppe', portal:'dunes', maze:'ruins', forest:'forest'};
+const BIOME = {yard:'yard', road:'road', classic:'meadow', steppe:'steppe', portal:'dunes', maze:'ruins', forest:'forest'};
 let decor = [], motes = [];
 
 function resize(){
@@ -2621,6 +2672,73 @@ function forestFloor(b, R, rr, S, W){
   for (let i = 0; i < 14; i++) decor.push({type:'tuft', x:rr(0, W), y:rr(0, W), n:(rr(4, 8)) | 0, h:S * rr(.3, .5), ph:R() * 6, col:[rr(120, 150), rr(30, 45), rr(18, 26)]});
 }
 
+// тропа на восток: старое шоссе через поле — асфальт в трещинах, выцветшая разметка,
+// по краям обочины с травой, сверху и снизу — живая изгородь (это и есть стены)
+function roadFloor(b, R, rr, S, W){
+  // трава на обочинах
+  const gg = b.createLinearGradient(0, 0, 0, W);
+  gg.addColorStop(0, '#5d8c30'); gg.addColorStop(.5, '#6b9636'); gg.addColorStop(1, '#4f7e2a');
+  b.fillStyle = gg; b.fillRect(0, 0, W, W);
+  blotches(b, R, rr, W, S, 50, ['140,170,70', '60,100,30', '160,140,70'], .2);
+  blades(b, R, rr, W, S, COLS * ROWS * 8, ['#3f6e22', '#4f8028', '#629433', '#76a53e', '#8cb54c'], [.12, .32], .75);
+  // асфальт: ряды 4..15
+  const y0 = S * 4, y1 = S * 16, pad = S * .35;
+  b.fillStyle = 'rgba(150,135,105,.75)';                                          // гравийная кромка
+  b.fillRect(0, y0 - pad, W, pad); b.fillRect(0, y1, W, pad);
+  for (let i = 0; i < 500; i++){ b.fillStyle = R() < .5 ? 'rgba(90,80,65,.5)' : 'rgba(210,200,180,.5)'; const yy = R() < .5 ? rr(y0 - pad, y0) : rr(y1, y1 + pad); b.beginPath(); b.arc(rr(0, W), yy, S * rr(.02, .05), 0, 7); b.fill(); }
+  const ag = b.createLinearGradient(0, y0, 0, y1);
+  ag.addColorStop(0, '#6a6b69'); ag.addColorStop(.5, '#747570'); ag.addColorStop(1, '#63645f');
+  b.fillStyle = ag; b.fillRect(0, y0, W, y1 - y0);
+  // зернистость и заплатки
+  for (let i = 0; i < 1600; i++){ b.fillStyle = R() < .5 ? 'rgba(30,30,30,.2)' : 'rgba(210,210,200,.16)'; b.fillRect(rr(0, W), rr(y0, y1), S * rr(.02, .045), S * rr(.02, .045)); }
+  for (let i = 0; i < 6; i++){ b.fillStyle = `rgba(${R() < .5 ? '45,46,46' : '95,96,92'},.55)`; b.beginPath(); b.roundRect(rr(0, W - S * 3), rr(y0, y1 - S * 2), S * rr(1.5, 3), S * rr(1, 2), S * .15); b.fill(); }
+  // разметка: белые края и жёлтый пунктир по центру — облезлые
+  b.save(); b.globalAlpha = .7;
+  b.fillStyle = '#efeee6'; b.fillRect(0, y0 + S * .35, W, S * .12); b.fillRect(0, y1 - S * .47, W, S * .12);
+  b.fillStyle = '#e8b830';
+  for (let x = S * .5; x < W; x += S * 2.2) b.fillRect(x, W / 2 - S * .07, S * 1.2, S * .14);
+  // стрелка «на восток»
+  b.fillStyle = '#efeee6';
+  const ax = S * 13.5, ay = S * 12.5;
+  b.fillRect(ax - S * 2.2, ay - S * .15, S * 2, S * .3);
+  b.beginPath(); b.moveTo(ax - S * .3, ay - S * .6); b.lineTo(ax + S * .5, ay); b.lineTo(ax - S * .3, ay + S * .6); b.closePath(); b.fill();
+  b.restore();
+  for (let i = 0; i < 900; i++){ b.fillStyle = `rgba(${R() < .5 ? '106,107,105' : '116,117,112'},${rr(.7, 1)})`; b.beginPath(); b.ellipse(rr(0, W), rr(y0, y1), S * rr(.05, .16), S * rr(.03, .1), R() * 3, 0, 7); b.fill(); }
+  // трещины с травой и ямы с лужами
+  b.lineCap = 'round';
+  for (let i = 0; i < 14; i++){
+    let x = rr(0, W), y = rr(y0, y1), a = R() * 6.28;
+    b.strokeStyle = 'rgba(25,25,25,.6)'; b.lineWidth = Math.max(.7, S * .05); b.beginPath(); b.moveTo(x, y);
+    for (let k = 0; k < 6; k++){ a += rr(-.9, .9); x += Math.cos(a) * S * .5; y = Math.max(y0, Math.min(y1, y + Math.sin(a) * S * .5)); b.lineTo(x, y); }
+    b.stroke();
+    for (let k = 0; k < 8; k++){ b.strokeStyle = R() < .5 ? '#5f9230' : '#79aa3c'; b.lineWidth = Math.max(.6, S * .04); const gx = x + rr(-S * .5, S * .5), gy = y + rr(-S * .3, S * .3); b.beginPath(); b.moveTo(gx, gy); b.lineTo(gx + rr(-2, 2), gy - S * rr(.15, .3)); b.stroke(); }
+  }
+  for (let i = 0; i < 4; i++){
+    const x = rr(S, W - S), y = rr(y0 + S, y1 - S), r = S * rr(.35, .6);
+    b.fillStyle = 'rgba(45,44,40,.7)'; b.beginPath(); b.ellipse(x, y, r * 1.8, r * .7, 0, 0, 7); b.fill();
+    const pg = b.createLinearGradient(x - r, y - r, x + r, y + r); pg.addColorStop(0, 'rgba(200,220,240,.55)'); pg.addColorStop(1, 'rgba(110,130,150,.45)');
+    b.fillStyle = pg; b.beginPath(); b.ellipse(x, y, r * 1.5, r * .5, 0, 0, 7); b.fill();
+  }
+  // цветы на обочинах
+  const fc = ['#ffffff', '#ffe066', '#c9a0ff', '#ff9ec4'];
+  for (let i = 0; i < 40; i++){
+    const x = rr(0, W), y = R() < .5 ? rr(S * .8, y0 - S * .5) : rr(y1 + S * .5, W - S * .8), r = S * rr(.04, .07);
+    b.fillStyle = fc[(R() * fc.length) | 0];
+    for (let k = 0; k < 5; k++){ const an = k * 1.2566; b.beginPath(); b.arc(x + Math.cos(an) * r, y + Math.sin(an) * r, r * .7, 0, 7); b.fill(); }
+    b.fillStyle = '#f5b82e'; b.beginPath(); b.arc(x, y, r * .5, 0, 7); b.fill();
+  }
+  // живая изгородь по верхнему и нижнему краю — стены
+  for (const top of [true, false]){
+    for (let x = -S * .3; x < W + S * .3; x += S * rr(.35, .55)){
+      const r = S * rr(.3, .48), y = top ? rr(-S * .1, S * .12) : W - rr(-S * .1, S * .12);
+      const hg = b.createRadialGradient(x - r * .3, y - r * .3, 0, x, y, r);
+      hg.addColorStop(0, `hsl(${rr(95, 115)},${rr(35, 50)}%,${rr(34, 42)}%)`); hg.addColorStop(1, `hsl(${rr(100, 120)},40%,${rr(16, 22)}%)`);
+      b.fillStyle = hg; b.beginPath(); b.arc(x, y, r, 0, 7); b.fill();
+    }
+  }
+  for (let i = 0; i < 16; i++){ const top = R() < .5; decor.push({type:'tuft', x:rr(0, W), y:top ? rr(S * 1.2, y0 - S * .4) : rr(y1 + S * .6, W - S * 1.2), n:(rr(4, 8)) | 0, h:S * rr(.3, .55), ph:R() * 6, col:[rr(85, 110), rr(40, 55), rr(30, 42)]}); }
+}
+
 // двор убежища: бетонные плиты, трава в швах, облезлая вертолётная разметка, полдень
 function yardFloor(b, R, rr, S, W){
   b.fillStyle = '#b4b1a4'; b.fillRect(0, 0, W, W);
@@ -2725,7 +2843,7 @@ function steppeFloor(b, R, rr, S, W){
 
 function buildBg(){
   const b = bg.getContext('2d'), S = cell, W = size, biome = BIOME[mode] || 'meadow';
-  const R = mulberry32({meadow:7, dunes:21, forest:33, steppe:45, yard:57}[biome] || 99);
+  const R = mulberry32({meadow:7, dunes:21, forest:33, steppe:45, yard:57, road:63}[biome] || 99);
   const rr = (a, c) => a + R() * (c - a);
   b.setTransform(dpr, 0, 0, dpr, 0, 0);
   decor = [];
@@ -2734,9 +2852,10 @@ function buildBg(){
   else if (biome === 'forest') forestFloor(b, R, rr, S, W);
   else if (biome === 'steppe') steppeFloor(b, R, rr, S, W);
   else if (biome === 'yard') yardFloor(b, R, rr, S, W);
+  else if (biome === 'road') roadFloor(b, R, rr, S, W);
   else ruins(b, R, rr, S, W);
   // закатный свет, прохладная тень, виньетка (в полдень — яркое солнце и лёгкая виньетка)
-  const noon = biome === 'yard';
+  const noon = biome === 'yard' || biome === 'road';
   let g = b.createRadialGradient(W * 1.05, -W * .1, 0, W * 1.05, -W * .1, W * 1.35);
   g.addColorStop(0, noon ? 'rgba(255,250,210,.3)' : 'rgba(255,170,80,.32)'); g.addColorStop(.5, noon ? 'rgba(255,245,200,.08)' : 'rgba(255,120,80,.1)'); g.addColorStop(1, 'rgba(255,120,80,0)');
   b.fillStyle = g; b.fillRect(0, 0, W, W);
@@ -2753,6 +2872,7 @@ function buildBg(){
                dunes: {n:26, c:'255,226,176', r:.035, vx:.03, vy:.002},
                ruins: {n:18, c:'255,215,170', r:.04, vx:.003, vy:-.002},
                forest:{n:22, c:'255,220,140', r:.05, vx:.005, vy:-.004},
+               road:  {n:14, c:'255,245,215', r:.045, vx:.01, vy:-.003},
                yard:  {n:12, c:'255,255,235', r:.05, vx:.006, vy:-.003},
                steppe:{n:20, c:'255,240,215', r:.04, vx:.012, vy:-.002}}[biome];
   motes = [];
@@ -2813,6 +2933,13 @@ function drawAtmosphere(c, dt){
     };
     edge(0, 0, d, 0, 0, 0, d, W); edge(W, 0, W - d, 0, W - d, 0, d, W);
     edge(0, 0, 0, d, 0, 0, W, d); edge(0, W, 0, W - d, 0, W - d, W, d);
+  } else if (mode === 'road'){        // дорога уходит за край: тёплый свет слева и справа
+    const p = .14 + .1 * Math.sin(A / 500), d = S * .9;
+    for (const [x0, x1] of [[0, d], [W, W - d]]){
+      const g = c.createLinearGradient(x0, 0, x1, 0);
+      g.addColorStop(0, `rgba(255,236,170,${p})`); g.addColorStop(1, 'rgba(255,236,170,0)');
+      c.fillStyle = g; c.fillRect(Math.min(x0, x1), 0, d, W);
+    }
   }
 }
 
@@ -2841,6 +2968,7 @@ function drawTrees(c){
 function drawObstacles(c){
   if (mode === 'forest') return drawTrees(c);
   if (mode === 'steppe') return drawIdols(c);
+  if (mode === 'road') return drawPosts(c);
   const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
   for (const [k, born] of list){
     const x = k % COLS, y = (k / COLS) | 0;
@@ -3275,6 +3403,7 @@ requestAnimationFrame(frame);
 /* ===================== LEVEL SCENE & TITLE ===================== */
 const LOCATIONS = {
   meadow:{kanji:'草原', rus:'ЛУГЪ', seal:'З', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg', aspect:1.5, sky:'rgb(125,112,172)', fx:'meadow'},
+  road:  {kanji:'道', sign:['ВОСТОЧНОЕ', 'НАПРАВЛЕНИЕ →'], seal:"<svg viewBox='0 0 40 42'><path d='M4,6 C10,3 14,2 20,5 C26,2 30,3 36,6 L36,20 C36,31 28,38 20,41 C12,38 4,31 4,20Z' fill='#fff'/><path d='M7,8 C12,6 15,5 20,7.5 C25,5 28,6 33,8 L33,13 L7,13Z' fill='#c8102e'/><path d='M7,14 L33,14 L33,20 C33,29 27,35 20,38 C13,35 7,29 7,20Z' fill='#1d3f8f'/><text x='20' y='31' font-family='Roboto Condensed,Arial,sans-serif' font-weight='700' font-size='14' fill='#fff' text-anchor='middle'>2</text></svg>", name:'Навстречу рассвету', sub:'ДОРОГА НА ВОСТОК', img:'img/road.jpg', aspect:1.5, sky:'rgb(150,176,222)', fx:'road'},
   yard:  {kanji:'門', stencil:'УБЕЖИЩЕ 7', seal:'<b>7</b>', name:'Двор убежища', sub:'БЕЗ СТЕН · ПЕРВЫЙ ВЫХОД', img:'img/yard.jpg', aspect:1.5, sky:'rgb(112,160,212)', fx:'yard'},
   steppe:{kanji:'草原', greek:'ΣΚΥΘΙΑ', seal:"<svg viewBox='-20 -20 40 40'><g fill='none' stroke='#3a1804' stroke-linecap='round'><path d='M9,-10A14,14 0 1,0 13,6' stroke-width='5.5'/><circle cx='13' cy='8' r='3' stroke-width='1.8'/><circle cx='-5' cy='-1' r='2.3' stroke-width='1.6'/><circle cx='0' cy='6' r='2.3' stroke-width='1.6'/><circle cx='5' cy='-2' r='2.3' stroke-width='1.6'/></g><circle cx='9' cy='-11' r='5.2' fill='#3a1804'/><path d='M6,-15l-2,-4l5,2z' fill='#3a1804'/><circle cx='10.5' cy='-11.5' r='1.3' fill='#f0b860'/></svg>", name:'Сумеречная степь', sub:'ВЕТЕР · НАЙДИ КУРГАН', img:'img/steppe.jpg', aspect:1.5, sky:'rgb(58,40,78)', fx:'steppe'},
   dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ · НАЙДИ ОАЗИС',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
@@ -3421,7 +3550,7 @@ const SceneFx = (() => {
     ctx.setTransform(pr, 0, 0, pr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.globalCompositeOperation = 'lighter';
-    const sx = X(1520), sy = Y(318), R = 520 * sc, pulse = .5 + .5 * Math.sin(t * .8);   // солнце у горизонта справа на картинке
+    const road = kind === 'road', sx = road ? X(1405) : X(1520), sy = road ? Y(135) : Y(318), R = (road ? 460 : 520) * sc, pulse = .5 + .5 * Math.sin(t * .8);   // солнце у горизонта справа на картинке
     const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, R);
     g.addColorStop(0, `rgba(255,252,225,${.28 + .08 * pulse})`); g.addColorStop(.3, 'rgba(255,245,200,.08)'); g.addColorStop(1, 'rgba(255,240,200,0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
@@ -3436,7 +3565,7 @@ const SceneFx = (() => {
   }
   function step(dt){
     if (kind === 'meadow') return stepMeadow(dt);
-    if (kind === 'steppe' || kind === 'yard') return stepSteppe(dt);
+    if (kind === 'steppe' || kind === 'yard' || kind === 'road') return stepSteppe(dt);
     if (kind === 'forest') return stepForest(dt);
     t += dt;
     // порывы ветра: то затишье, то песок срывается струями
@@ -3477,7 +3606,7 @@ const SceneFx = (() => {
   function draw(){
     if (kind === 'meadow') return drawMeadow();
     if (kind === 'steppe') return drawSteppe();
-    if (kind === 'yard') return drawYard();
+    if (kind === 'yard' || kind === 'road') return drawYard();
     if (kind === 'forest') return drawForest();
     ctx.setTransform(pr, 0, 0, pr, 0, 0);
     ctx.clearRect(0, 0, W, H);
@@ -3536,6 +3665,7 @@ function applyScene(){
   $('game').classList.toggle('fx-forest', on && loc.fx === 'forest');
   $('game').classList.toggle('fx-steppe', on && loc.fx === 'steppe');
   $('game').classList.toggle('fx-yard', on && loc.fx === 'yard');
+  $('game').classList.toggle('fx-road', on && loc.fx === 'road');
   $('game').classList.toggle('fx', on && !!loc.fx);
   SceneFx.set(on && loc.fx ? loc.fx : null);
   if (on) $('sceneImg').style.backgroundImage = `url("${loc.img}")`;
@@ -3575,12 +3705,13 @@ function layoutScene(){
 let titleTimer = null;
 function showTitle(){
   const loc = LOCATIONS[BIOME[mode]], tc = $('titleCard');
-  const arab = !!loc.arabic, rus = !!loc.rus, runic = !!loc.runes, scyth = !!loc.greek, sten = !!loc.stencil;
-  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus); tc.classList.toggle('runic', runic); tc.classList.toggle('scyth', scyth); tc.classList.toggle('stencil', sten);
+  const arab = !!loc.arabic, rus = !!loc.rus, runic = !!loc.runes, scyth = !!loc.greek, sten = !!loc.stencil, road = !!loc.sign;
+  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus); tc.classList.toggle('runic', runic); tc.classList.toggle('scyth', scyth); tc.classList.toggle('stencil', sten); tc.classList.toggle('road', road);
   // арабскую вязь не режем на буквы — иначе рассыплются соединения
   if (arab) $('tcKanji').textContent = loc.arabic;
+  else if (road) $('tcKanji').innerHTML = loc.sign.map(t => `<span>${t}</span>`).join('');   // дорожный щит — строками, не по буквам
   else $('tcKanji').innerHTML = [...(rus ? loc.rus : runic ? loc.runes : scyth ? loc.greek : sten ? loc.stencil : loc.kanji)].map((ch, i) => `<span style="--i:${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
-  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : (arab || runic || scyth || sten) ? loc.seal : '蛇';
+  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : (arab || runic || scyth || sten || road) ? loc.seal : '蛇';
   $('tcName').textContent = loc.name; $('tcSub').textContent = freePlay ? '∞ СВОБОДНАЯ ИГРА' : loc.sub;
   clearTimeout(titleTimer);
   tc.classList.remove('show', 'out'); void tc.offsetWidth; tc.classList.add('show');
@@ -3593,6 +3724,12 @@ function showTitle(){
       tone(f, .42, 'sawtooth', .025, null, d); tone(f * 2, .25, 'triangle', .03, null, d);
     });
     tone(146.8, 1.6, 'sine', .07, null, 1.5);
+  } else if (road){
+    // дорога: слайд-гитара по мажорной пентатонике и далёкий гудок
+    tone(98, 1.4, 'sine', .08, null, .1);
+    [392, 440, 493.9, 587.3, 659.3, 587.3, 784].forEach((f, i) => tone(f * .985, .45, 'sawtooth', .022, f, .3 + i * .15));
+    [196, 246.9, 293.7].forEach(f => tone(f, 1.6, 'triangle', .04, null, 1.4));
+    tone(330, .5, 'square', .018, null, 2.1); tone(415, .5, 'square', .018, null, 2.1);
   } else if (sten){
     // двор: скрип гермодвери, звонкий «чпок» и светлый мажорный перелив — наверху день
     tone(60, .9, 'sawtooth', .04, 45); tone(180, .7, 'square', .015, 120, .05);

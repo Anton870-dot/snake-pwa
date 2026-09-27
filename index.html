@@ -17,6 +17,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Ruslan+Display&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@700&text=%CE%A3%CE%9A%CE%A5%CE%98%CE%99%CE%91&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg0:#0d0619; --bg1:#1b0d33;
@@ -278,7 +280,7 @@ button:disabled{cursor:default}
 .scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,3,18,.55) 0%,rgba(8,3,18,0) 26%,rgba(8,3,18,0) 70%,rgba(13,6,25,.35) 100%)}
 #sceneFx{position:absolute;inset:0;width:100%;height:100%;display:none}
 #game.fx #sceneFx{display:block}
-#game.fx-dunes #petals,#game.fx-forest #petals{display:none}
+#game.fx-dunes #petals,#game.fx-forest #petals,#game.fx-steppe #petals,#game.fx-yard #petals{display:none}
 .petal{position:absolute;top:-6%;width:var(--s);height:calc(var(--s)*.7);border-radius:70% 0 70% 0;opacity:.9;
   background:linear-gradient(135deg,#fff,#ffc8dc);box-shadow:0 1px 3px rgba(0,0,0,.25);animation:petal var(--d) linear var(--dl) infinite}
 @keyframes petal{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(calc(var(--x)*.4),30vh) rotate(160deg)}
@@ -403,12 +405,72 @@ button:disabled{cursor:default}
 .title-card.runic .tc-name{color:#e6fff0;letter-spacing:.2em;white-space:nowrap;font-size:25px;animation-name:tcNameA;text-shadow:0 0 14px rgba(80,220,150,.6),0 2px 8px rgba(0,0,0,.9)}
 .title-card.runic .tc-name i{background:linear-gradient(90deg,transparent,#6fe3a5);height:1px;width:38px}
 .title-card.runic .tc-sub{color:#8ff0bd}
+/* ---------- степь: скифский «звериный стиль» — золото, олень, свернувшийся барс ---------- */
+.tc-deer{display:none;position:absolute;width:190px;height:150px;left:50%;top:50%;margin:-78px 0 0 -95px;overflow:visible;
+  filter:drop-shadow(0 0 18px rgba(232,168,60,.35)) drop-shadow(0 3px 0 rgba(40,16,0,.7))}
+.tc-deer-body{animation:tcDeer 1.1s .15s cubic-bezier(.2,1.1,.35,1) both}
+@keyframes tcDeer{from{opacity:0;transform:translateX(-26px) scale(.8)}}
+.tc-deer-ring{transform-origin:0 0;animation:tcStar 1s .05s cubic-bezier(.2,1.2,.4,1) both,tcSpin 60s 1.1s linear infinite}
+.title-card.scyth .tc-sun{display:none}
+.title-card.scyth .tc-deer{display:block}
+.title-card.scyth .tc-band{background:
+  linear-gradient(90deg,transparent,rgba(214,150,50,.95) 20%,rgba(255,226,150,1) 50%,rgba(214,150,50,.95) 80%,transparent) top/100% 2px no-repeat,
+  linear-gradient(90deg,transparent,rgba(214,150,50,.95) 20%,rgba(255,226,150,1) 50%,rgba(214,150,50,.95) 80%,transparent) bottom/100% 2px no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='12' viewBox='0 0 28 12'%3E%3Cg fill='%23e0a040' fill-opacity='.8'%3E%3Ccircle cx='7' cy='6' r='1.6'/%3E%3Ccircle cx='21' cy='6' r='1.6'/%3E%3C/g%3E%3Cpath d='M0 6c3.5-5 10.5-5 14 0s10.5 5 14 0' fill='none' stroke='%23e0a040' stroke-opacity='.55'/%3E%3C/svg%3E") top 5px center/28px 12px repeat-x,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='12' viewBox='0 0 28 12'%3E%3Cg fill='%23e0a040' fill-opacity='.8'%3E%3Ccircle cx='7' cy='6' r='1.6'/%3E%3Ccircle cx='21' cy='6' r='1.6'/%3E%3C/g%3E%3Cpath d='M0 6c3.5-5 10.5-5 14 0s10.5 5 14 0' fill='none' stroke='%23e0a040' stroke-opacity='.55'/%3E%3C/svg%3E") bottom 5px center/28px 12px repeat-x,
+  radial-gradient(55% 140% at 50% 50%,rgba(120,30,20,.35),transparent 70%),
+  linear-gradient(90deg,transparent,rgba(22,10,18,.8) 16%,rgba(22,10,18,.8) 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.title-card.scyth .tc-row{margin:10px 0 2px}
+.title-card.scyth .tc-kanji{flex-direction:row;font-family:"Noto Sans Display","Segoe UI","Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:48px;letter-spacing:.2em;
+  padding-left:.2em;color:#ffd98a;text-shadow:0 0 12px rgba(255,170,60,.55),0 3px 0 #5a2808,0 5px 12px rgba(0,0,0,.8);animation:none}
+.title-card.scyth .tc-kanji span{display:inline-block;animation:tcGold .7s cubic-bezier(.3,1.4,.5,1) both}
+.title-card.scyth .tc-kanji span:nth-child(1){animation-delay:.45s}.title-card.scyth .tc-kanji span:nth-child(2){animation-delay:.55s}
+.title-card.scyth .tc-kanji span:nth-child(3){animation-delay:.65s}.title-card.scyth .tc-kanji span:nth-child(4){animation-delay:.75s}
+.title-card.scyth .tc-kanji span:nth-child(5){animation-delay:.85s}.title-card.scyth .tc-kanji span:nth-child(6){animation-delay:.95s}
+@keyframes tcGold{from{opacity:0;transform:translateY(10px) scale(1.4);filter:brightness(2.2) blur(3px)}}
+.title-card.scyth .tc-seal{right:-50px;bottom:0;width:40px;height:40px;border:0;border-radius:50%;padding:0;
+  background:radial-gradient(circle at 38% 34%,#fff0c0,#e0a040 45%,#8a5210);box-shadow:0 0 0 1.5px #5a2808,0 0 14px rgba(255,180,70,.55);
+  transform:none;animation-name:tcSealR}
+.title-card.scyth .tc-seal svg{width:34px;height:34px;display:block;margin:3px}
+.title-card.scyth .tc-name{color:#fff0d6;letter-spacing:.16em;white-space:nowrap;font-size:24px;animation-name:tcNameA;text-shadow:0 0 14px rgba(255,150,60,.45),0 2px 8px rgba(0,0,0,.9)}
+.title-card.scyth .tc-name i{background:linear-gradient(90deg,transparent,#e0a040);height:1.5px;width:38px;position:relative}
+.title-card.scyth .tc-name i::after{content:"";position:absolute;right:-5px;top:-4px;width:6px;height:6px;border:1.5px solid #e0a040;border-radius:50%}
+.title-card.scyth .tc-sub{color:#f0b860}
+/* ---------- двор убежища: трафарет богов на бетоне, жёлто-чёрные полосы ---------- */
+.tc-hatch{display:none;position:absolute;width:150px;height:150px;left:50%;top:50%;margin:-75px 0 0 -75px;overflow:visible;
+  opacity:.5;animation:tcSun .8s .1s cubic-bezier(.2,1.2,.4,1) both}
+.tc-hatch-spin{animation:tcSpin 50s 1s linear infinite}
+.title-card.stencil .tc-sun{display:none}
+.title-card.stencil .tc-hatch{display:block}
+.title-card.stencil .tc-band{background:
+  repeating-linear-gradient(-45deg,#f2c230 0 10px,#1a1a1a 10px 20px) top/100% 7px no-repeat,
+  repeating-linear-gradient(-45deg,#f2c230 0 10px,#1a1a1a 10px 20px) bottom/100% 7px no-repeat,
+  radial-gradient(40% 90% at 25% 40%,rgba(255,255,255,.07),transparent 70%),
+  radial-gradient(35% 80% at 78% 65%,rgba(0,0,0,.18),transparent 70%),
+  linear-gradient(90deg,transparent,rgba(58,62,60,.84) 16%,rgba(74,78,74,.84) 50%,rgba(58,62,60,.84) 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.title-card.stencil .tc-row{margin:8px 0 0}
+.title-card.stencil .tc-kanji{flex-direction:row;font-family:"Russo One","Arial Black","Segoe UI",sans-serif;font-size:38px;letter-spacing:.08em;
+  padding-left:.08em;color:#f2c230;text-shadow:0 0 1px rgba(0,0,0,.4),0 3px 10px rgba(0,0,0,.55);animation:none}
+.title-card.stencil .tc-kanji span{display:inline-block;animation:tcSpray .45s steps(4) both;animation-delay:calc(.3s + var(--i) * .08s);
+  -webkit-mask-image:linear-gradient(#000 0 46%,transparent 46% 55%,#000 55%);mask-image:linear-gradient(#000 0 46%,transparent 46% 55%,#000 55%)}
+@keyframes tcSpray{from{opacity:0;filter:blur(4px)}}
+.title-card.stencil .tc-seal{right:-46px;bottom:6px;width:36px;height:36px;border:2px solid #1a1a1a;border-radius:4px;padding:0;
+  background:repeating-linear-gradient(-45deg,#f2c230 0 5px,#1a1a1a 5px 10px);box-shadow:0 2px 8px rgba(0,0,0,.5);
+  font-family:"Russo One","Arial Black",sans-serif;font-size:18px;display:grid;place-items:center;transform:none;animation-name:tcSealR}
+.title-card.stencil .tc-seal b{display:inline-block;background:#f2c230;color:#1a1a1a;padding:0 5px;border-radius:2px;line-height:22px;font-weight:400}
+.title-card.stencil .tc-name{color:#fffdf2;letter-spacing:.14em;white-space:nowrap;font-size:25px;animation-name:tcNameA;text-shadow:0 2px 8px rgba(0,0,0,.85)}
+.title-card.stencil .tc-name i{background:#f2c230;height:3px;width:34px}
+.title-card.stencil .tc-sub{color:#f2c230;text-shadow:0 1px 4px rgba(0,0,0,.8)}
 .title-card.out{animation:tcOut .6s ease-in forwards}
 @keyframes tcOut{to{opacity:0;transform:translateY(-60%)}}
 .board{position:relative;border-radius:20px;overflow:hidden;transition:box-shadow .3s;
   box-shadow:0 0 0 2px rgba(255,122,69,.6),0 0 34px rgba(255,61,127,.28),0 24px 60px rgba(0,0,0,.55)}
 .board.portal{box-shadow:0 0 0 2px rgba(62,230,255,.55),0 0 34px rgba(62,230,255,.3),0 24px 60px rgba(0,0,0,.55)}
 .board.forest{box-shadow:0 0 0 2px rgba(110,231,160,.55),0 0 34px rgba(52,211,153,.3),0 24px 60px rgba(0,0,0,.6)}
+.board.yard{box-shadow:0 0 0 2px rgba(190,240,150,.7),0 0 34px rgba(255,240,170,.35),0 24px 60px rgba(0,0,0,.45)}
+.board.steppe{box-shadow:0 0 0 2px rgba(240,180,90,.6),0 0 34px rgba(200,110,170,.3),0 24px 60px rgba(0,0,0,.55)}
 .board.maze{box-shadow:0 0 0 2px rgba(167,139,250,.65),0 0 34px rgba(139,92,246,.35),0 24px 60px rgba(0,0,0,.55)}
 canvas{display:block}
 .hint{position:absolute;left:0;right:0;bottom:16%;text-align:center;font-weight:800;font-size:17px;pointer-events:none;
@@ -603,7 +665,7 @@ canvas{display:block}
   <div class="scene" id="scene"><div class="scene-img" id="sceneImg"><canvas id="sceneFx"></canvas></div><div id="petals"></div></div>
   <div class="title-card" id="titleCard">
     <div class="tc-band"></div>
-    <div class="tc-row"><div class="tc-sun"></div><svg class="tc-moon" viewBox="-60 -60 120 120" aria-hidden="true"><defs><radialGradient id="tcMoonG" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#f4fff2"/><stop offset=".6" stop-color="#bfe8cf"/><stop offset="1" stop-color="#6fa888"/></radialGradient></defs><circle r="58" fill="none" stroke="#9ff0c0" stroke-opacity=".25" stroke-width="1" stroke-dasharray="1 5"/><circle r="44" fill="url(#tcMoonG)"/><circle cx="-12" cy="-10" r="7" fill="#9cc9ad" opacity=".45"/><circle cx="14" cy="8" r="5" fill="#9cc9ad" opacity=".4"/><g fill="#07130d"><path d="M-58,60 L-44,14 L-36,30 L-30,4 L-20,26 L-14,-2 L-6,24 L0,8 L8,28 L16,-6 L24,24 L30,10 L38,30 L46,12 L58,60Z"/></g></svg><svg class="tc-rose" viewBox="-60 -60 120 120" aria-hidden="true"><g class="tc-rose-spin"><circle r="55" fill="none" stroke="#f3c98b" stroke-width="1.2" stroke-dasharray="1.5 4.5"/><g fill="#c8102e" stroke="#ffd9a0" stroke-width="1.2"><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(0)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(30)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(60)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(90)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(120)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(150)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(180)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(210)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(240)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(270)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(300)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(330)"/></g></g><circle r="27" fill="#fff4e0" stroke="#c8102e" stroke-width="2"/><g fill="#e8a33a" stroke="#9c2a14" stroke-width="1" transform="scale(.8)"><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(0)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(60)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(120)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(180)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(240)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(300)"/></g><circle r="5" fill="#c8102e"/></svg><svg class="tc-orn" viewBox="-60 -60 120 120" aria-hidden="true"><defs><linearGradient id="tcGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c1"/><stop offset=".45" stop-color="#e8b04e"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs><g class="tc-orn-star"><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6"/><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6" transform="rotate(45)"/><circle r="54" fill="none" stroke="url(#tcGold)" stroke-width=".8" stroke-dasharray="2 4"/></g><path class="tc-orn-moon" d="M-8,-36 A36,36 0 1,0 -8,36 A29,29 0 1,1 -8,-36 Z" transform="translate(-6,0) rotate(-20)" fill="url(#tcGold)"/></svg><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
+    <div class="tc-row"><div class="tc-sun"></div><svg class="tc-moon" viewBox="-60 -60 120 120" aria-hidden="true"><defs><radialGradient id="tcMoonG" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#f4fff2"/><stop offset=".6" stop-color="#bfe8cf"/><stop offset="1" stop-color="#6fa888"/></radialGradient></defs><circle r="58" fill="none" stroke="#9ff0c0" stroke-opacity=".25" stroke-width="1" stroke-dasharray="1 5"/><circle r="44" fill="url(#tcMoonG)"/><circle cx="-12" cy="-10" r="7" fill="#9cc9ad" opacity=".45"/><circle cx="14" cy="8" r="5" fill="#9cc9ad" opacity=".4"/><g fill="#07130d"><path d="M-58,60 L-44,14 L-36,30 L-30,4 L-20,26 L-14,-2 L-6,24 L0,8 L8,28 L16,-6 L24,24 L30,10 L38,30 L46,12 L58,60Z"/></g></svg><svg class="tc-rose" viewBox="-60 -60 120 120" aria-hidden="true"><g class="tc-rose-spin"><circle r="55" fill="none" stroke="#f3c98b" stroke-width="1.2" stroke-dasharray="1.5 4.5"/><g fill="#c8102e" stroke="#ffd9a0" stroke-width="1.2"><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(0)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(30)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(60)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(90)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(120)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(150)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(180)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(210)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(240)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(270)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(300)"/><ellipse cx="0" cy="-38" rx="7" ry="15" transform="rotate(330)"/></g></g><circle r="27" fill="#fff4e0" stroke="#c8102e" stroke-width="2"/><g fill="#e8a33a" stroke="#9c2a14" stroke-width="1" transform="scale(.8)"><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(0)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(60)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(120)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(180)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(240)"/><path d="M0,0 C9,-10 9,-22 0,-30 C-9,-22 -9,-10 0,0Z" transform="rotate(300)"/></g><circle r="5" fill="#c8102e"/></svg><svg class="tc-orn" viewBox="-60 -60 120 120" aria-hidden="true"><defs><linearGradient id="tcGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c1"/><stop offset=".45" stop-color="#e8b04e"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs><g class="tc-orn-star"><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6"/><rect x="-44" y="-44" width="88" height="88" fill="none" stroke="url(#tcGold)" stroke-width="1.6" transform="rotate(45)"/><circle r="54" fill="none" stroke="url(#tcGold)" stroke-width=".8" stroke-dasharray="2 4"/></g><path class="tc-orn-moon" d="M-8,-36 A36,36 0 1,0 -8,36 A29,29 0 1,1 -8,-36 Z" transform="translate(-6,0) rotate(-20)" fill="url(#tcGold)"/></svg><svg class="tc-hatch" viewBox="-60 -60 120 120" aria-hidden="true"><g class="tc-hatch-spin"><circle r="56" fill="none" stroke="#f2c230" stroke-width="3" stroke-dasharray="14 8"/></g><circle r="44" fill="none" stroke="#fffdf2" stroke-opacity=".5" stroke-width="5"/><path d="M-18,-26V26M18,-26V26M-18,0H18" stroke="#fffdf2" stroke-opacity=".35" stroke-width="9" fill="none"/></svg><svg class="tc-deer" viewBox="-95 -75 190 150" aria-hidden="true"><defs><linearGradient id="tcDeerG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0c0"/><stop offset=".4" stop-color="#e8a840"/><stop offset="1" stop-color="#8a4e10"/></linearGradient></defs><g class="tc-deer-ring"><circle r="70" fill="none" stroke="#e0a040" stroke-opacity=".5" stroke-width="2.2" stroke-dasharray="0 7" stroke-linecap="round"/><circle r="63" fill="none" stroke="#e0a040" stroke-opacity=".22" stroke-width="1"/></g><g class="tc-deer-body" opacity=".62"><path fill="url(#tcDeerG)" d="M-58,18C-60,4 -44,-4 -24,-2C-4,0 14,-2 26,-10C32,-16 36,-26 42,-30C46,-33 52,-32 56,-28L68,-22C70,-20 68,-17 64,-17L56,-18C52,-12 48,-4 44,4C40,14 32,22 18,24L-40,26C-50,26 -57,24 -58,18Z M30,20C36,26 44,28 52,28C54,30 52,33 48,33L28,30Z M-44,24C-34,30 -20,32 -10,31C-8,33 -10,35 -14,35L-44,32Z M44,-31C40,-41 46,-45 50,-36Z"/><g fill="none" stroke="#5a2808" stroke-width="2" stroke-linecap="round" opacity=".75"><path d="M-44,10C-32,2 -20,6 -18,18"/><path d="M16,-2C26,2 28,12 22,20"/><circle cx="54" cy="-25" r="2.2" fill="#3a1804" stroke="none"/></g><g fill="none" stroke="url(#tcDeerG)" stroke-width="3.6" stroke-linecap="round"><path d="M47,-33C30,-50 0,-53 -30,-45C-44,-41 -54,-33 -60,-22"/><path d="M34,-44c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/><path d="M17,-49c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/><path d="M0,-51c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/><path d="M-17,-48c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/><path d="M-34,-42c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/><path d="M-50,-33c1,-9 9,-14 13,-9c2,3 -1,6 -4,4"/></g></g></svg><div class="tc-kanji" id="tcKanji">遺跡</div><div class="tc-seal">蛇</div></div>
     <div class="tc-name"><i></i><span id="tcName">Древние руины</span><i></i></div>
     <div class="tc-sub" id="tcSub">ЛАБИРИНТ</div>
   </div>
@@ -756,8 +818,8 @@ canvas{display:block}
   <div class="card">
     <h2>🏆 Рекорды</h2>
     <div class="seg" id="recTabs">
-      <button data-val="all">Все</button><button data-val="classic">🧱</button>
-      <button data-val="portal">🌀</button><button data-val="maze">🗿</button><button data-val="forest">🌲</button>
+      <button data-val="all">Все</button><button data-val="yard">☀️</button><button data-val="classic">🧱</button><button data-val="steppe">🌾</button>
+      <button data-val="portal">🌀</button><button data-val="forest">🌲</button><button data-val="maze">🗿</button>
     </div>
     <ul class="rec-list" id="recList"></ul>
     <div class="legend">
@@ -805,10 +867,12 @@ const playerName = () => curPlayer().name || 'Игрок';
 let mode = store.get('ss_mode', 'classic');
 
 const MODES = {
+  yard:{icon:'☀️', name:'Без стен'},
   classic:{icon:'🧱', name:'Классика'},
+  steppe:{icon:'🌾', name:'Ветер'},
   portal:{icon:'🌀', name:'Портал'},
-  maze:{icon:'🗿', name:'Лабиринт'},
-  forest:{icon:'🌲', name:'Лихолесье'}
+  forest:{icon:'🌲', name:'Лихолесье'},
+  maze:{icon:'🗿', name:'Лабиринт'}
 };
 
 // перенос рекордов из самой первой версии игры
@@ -978,7 +1042,7 @@ const SFX = {
   start: () => tone(440, .12, 'triangle', .09, 880)
 };
 /* ===================== MUSIC ===================== */
-// Свои треки: положи в папку music/ файлы menu.mp3, meadow.mp3, dunes.mp3, ruins.mp3
+// Свои треки: положи в папку music/ файлы menu.mp3, yard.mp3, meadow.mp3, steppe.mp3, dunes.mp3, forest.mp3, ruins.mp3
 // (или один общий game.mp3 для всех уровней). Если файла нет — играет встроенная мелодия.
 const Music = (() => {
   const VOL = {low:.2, mid:.4, high:.7};
@@ -1034,7 +1098,9 @@ const Music = (() => {
   /* ---------- встроенный синтвейв ---------- */
   const SONGS = {
     menu:  {bpm:84,  drums:0, lead:'triangle', arp:'slow', bright:1500, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]}, // Am F C G
+    yard:  {bpm:118, drums:1, lead:'triangle', arp:'fast', bright:3000, prog:[[53,57,60],[48,52,55],[50,53,57],[46,50,53]]}, // F C Dm B♭
     meadow:{bpm:112, drums:1, lead:'square',   arp:'fast', bright:2600, prog:[[48,52,55],[55,59,62],[57,60,64],[53,57,60]]}, // C G Am F
+    steppe:{bpm:100, drums:2, lead:'sawtooth', arp:'slow', bright:1700, prog:[[52,55,59],[50,55,59],[48,52,55],[50,54,57]]}, // Em G C D
     dunes: {bpm:104, drums:2, lead:'sawtooth', arp:'fast', bright:1900, prog:[[50,53,57],[46,50,53],[48,52,55],[45,49,52]]}, // Dm B♭ C A
     ruins: {bpm:96,  drums:3, lead:'triangle', arp:'slow', bright:1300, prog:[[45,48,52],[40,43,47],[41,45,48],[40,44,47]]}, // Am Em F E
     forest:{bpm:78,  drums:0, lead:'sine',     arp:'slow', bright:1100, prog:[[50,53,57],[45,48,52],[46,50,53],[45,49,52]]}  // Dm Am B♭ A
@@ -1182,11 +1248,14 @@ const COLS = 20, ROWS = 20;
 const COMBO_WINDOW = 3000, SPECIAL_LIFE = 7000, APPLES_PER_LEVEL = 8;
 const OASIS_WAVE = 10;   // в каждом мире: дойди до этой волны — мир пройден
 // ---- карта затерянных миров: каждый следующий открывается после прохождения предыдущего
+// путь идёт сквозь сутки: полдень → вечер → сумерки → ночь → глубокая ночь → рассвет
 const WORLDS = [
-  {id:'meadow', mode:'classic', name:'Закатный луг',   desc:'Стены опасны. Ёжики колючие, мыши вкусные.', win:'🌅 ЛУГ ПРОЙДЕН!',          title:'🌅 Луг пройден!'},
-  {id:'dunes',  mode:'portal',  name:'Ночная пустыня', desc:'Сквозь края — но берегись зыбучих песков и скорпионов.', win:'🌴 ОАЗИС НАЙДЕН!', title:'🌴 Оазис найден!'},
-  {id:'ruins',  mode:'maze',    name:'Древние руины',  desc:'С каждой волной растут каменные преграды.', win:'🗿 РУИНЫ ПОКОРЕНЫ!',      title:'🗿 Руины покорены!'},
-  {id:'forest', mode:'forest',  name:'Лихолесье',      desc:'Тьма, деревья, пауки и паутина.',          win:'🌲 ВЫХОД ИЗ ЛИХОЛЕСЬЯ!', title:'🌲 Выход найден!'}
+  {id:'yard',   mode:'yard',    name:'Двор убежища',     desc:'Полдень. Первый выход наверх: стен нет — ползи сквозь края. Лёгкое начало пути.', win:'🚪 ПУТЬ ОТКРЫТ!', title:'🚪 Путь открыт!'},
+  {id:'meadow', mode:'classic', name:'Закатный луг',     desc:'Вечер. Стены опасны. Ёжики колючие, мыши вкусные.', win:'🌅 ЛУГ ПРОЙДЕН!',          title:'🌅 Луг пройден!'},
+  {id:'steppe', mode:'steppe',  name:'Сумеречная степь', desc:'Сумерки. Ветер сносит змейку, катится перекати-поле, гадюки в ковыле.', win:'🏺 КУРГАН НАЙДЕН!', title:'🏺 Курган найден!'},
+  {id:'dunes',  mode:'portal',  name:'Ночная пустыня',   desc:'Ночь. Сквозь края — но берегись зыбучих песков и скорпионов.', win:'🌴 ОАЗИС НАЙДЕН!', title:'🌴 Оазис найден!'},
+  {id:'forest', mode:'forest',  name:'Лихолесье',        desc:'Глубокая ночь. Тьма, деревья, пауки и паутина.',   win:'🌲 ВЫХОД ИЗ ЛИХОЛЕСЬЯ!', title:'🌲 Выход найден!'},
+  {id:'ruins',  mode:'maze',    name:'Древние руины',    desc:'Рассвет. С каждой волной растут каменные преграды.', win:'🗿 РУИНЫ ПОКОРЕНЫ!',      title:'🗿 Руины покорены!'}
 ];
 const STAR_SCORE = [0, 1800, 3000];   // ★ — пройти мир, ★★ и ★★★ — набрать столько очков
 const worldOf = m => WORLDS.find(w => w.mode === m) || WORLDS[0];
@@ -1195,9 +1264,12 @@ const worldStars = id => (worldProg()[id] || {}).stars || 0;
 function worldOpen(i){
   if (i <= 0) return true;
   if (i >= WORLDS.length) return false;
-  return worldStars(WORLDS[i - 1].id) > 0;   // строго: только после прохождения предыдущего
+  // строго: только после прохождения предыдущего; уже пройденный мир остаётся открытым,
+  // даже если порядок миров поменялся (старые сохранения)
+  return worldStars(WORLDS[i - 1].id) > 0 || worldStars(WORLDS[i].id) > 0;
 }
 const starsFor = score => 1 + (score >= STAR_SCORE[1]) + (score >= STAR_SCORE[2]);
+const wraps = () => mode === 'portal' || mode === 'yard';   // миры без стен
 let freePlay = false;   // свободная игра: без волн и без финиша, только очки
 const bestKey = (m = mode, f = freePlay) => f ? m + '_free' : m;
 const SPECIALS = [
@@ -1230,11 +1302,13 @@ function newGame(){
     powers:{}, powerMax:{}, cd:{}, cdMax:{}, lives:sk('lives'),
     state:'ready', acc:0, clock:0, anim:0,
     particles:[], floats:[], shake:0, flash:0, deathT:0, newBest:false,
-    headAng:0, overShown:false, wave:0, gulps:[], tongue:0, tongueT:800
+    headAng:0, overShown:false, wave:0, gulps:[], tongue:0, tongueT:800,
+    wind:{st:'calm', t:6500, dir:null, n:0, lean:0, pow:0}, tumbles:[]
   };
   G.from = G.snake.map(s => ({...s}));
   if (mode === 'maze') for (let i = 0; i < Math.max(1, 3 - sk('stonemason')); i++) addCluster();
   if (mode === 'forest') for (let i = 0; i < 7; i++) addTree();
+  if (mode === 'steppe') for (let i = 0; i < 2; i++) addTree();   // каменные бабы
   placeFood();
   $('board').className = 'board ' + mode;
   $('hint').style.display = '';
@@ -1316,6 +1390,11 @@ function stepMs(){
   ms /= (1 + 0.04 * sk('swift'));
   if (G.powers.fast) ms *= .72;
   if (G.powers.slow) ms *= 1.6;
+  // степь: попутный ветер подгоняет, встречный — тормозит
+  if (mode === 'steppe' && G.wind.st === 'gust'){
+    const dot = G.wind.dir.x * G.dir.x + G.wind.dir.y * G.dir.y;
+    if (dot > 0) ms *= .8; else if (dot < 0) ms *= 1.25;
+  }
   return ms;
 }
 
@@ -1335,9 +1414,16 @@ function queueDir(d){
 function step(){
   if (G.queue.length) G.dir = G.queue.shift();
   const h = G.snake[0], ghost = !!G.powers.ghost;
-  let nx = h.x + G.dir.x, ny = h.y + G.dir.y;
+  let mv = windDrift(), drift = mv !== G.dir;
+  if (drift && !inB(h.x + mv.x, h.y + mv.y) && !ghost && sk('bounce') && G.bounceCd <= 0){
+    // рикошет спасает и от ветра: змейка упирается и не даёт сдуть себя в стену
+    mv = G.dir; drift = false; G.bounceCd = 10000;
+    floatText(h.x, h.y, '💪 Устояла!', '#7dd3fc', .9); SFX.bonus();
+  }
+  let nx = h.x + mv.x, ny = h.y + mv.y;
   if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS){
-    if (mode === 'portal' || ghost){ nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+    if (wraps() || ghost){ nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+    else if (drift){ floatText(h.x, h.y, '💨 Сдуло!', '#fde68a', .9); return crash(); }
     else if (sk('bounce') && G.bounceCd <= 0){
       // рикошет: разворачиваемся вдоль стены туда, где свободно
       const opts = [{x:G.dir.y, y:-G.dir.x}, {x:-G.dir.y, y:G.dir.x}].sort(() => Math.random() - .5)
@@ -1379,6 +1465,7 @@ function step(){
   const old = G.snake.map(s => ({x:s.x, y:s.y}));
   G.snake.unshift({x:nx, y:ny});
   kickDust(old[0].x, old[0].y);
+  if (drift){ kickDust(old[0].x, old[0].y); kickDust(nx, ny); G.shake = Math.max(G.shake, 2.5); buzz(8); }
   if (G.grow > 0) G.grow--; else if (!eatsFood) G.snake.pop();
   G.from = G.snake.map((s, i) => i === 0 ? old[0] : (old[i - 1] || s));
 
@@ -1457,8 +1544,178 @@ function drawSands(c){
     }
   }
 }
+/* ---------- степь: ветер и перекати-поле ---------- */
+// ветер: затишье → предупреждение (стрелки у края, свист) → порыв. Во время порыва
+// змейку, идущую поперёк ветра, каждые несколько шагов сносит на клетку; попутный ветер
+// разгоняет, встречный тормозит. Перекати-поле катится по ветру и опутывает голову.
+const WIND_DIRS = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+const windArrow = d => d.x > 0 ? '→' : d.x < 0 ? '←' : d.y > 0 ? '↓' : '↑';
+function windDrift(){
+  const w = G.wind;
+  if (mode !== 'steppe' || w.st !== 'gust') return G.dir;
+  if (w.dir.x * G.dir.x + w.dir.y * G.dir.y !== 0) return G.dir;
+  const every = G.level >= 7 ? 2 : G.level >= 4 ? 3 : 4;
+  if (++w.n < every) return G.dir;
+  w.n = 0; return w.dir;
+}
+function whoosh(v = .05, dur = 1.2){
+  const a = audio(); if (!a) return;
+  const len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(), t = a.currentTime;
+  s.buffer = buf; f.type = 'bandpass'; f.Q.value = 1.4;
+  f.frequency.setValueAtTime(260, t); f.frequency.exponentialRampToValueAtTime(1500, t + dur * .45); f.frequency.exponentialRampToValueAtTime(380, t + dur);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + dur * .4); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(a.destination); s.start(t); s.stop(t + dur + .05);
+}
+function spawnTumble(){
+  const w = G.wind, d = w.dir; if (!d) return;
+  const h = G.snake[0];
+  for (let tries = 0; tries < 20; tries++){
+    const lane = 1 + rnd((d.x ? ROWS : COLS) - 2);
+    if (lane === (d.x ? h.y : h.x) && tries < 10) continue;    // не прямо в лоб — дать шанс увернуться
+    const x = d.x ? (d.x > 0 ? -1.5 : COLS + .5) : lane, y = d.x ? lane : (d.y > 0 ? -1.5 : ROWS + .5);
+    G.tumbles.push({x, y, d, sp:3.2 + G.level * .18, rot:0, ph:Math.random() * 6, seed:(Math.random() * 1e6) | 0, r:.46 + Math.random() * .1});
+    tone(90, .25, 'sine', .03, 60);
+    return;
+  }
+}
+function tangle(q){
+  const h = G.snake[0];
+  G.tumbles.splice(G.tumbles.indexOf(q), 1);
+  G.stuck = 700; G.combo = 0; G.shake = 4;
+  burst(h.x, h.y, ['#c9a066', '#8a6534', '#e8d3a0'], 18);
+  floatText(h.x, h.y, '🌾 Запутался!', '#f5deb3', .9);
+  SFX.hurt(); buzz([15, 30, 15]);
+}
+function windUpdate(dt){
+  const w = G.wind, L = G.level;
+  w.pow += ((w.st === 'gust' ? 1 : w.st === 'warn' ? .3 : 0) - w.pow) * Math.min(1, dt / 450);
+  w.lean += (((w.dir ? w.dir.x : 0) * w.pow) - w.lean) * Math.min(1, dt / 300);
+  if ((w.t -= dt) <= 0){
+    if (w.st === 'calm'){
+      // чаще всего ветер дует поперёк движения — именно так он и сносит
+      const side = WIND_DIRS.filter(d => d.x * G.dir.x + d.y * G.dir.y === 0);
+      const pool = Math.random() < .3 ? WIND_DIRS : side;
+      w.dir = pool[rnd(pool.length)]; w.st = 'warn'; w.t = 1900; w.n = 0;
+      floatText(COLS / 2 - .5, 1.6, '💨 Ветер ' + windArrow(w.dir), '#fde68a', 1);
+      whoosh(.035, 1.8);
+    } else if (w.st === 'warn'){
+      w.st = 'gust'; w.t = Math.min(6500, 3200 + L * 300) * (.85 + Math.random() * .3); w.tumT = 900;
+      whoosh(.07, 1.6);
+      for (let i = 0; i < 1 + (L >= 3) + (L >= 6); i++) spawnTumble();
+    } else {
+      w.st = 'calm'; w.t = Math.max(3800, 9000 - L * 500) * (.8 + Math.random() * .4); w.n = 0;
+    }
+  }
+  if (w.st === 'gust' && L >= 2 && (w.tumT -= dt) <= 0){
+    w.tumT = Math.max(900, 2600 - L * 150) * (.7 + Math.random() * .6);
+    if (G.tumbles.length < 2 + L / 2) spawnTumble();
+  }
+  const h = G.snake[0];
+  for (const q of [...G.tumbles]){
+    // после порыва перекати-поле замедляется, но докатывается до края
+    const sp = w.st === 'gust' ? q.sp : Math.max(1.3, q.sp * .5);
+    q.x += q.d.x * sp * dt / 1000; q.y += q.d.y * sp * dt / 1000;
+    q.rot += sp * dt / 1000 * 2.4 * (q.d.x || q.d.y);
+    if (q.x < -2.5 || q.y < -2.5 || q.x > COLS + 1.5 || q.y > ROWS + 1.5){ G.tumbles.splice(G.tumbles.indexOf(q), 1); continue; }
+    const cx = Math.round(q.x), cy = Math.round(q.y);
+    if (G.obstacles.has(key(cx, cy)) && inB(cx, cy)){
+      burst(cx, cy, ['#c9a066', '#8a6534'], 12); G.tumbles.splice(G.tumbles.indexOf(q), 1); continue;
+    }
+    if (cx === h.x && cy === h.y && !G.powers.ghost && G.state === 'play') tangle(q);
+  }
+}
+function drawTumbles(c){
+  const S = cell;
+  for (const q of G.tumbles){
+    const hop = Math.abs(Math.sin(G.anim / 140 + q.ph)) * S * .22, cx = (q.x + .5) * S, cy = (q.y + .5) * S, r = S * q.r * 1.15;
+    groundShadow(c, cx + S * .12, cy + S * .38, r * .9, r * .28, .3);
+    c.save(); c.translate(cx, cy - hop); c.rotate(q.rot);
+    const R = mulberry32(q.seed);
+    c.lineCap = 'round';
+    const cols = ['#6e4a22', '#9a7040', '#c8a06a', '#e2c894'];
+    for (let k = 0; k < 4; k++){
+      c.strokeStyle = cols[k]; c.lineWidth = Math.max(.7, S * (.07 - k * .012)); c.beginPath();
+      for (let i = 0; i < 7; i++){
+        const a1 = R() * 6.28, a2 = a1 + 1.2 + R() * 2.4, r1 = r * (.35 + R() * .65), r2 = r * (.35 + R() * .65);
+        c.moveTo(Math.cos(a1) * r1, Math.sin(a1) * r1);
+        c.quadraticCurveTo(Math.cos((a1 + a2) / 2) * r * 1.1, Math.sin((a1 + a2) / 2) * r * 1.1, Math.cos(a2) * r2, Math.sin(a2) * r2);
+      }
+      c.stroke();
+    }
+    c.restore();
+  }
+}
+// следы ветра по полю + стрелки-предупреждения у наветренного края
+function drawWind(c, dt){
+  const w = G.wind, S = cell, W = size;
+  w.streaks = w.streaks || [];
+  if (w.dir && w.pow > .05 && Math.random() < w.pow * dt / 18){
+    const along = Math.random() * W, len = S * (1.5 + Math.random() * 3);
+    w.streaks.push({p:-len, q:along, len, sp:(.5 + Math.random() * .5) * W / 700, a:.22 + Math.random() * .25, wob:Math.random() * 6});
+  }
+  if (w.streaks.length > 60) w.streaks.splice(0, w.streaks.length - 60);
+  c.save(); c.lineCap = 'round';
+  for (let i = w.streaks.length - 1; i >= 0; i--){
+    const s = w.streaks[i]; s.p += s.sp * dt;
+    if (s.p > W + s.len || !w.dir){ w.streaks.splice(i, 1); continue; }
+    const d = w.dir, wob = Math.sin(G.anim / 250 + s.wob) * S * .15;
+    // p — вдоль ветра, q — поперёк
+    const P = p => d.x > 0 ? p : W - p;
+    const x1 = d.x ? P(s.p) : s.q + wob, y1 = d.x ? s.q + wob : (d.y > 0 ? s.p : W - s.p);
+    const x2 = d.x ? P(s.p - s.len) : s.q + wob * .3, y2 = d.x ? s.q + wob * .3 : (d.y > 0 ? s.p - s.len : W - s.p + s.len);
+    const g = c.createLinearGradient(x1, y1, x2, y2);
+    g.addColorStop(0, `rgba(255,248,225,${s.a * Math.max(w.pow, .25)})`); g.addColorStop(1, 'rgba(255,248,225,0)');
+    c.strokeStyle = g; c.lineWidth = Math.max(1, S * .07); c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+  }
+  if (w.st === 'warn' && w.dir){
+    const d = w.dir, k = .45 + .45 * Math.sin(G.anim / 110), ang = Math.atan2(d.y, d.x);
+    c.fillStyle = `rgba(255,222,140,${k})`; c.strokeStyle = 'rgba(60,30,0,.5)'; c.lineWidth = 1;
+    for (const f of [.25, .5, .75]) for (let j = 0; j < 2; j++){
+      const off = S * (.7 + j * .8 + (G.anim / 600 % 1) * .5);
+      const x = d.x ? (d.x > 0 ? off : W - off) : W * f, y = d.x ? W * f : (d.y > 0 ? off : W - off);
+      c.save(); c.translate(x, y); c.rotate(ang); c.globalAlpha = j ? .6 : 1;
+      c.beginPath(); c.moveTo(-S * .4, -S * .5); c.lineTo(S * .25, 0); c.lineTo(-S * .4, S * .5); c.lineTo(-S * .14, 0); c.closePath(); c.fill(); c.stroke();
+      c.restore();
+    }
+  }
+  c.restore();
+}
+// каменные бабы — скифские изваяния, стоят в степи преградами
+function drawIdols(c){
+  const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
+  for (const [k, born] of list){
+    const x = k % COLS, y = (k / COLS) | 0, cx = (x + .5) * S, by = (y + .92) * S;
+    const a = Math.min(1, (G.anim - born) / 500), e = 1 - Math.pow(1 - a, 3), R = mulberry32(k * 53 + 11);
+    const hu = 28 + R() * 14, l = 52 + R() * 8, w = S * .64, h = S * 1.25 * e;
+    groundShadow(c, cx + S * .22, by - S * .02, S * .5, S * .16, .4 * e);
+    const g = c.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0);
+    g.addColorStop(0, `hsl(${hu},14%,${l + 8}%)`); g.addColorStop(.6, `hsl(${hu},12%,${l - 4}%)`); g.addColorStop(1, `hsl(${hu},12%,${l - 18}%)`);
+    c.fillStyle = g; c.beginPath();
+    c.moveTo(cx - w / 2, by); c.lineTo(cx - w / 2 * .92, by - h * .62);
+    c.quadraticCurveTo(cx - w / 2, by - h, cx, by - h); c.quadraticCurveTo(cx + w / 2, by - h, cx + w / 2 * .92, by - h * .62);
+    c.lineTo(cx + w / 2, by); c.closePath(); c.fill();
+    if (e < .9) continue;
+    c.strokeStyle = `hsla(${hu},20%,${l - 30}%,.8)`; c.lineWidth = Math.max(.7, S * .04); c.lineCap = 'round';
+    c.beginPath();
+    c.moveTo(cx - w * .32, by - h * .6); c.quadraticCurveTo(cx, by - h * .55, cx + w * .32, by - h * .6);   // плечи/шея
+    c.moveTo(cx - w * .18, by - h * .82); c.lineTo(cx - w * .05, by - h * .82);                           // глаза
+    c.moveTo(cx + w * .05, by - h * .82); c.lineTo(cx + w * .18, by - h * .82);
+    c.moveTo(cx, by - h * .8); c.lineTo(cx, by - h * .7);                                                 // нос
+    c.moveTo(cx - w * .4, by - h * .5); c.quadraticCurveTo(cx - w * .1, by - h * .28, cx, by - h * .32); // руки к сосуду
+    c.moveTo(cx + w * .4, by - h * .5); c.quadraticCurveTo(cx + w * .1, by - h * .28, cx, by - h * .32);
+    c.stroke();
+    c.fillStyle = `hsla(${hu},20%,${l - 26}%,.85)`; c.beginPath(); c.roundRect(cx - w * .1, by - h * .36, w * .2, h * .16, S * .03); c.fill();
+    c.fillStyle = 'rgba(255,230,190,.14)'; c.beginPath(); c.ellipse(cx - w * .22, by - h * .78, w * .08, h * .12, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(120,140,60,.55)';                                                                   // лишайник
+    for (let i = 0; i < 4; i++){ c.beginPath(); c.arc(cx + (R() - .5) * w * .8, by - h * (.1 + R() * .35), S * (.03 + R() * .03), 0, 7); c.fill(); }
+  }
+}
+
 function winOasis(){
   const W = worldOf(mode), idx = WORLDS.indexOf(W);
+  G.tumbles.length = 0; G.wind.st = 'calm'; G.wind.t = 1e9; G.wind.pow = G.wind.lean = 0; G.wind.streaks = [];
   G.won = true;
   const bonus = 500;
   G.score += bonus;
@@ -1498,7 +1755,7 @@ function drawRings(c, dt){
   c.restore();
 }
 // пыль/пыльца из-под змейки — обычное смешивание, чтобы не светилась
-const DUST = {meadow:['225,240,160', .25, 1], dunes:['226,186,128', 1, 2], ruins:['190,170,150', .55, 1], forest:['110,140,100', .35, 1]};
+const DUST = {yard:['230,225,210', .35, 1], meadow:['225,240,160', .25, 1], steppe:['214,190,140', .5, 1], dunes:['226,186,128', 1, 2], ruins:['190,170,150', .55, 1], forest:['110,140,100', .35, 1]};
 function kickDust(x, y){
   const d = DUST[BIOME[mode]] || DUST.meadow;
   for (let i = 0; i < d[2]; i++){
@@ -1519,7 +1776,7 @@ function drawDust(c, dt){
   }
 }
 // лучи света по полю
-const RAYS = {meadow:'255,214,150', ruins:'255,210,160', dunes:'200,220,255'};
+const RAYS = {yard:'255,250,215', meadow:'255,214,150', steppe:'255,170,200', ruins:'255,210,160', dunes:'200,220,255'};
 function drawRays(c){
   const col = RAYS[BIOME[mode]]; if (!col) return;
   const W = size, A = G.anim;
@@ -1620,7 +1877,9 @@ function updateParallax(){
 
 /* ---------- живность ---------- */
 const CRIT = {
+  yard:  {prey:['🦗', 'Кузнечик'], hazard:['🐝', 'Оса'],     thief:['🕊️', 'Голубь']},
   meadow:{prey:['🐭', 'Мышь'],     hazard:['🦔', 'Ёж'],      thief:['🐦', 'Воробей']},
+  steppe:{prey:['🐿️', 'Суслик'],   hazard:['🐍', 'Гадюка'],  thief:['🦅', 'Орёл']},
   dunes: {prey:['🦎', 'Ящерица'],  hazard:['🦂', 'Скорпион'], thief:['🦅', 'Гриф']},
   ruins: {prey:['🐭', 'Мышь'],     hazard:['🦇', 'Летучая мышь'], thief:['🐒', 'Мартышка']},
   forest:{prey:['🐇', 'Заяц'],     hazard:['🕷️', 'Паук'],     thief:['🦉', 'Сова']}
@@ -1660,9 +1919,10 @@ function eatPrey(q){
 function crittersUpdate(dt){
   const L = G.level, h = G.snake[0];
   if ((G.preyT -= dt) <= 0){ G.preyT = (11000 + Math.random() * 8000) / (1 + .3 * sk('tracking')); if (!G.critters.some(q => q.kind === 'prey')) spawnCritter('prey'); }
-  if (L >= 2 && (G.hazT -= dt) <= 0){
-    G.hazT = (9000 + Math.random() * 7000) * (1 + .25 * sk('tamer'));
-    if (G.critters.filter(q => q.kind === 'hazard').length < Math.min(3, 1 + Math.floor((L - 2) / 3))) spawnCritter('hazard');
+  const easy = mode === 'yard';   // первый мир: опасность появляется поздно и одна
+  if (L >= (easy ? 4 : 2) && (G.hazT -= dt) <= 0){
+    G.hazT = (9000 + Math.random() * 7000) * (1 + .25 * sk('tamer')) * (easy ? 1.5 : 1);
+    if (G.critters.filter(q => q.kind === 'hazard').length < (easy ? 1 : Math.min(3, 1 + Math.floor((L - 2) / 3)))) spawnCritter('hazard');
   }
   if (L >= 3 && (G.thiefT -= dt) <= 0){ G.thiefT = 16000 + Math.random() * 12000; if (!G.critters.some(q => q.kind === 'thief')) spawnCritter('thief'); }
   for (const q of [...G.critters]){
@@ -1991,6 +2251,7 @@ function levelUp(){
   banner(goal ? `Волна ${G.level} / ${OASIS_WAVE}` : 'Волна ' + G.level);
   fxRing(G.snake[0].x, G.snake[0].y, '#fff4c2', COLS * .9, .25, 1.4);
   if (mode === 'forest' && G.obstacles.size < 45 && Math.random() < .8) addTree();
+  if (mode === 'steppe' && G.level % 3 === 0 && G.obstacles.size < 6) addTree();
   SFX.level();
   if (mode === 'maze' && G.obstacles.size < 70 && Math.random() >= .3 * sk('stonemason')) addCluster();
   G.bonusXp += 20 * sk('explorer');
@@ -2018,7 +2279,7 @@ function summonApple(){
   const h = G.snake[0];
   for (let d = 2; d <= 5; d++){
     let x = h.x + G.dir.x * d, y = h.y + G.dir.y * d;
-    if (mode === 'portal'){ x = (x + COLS) % COLS; y = (y + ROWS) % ROWS; }
+    if (wraps()){ x = (x + COLS) % COLS; y = (y + ROWS) % ROWS; }
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) break;
     if (G.food && G.food.x === x && G.food.y === y) return;
     if (isFree(x, y)){
@@ -2175,7 +2436,7 @@ function mulberry32(a){
   return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
     t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-const BIOME = {classic:'meadow', portal:'dunes', maze:'ruins', forest:'forest'};
+const BIOME = {yard:'yard', classic:'meadow', steppe:'steppe', portal:'dunes', maze:'ruins', forest:'forest'};
 let decor = [], motes = [];
 
 function resize(){
@@ -2360,31 +2621,140 @@ function forestFloor(b, R, rr, S, W){
   for (let i = 0; i < 14; i++) decor.push({type:'tuft', x:rr(0, W), y:rr(0, W), n:(rr(4, 8)) | 0, h:S * rr(.3, .5), ph:R() * 6, col:[rr(120, 150), rr(30, 45), rr(18, 26)]});
 }
 
+// двор убежища: бетонные плиты, трава в швах, облезлая вертолётная разметка, полдень
+function yardFloor(b, R, rr, S, W){
+  b.fillStyle = '#b4b1a4'; b.fillRect(0, 0, W, W);
+  blotches(b, R, rr, W, S, 80, ['140,138,125', '190,188,175', '120,125,100', '160,150,130'], .22);
+  // плиты 5×5 клеток: у каждой свой оттенок
+  const P = S * 5;
+  for (let py = 0; py < 4; py++) for (let px = 0; px < 4; px++){
+    const l = rr(-6, 6);
+    b.fillStyle = l > 0 ? `rgba(255,255,245,${l / 80})` : `rgba(40,40,30,${-l / 60})`; b.fillRect(px * P, py * P, P, P);
+  }
+  for (let i = 0; i < 900; i++){ b.fillStyle = R() < .5 ? 'rgba(60,60,55,.18)' : 'rgba(255,255,245,.2)'; b.fillRect(rr(0, W), rr(0, W), S * rr(.02, .05), S * rr(.02, .05)); }
+  blotches(b, R, rr, W, S, 10, ['150,90,50'], .18);                       // ржавые потёки
+  blotches(b, R, rr, W, S, 18, ['80,120,50', '100,140,60'], .3);          // мох
+  // вертолётная площадка: круг, «H», по краю — жёлтая разметка
+  const cx = W / 2, cy = W / 2, rO = S * 6.2;
+  b.save(); b.globalAlpha = .75;
+  b.strokeStyle = '#f2f0e6'; b.lineWidth = S * .45; b.beginPath(); b.arc(cx, cy, rO, 0, 7); b.stroke();
+  b.strokeStyle = '#e9b62c'; b.lineWidth = S * .16; b.setLineDash([S * .9, S * .5]); b.beginPath(); b.arc(cx, cy, rO + S * .55, 0, 7); b.stroke(); b.setLineDash([]);
+  b.fillStyle = '#f2f0e6';
+  b.fillRect(cx - S * 2.2, cy - S * 2.6, S * .9, S * 5.2); b.fillRect(cx + S * 1.3, cy - S * 2.6, S * .9, S * 5.2); b.fillRect(cx - S * 1.3, cy - S * .45, S * 2.6, S * .9);
+  b.strokeStyle = '#e9b62c'; b.lineWidth = S * .22;
+  b.strokeRect(S * .9, S * .9, W - S * 1.8, W - S * 1.8);
+  b.restore();
+  // краска облезла: пятна бетона поверх
+  for (let i = 0; i < 700; i++){
+    const x = rr(0, W), y = rr(0, W), r = S * rr(.04, .2);
+    b.fillStyle = `rgba(${R() < .5 ? '180,177,164' : '160,158,146'},${rr(.6, 1)})`; b.beginPath(); b.ellipse(x, y, r * 1.4, r, R() * 3, 0, 7); b.fill();
+  }
+  // швы между плитами, заросшие травой
+  b.lineCap = 'round';
+  for (let k = 1; k < 4; k++){
+    for (const v of [0, 1]){
+      b.strokeStyle = 'rgba(60,58,48,.38)'; b.lineWidth = Math.max(1, S * .07); b.beginPath();
+      if (v){ b.moveTo(k * P, 0); b.lineTo(k * P, W); } else { b.moveTo(0, k * P); b.lineTo(W, k * P); }
+      b.stroke();
+      for (let t = 0; t < W; t += S * rr(.12, .3)){
+        if (R() < .25) continue;
+        const x = v ? k * P + rr(-S * .12, S * .12) : t, y = v ? t : k * P + rr(-S * .12, S * .12), L = S * rr(.12, .35);
+        b.strokeStyle = `hsl(${rr(80, 110)},${rr(40, 60)}%,${rr(30, 45)}%)`; b.lineWidth = Math.max(.6, S * .045);
+        b.beginPath(); b.moveTo(x, y); b.lineTo(x + rr(-L * .5, L * .5), y - L); b.stroke();
+      }
+    }
+  }
+  // трещины, из которых лезет трава
+  for (let i = 0; i < 12; i++){
+    let x = rr(0, W), y = rr(0, W), a = R() * 6.28;
+    b.strokeStyle = 'rgba(45,42,35,.55)'; b.lineWidth = Math.max(.7, S * .04); b.beginPath(); b.moveTo(x, y);
+    for (let k = 0; k < 5; k++){ a += rr(-.8, .8); x += Math.cos(a) * S * .5; y += Math.sin(a) * S * .5; b.lineTo(x, y); }
+    b.stroke();
+    for (let k = 0; k < 10; k++){ b.strokeStyle = R() < .5 ? '#5f9230' : '#77a83a'; b.lineWidth = Math.max(.6, S * .04); b.beginPath(); const gx = x + rr(-S * .4, S * .4), gy = y + rr(-S * .4, S * .4); b.moveTo(gx, gy); b.lineTo(gx + rr(-2, 2), gy - S * rr(.15, .3)); b.stroke(); }
+  }
+  // одуванчики
+  for (let i = 0; i < 16; i++){
+    const x = rr(0, W), y = rr(0, W), r = S * rr(.07, .1), fluff = R() < .35;
+    b.fillStyle = 'rgba(0,0,0,.15)'; b.beginPath(); b.arc(x + r * .5, y + r * .7, r * 1.4, 0, 7); b.fill();
+    b.fillStyle = fluff ? 'rgba(255,255,250,.85)' : '#ffd21f'; b.beginPath(); b.arc(x, y, r, 0, 7); b.fill();
+    if (!fluff){ b.fillStyle = '#f0a800'; b.beginPath(); b.arc(x, y, r * .45, 0, 7); b.fill(); }
+  }
+  for (let i = 0; i < 10; i++) pebble(b, rr(0, W), rr(0, W), S * rr(.06, .14), R, [rr(35, 50), rr(5, 12), rr(55, 70)]);
+  for (let i = 0; i < 14; i++) decor.push({type:'tuft', x:rr(0, W), y:rr(0, W), n:(rr(4, 8)) | 0, h:S * rr(.3, .55), ph:R() * 6, col:[rr(85, 105), rr(45, 60), rr(34, 44)]});
+}
+
+// сумеречная степь: выгоревшая трава, серебристый ковыль, полынь, сусличьи норы
+function steppeFloor(b, R, rr, S, W){
+  const g = b.createLinearGradient(0, 0, W * .4, W);
+  g.addColorStop(0, '#94934a'); g.addColorStop(.55, '#737a3a'); g.addColorStop(1, '#4f5530');
+  b.fillStyle = g; b.fillRect(0, 0, W, W);
+  blotches(b, R, rr, W, S, 70, ['170,150,90', '90,95,50', '120,80,60', '140,140,120'], .18);
+  cellChecker(b, S, 'rgba(255,240,200,.045)', 'rgba(40,20,30,.04)');
+  // проплешины сухой земли
+  for (let i = 0; i < 9; i++){
+    const x = rr(0, W), y = rr(0, W), r = S * rr(.6, 1.4);
+    const gg = b.createRadialGradient(x, y, 0, x, y, r);
+    gg.addColorStop(0, 'rgba(150,118,80,.5)'); gg.addColorStop(1, 'rgba(150,118,80,0)');
+    b.fillStyle = gg; b.beginPath(); b.ellipse(x, y, r * 1.4, r, R() * 3, 0, 7); b.fill();
+  }
+  blades(b, R, rr, W, S, COLS * ROWS * 16,
+    ['#5f6a30', '#727d38', '#8a8c42', '#a49a50', '#c2b060', '#d8c47a', '#4f5a2a', '#9aa060'], [.15, .42], .8);
+  // полынь — серо-голубые кустики
+  for (let i = 0; i < 26; i++){
+    const cx = rr(0, W), cy = rr(0, W);
+    for (let k = 0; k < 8; k++){ b.fillStyle = `hsla(${rr(80, 110)},${rr(8, 18)}%,${rr(48, 62)}%,.55)`; b.beginPath(); b.arc(cx + rr(-S * .3, S * .3), cy + rr(-S * .3, S * .3), S * rr(.04, .08), 0, 7); b.fill(); }
+  }
+  // сусличьи норки
+  for (let i = 0; i < 6; i++){
+    const x = rr(S, W - S), y = rr(S, W - S), r = S * rr(.14, .2);
+    b.fillStyle = 'rgba(120,90,55,.8)'; b.beginPath(); b.ellipse(x, y + r * .3, r * 1.6, r * .9, 0, 0, 7); b.fill();
+    b.fillStyle = 'rgba(25,14,8,.9)'; b.beginPath(); b.ellipse(x, y, r, r * .6, 0, 0, 7); b.fill();
+  }
+  for (let i = 0; i < 12; i++) pebble(b, rr(0, W), rr(0, W), S * rr(.06, .14), R, [rr(25, 40), rr(8, 16), rr(45, 60)]);
+  // лиловые цветы шалфея и жёлтые — зверобоя
+  for (let i = 0; i < 22; i++){
+    const x = rr(0, W), y = rr(0, W), purple = R() < .6;
+    for (let k = 0; k < 4; k++){ b.fillStyle = purple ? `hsl(${rr(270, 290)},55%,${rr(55, 68)}%)` : `hsl(${rr(45, 52)},85%,62%)`; b.beginPath(); b.arc(x + rr(-2, 2), y - k * S * .06, S * rr(.03, .05), 0, 7); b.fill(); }
+  }
+  // сумеречный лиловый налёт
+  const dusk = b.createLinearGradient(0, 0, 0, W);
+  dusk.addColorStop(0, 'rgba(170,90,150,.1)'); dusk.addColorStop(1, 'rgba(50,20,80,.16)');
+  b.fillStyle = dusk; b.fillRect(0, 0, W, W);
+  for (let i = 0; i < 20; i++) decor.push({type:'feather', x:rr(0, W), y:rr(0, W), n:(rr(3, 6)) | 0, h:S * rr(.5, .8), ph:R() * 6});
+}
+
 function buildBg(){
   const b = bg.getContext('2d'), S = cell, W = size, biome = BIOME[mode] || 'meadow';
-  const R = mulberry32(biome === 'meadow' ? 7 : biome === 'dunes' ? 21 : biome === 'forest' ? 33 : 99);
+  const R = mulberry32({meadow:7, dunes:21, forest:33, steppe:45, yard:57}[biome] || 99);
   const rr = (a, c) => a + R() * (c - a);
   b.setTransform(dpr, 0, 0, dpr, 0, 0);
   decor = [];
   if (biome === 'meadow') meadow(b, R, rr, S, W);
   else if (biome === 'dunes') dunes(b, R, rr, S, W);
   else if (biome === 'forest') forestFloor(b, R, rr, S, W);
+  else if (biome === 'steppe') steppeFloor(b, R, rr, S, W);
+  else if (biome === 'yard') yardFloor(b, R, rr, S, W);
   else ruins(b, R, rr, S, W);
-  // закатный свет, прохладная тень, виньетка
+  // закатный свет, прохладная тень, виньетка (в полдень — яркое солнце и лёгкая виньетка)
+  const noon = biome === 'yard';
   let g = b.createRadialGradient(W * 1.05, -W * .1, 0, W * 1.05, -W * .1, W * 1.35);
-  g.addColorStop(0, 'rgba(255,170,80,.32)'); g.addColorStop(.5, 'rgba(255,120,80,.1)'); g.addColorStop(1, 'rgba(255,120,80,0)');
+  g.addColorStop(0, noon ? 'rgba(255,250,210,.3)' : 'rgba(255,170,80,.32)'); g.addColorStop(.5, noon ? 'rgba(255,245,200,.08)' : 'rgba(255,120,80,.1)'); g.addColorStop(1, 'rgba(255,120,80,0)');
   b.fillStyle = g; b.fillRect(0, 0, W, W);
-  g = b.createLinearGradient(0, 0, 0, W);
-  g.addColorStop(0, 'rgba(60,20,90,0)'); g.addColorStop(1, 'rgba(40,10,70,.24)');
-  b.fillStyle = g; b.fillRect(0, 0, W, W);
+  if (!noon){
+    g = b.createLinearGradient(0, 0, 0, W);
+    g.addColorStop(0, 'rgba(60,20,90,0)'); g.addColorStop(1, 'rgba(40,10,70,.24)');
+    b.fillStyle = g; b.fillRect(0, 0, W, W);
+  }
   g = b.createRadialGradient(W / 2, W / 2, W * .42, W / 2, W / 2, W * .78);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.42)');
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${noon ? .22 : .42})`);
   b.fillStyle = g; b.fillRect(0, 0, W, W);
   // частицы в воздухе
   const cfg = {meadow:{n:14, c:'255,240,150', r:.07, vx:.004, vy:-.004},
                dunes: {n:26, c:'255,226,176', r:.035, vx:.03, vy:.002},
                ruins: {n:18, c:'255,215,170', r:.04, vx:.003, vy:-.002},
-               forest:{n:22, c:'255,220,140', r:.05, vx:.005, vy:-.004}}[biome];
+               forest:{n:22, c:'255,220,140', r:.05, vx:.005, vy:-.004},
+               yard:  {n:12, c:'255,255,235', r:.05, vx:.006, vy:-.003},
+               steppe:{n:20, c:'255,240,215', r:.04, vx:.012, vy:-.002}}[biome];
   motes = [];
   for (let i = 0; i < cfg.n; i++) motes.push({x:rr(0, W), y:rr(0, W), vx:cfg.vx * rr(.5, 1.5) * (biome === 'dunes' ? 1 : (R() < .5 ? -1 : 1)),
     vy:cfg.vy * rr(.5, 1.5), r:S * cfg.r * rr(.6, 1.3), c:cfg.c, ph:R() * 6, tw:rr(300, 900), a:rr(.4, .9)});
@@ -2395,15 +2765,20 @@ function drawGround(c){
   const A = G.anim, S = cell;
   c.lineCap = 'round';
   for (const d of decor){
-    const sway = Math.sin(A / 700 + d.ph) * .18 + Math.sin(A / 260 + d.ph * 2) * .05;
-    c.lineWidth = S * .055;
+    const gust = G.wind ? G.wind.pow : 0;
+    const sway = Math.sin(A / 700 + d.ph) * .18 + Math.sin(A / 260 + d.ph * 2) * (.05 + .12 * gust) + (G.wind ? G.wind.lean * .75 : 0);
+    c.lineWidth = S * (d.type === 'feather' ? .03 : .055);
     for (let k = 0; k < d.n; k++){
       const off = k / Math.max(1, d.n - 1) - .5, bx = d.x + off * S * .35, h = d.h * (.6 + .4 * Math.cos(off * 2.2));
       const a = -Math.PI / 2 + off * .9 + sway * (.6 + Math.abs(off));
-      c.strokeStyle = d.type === 'dry' ? `hsl(${38 + off * 10},45%,${50 + off * 12}%)` : `hsl(${d.col[0] + off * 14},${d.col[1]}%,${d.col[2] + Math.abs(off) * 14}%)`;
+      c.strokeStyle = d.type === 'feather' ? `hsla(${50 + off * 10},${30 + off * 10}%,${62 + Math.abs(off) * 14}%,.7)` : d.type === 'dry' ? `hsl(${38 + off * 10},45%,${50 + off * 12}%)` : `hsl(${d.col[0] + off * 14},${d.col[1]}%,${d.col[2] + Math.abs(off) * 14}%)`;
       c.beginPath(); c.moveTo(bx, d.y);
       c.quadraticCurveTo(bx + Math.cos(a) * h * .2, d.y - h * .55, bx + Math.cos(a) * h, d.y + Math.sin(a) * h);
       c.stroke();
+      if (d.type === 'feather'){       // пушистая метёлка ковыля
+        const ex = bx + Math.cos(a) * h, ey = d.y + Math.sin(a) * h;
+        c.fillStyle = 'rgba(248,242,226,.5)'; c.beginPath(); c.ellipse(ex + Math.cos(a) * S * .1, ey + Math.sin(a) * S * .1, S * .16, S * .04, a, 0, 7); c.fill();
+      }
     }
   }
 }
@@ -2420,6 +2795,7 @@ function drawAtmosphere(c, dt){
   c.save(); c.globalCompositeOperation = 'lighter';
   for (const m of motes){
     m.x += m.vx * dt; m.y += m.vy * dt + Math.sin(A / 900 + m.ph) * .006 * dt;
+    if (G.wind && G.wind.dir && G.wind.pow > .05){ m.x += G.wind.dir.x * G.wind.pow * .12 * dt; m.y += G.wind.dir.y * G.wind.pow * .12 * dt; }
     if (m.x < -10) m.x = W + 10; if (m.x > W + 10) m.x = -10; if (m.y < -10) m.y = W + 10; if (m.y > W + 10) m.y = -10;
     const tw = .5 + .5 * Math.sin(A / m.tw + m.ph);
     c.globalAlpha = m.a * tw * .35; c.fillStyle = `rgb(${m.c})`;
@@ -2428,11 +2804,11 @@ function drawAtmosphere(c, dt){
     c.beginPath(); c.arc(m.x, m.y, m.r, 0, 7); c.fill();
   }
   c.restore();
-  if (mode === 'portal'){        // мерцающие края-порталы
-    const p = .26 + .14 * Math.sin(A / 400), d = S * .7;
+  if (wraps()){        // мерцающие края-порталы (во дворе — мягкий солнечный край)
+    const p = (mode === 'yard' ? .16 : .26) + .14 * Math.sin(A / 400), d = S * .7, ec = mode === 'yard' ? '220,255,170' : '62,230,255';
     const edge = (x0, y0, x1, y1, rx, ry, rw, rh) => {
       const g = c.createLinearGradient(x0, y0, x1, y1);
-      g.addColorStop(0, `rgba(62,230,255,${p})`); g.addColorStop(1, 'rgba(62,230,255,0)');
+      g.addColorStop(0, `rgba(${ec},${p})`); g.addColorStop(1, `rgba(${ec},0)`);
       c.fillStyle = g; c.fillRect(rx, ry, rw, rh);
     };
     edge(0, 0, d, 0, 0, 0, d, W); edge(W, 0, W - d, 0, W - d, 0, d, W);
@@ -2464,6 +2840,7 @@ function drawTrees(c){
 }
 function drawObstacles(c){
   if (mode === 'forest') return drawTrees(c);
+  if (mode === 'steppe') return drawIdols(c);
   const S = cell, list = [...G.obstacles].sort((a, b) => a[0] - b[0]);
   for (const [k, born] of list){
     const x = k % COLS, y = (k / COLS) | 0;
@@ -2849,9 +3226,11 @@ function render(dt){
   if (G.state === 'play' || G.state === 'paused') t = Math.min(1, G.acc / stepMs());
   else if (G.state === 'ready') t = 0;
   drawSnake(c, t, dt);
+  if (mode === 'steppe') drawTumbles(c);
   drawComboAura(c);
   drawRays(c);
   drawAmbient(c, dt);
+  if (mode === 'steppe') drawWind(c, dt);
   drawAtmosphere(c, dt);
   if (mode === 'forest') drawDarkness(c);
   drawEffects(c, dt);
@@ -2872,6 +3251,7 @@ function frame(now){
       if (G.special){ G.special.life -= dt; if (G.special.life <= 0) G.special = null; }
       if (mode === 'portal') sandsUpdate(dt);
       if (mode === 'forest') websUpdate(dt);
+      if (mode === 'steppe') windUpdate(dt);
       crittersUpdate(dt); treasureUpdate(dt);
       G.wave += dt / stepMs() * 2.4;
       for (const g of G.gulps) g.p += dt / stepMs();
@@ -2895,6 +3275,8 @@ requestAnimationFrame(frame);
 /* ===================== LEVEL SCENE & TITLE ===================== */
 const LOCATIONS = {
   meadow:{kanji:'草原', rus:'ЛУГЪ', seal:'З', name:'Закатный луг',   sub:'КЛАССИКА', img:'img/meadow.jpg', aspect:1.5, sky:'rgb(125,112,172)', fx:'meadow'},
+  yard:  {kanji:'門', stencil:'УБЕЖИЩЕ 7', seal:'<b>7</b>', name:'Двор убежища', sub:'БЕЗ СТЕН · ПЕРВЫЙ ВЫХОД', img:'img/yard.jpg', aspect:1.5, sky:'rgb(112,160,212)', fx:'yard'},
+  steppe:{kanji:'草原', greek:'ΣΚΥΘΙΑ', seal:"<svg viewBox='-20 -20 40 40'><g fill='none' stroke='#3a1804' stroke-linecap='round'><path d='M9,-10A14,14 0 1,0 13,6' stroke-width='5.5'/><circle cx='13' cy='8' r='3' stroke-width='1.8'/><circle cx='-5' cy='-1' r='2.3' stroke-width='1.6'/><circle cx='0' cy='6' r='2.3' stroke-width='1.6'/><circle cx='5' cy='-2' r='2.3' stroke-width='1.6'/></g><circle cx='9' cy='-11' r='5.2' fill='#3a1804'/><path d='M6,-15l-2,-4l5,2z' fill='#3a1804'/><circle cx='10.5' cy='-11.5' r='1.3' fill='#f0b860'/></svg>", name:'Сумеречная степь', sub:'ВЕТЕР · НАЙДИ КУРГАН', img:'img/steppe.jpg', aspect:1.5, sky:'rgb(58,40,78)', fx:'steppe'},
   dunes: {kanji:'砂漠', arabic:'الصحراء', seal:'أفعى', name:'Ночная пустыня', sub:'ПОРТАЛ · НАЙДИ ОАЗИС',   img:'img/dunes.jpg', aspect:1.5, sky:'rgb(20,28,66)', fx:'dunes', iw:1536, ih:1024},
   forest:{kanji:'森', runes:'ᛚᛁᚺᛟᛚᛖᛋ', seal:'ᛉ', name:'Лихолесье', sub:'ТЬМА · НАЙДИ ВЫХОД', img:'img/forest.jpg', aspect:1.5, sky:'rgb(9,20,30)', fx:'forest'},
   ruins: {kanji:'遺跡', name:'Древние руины',  sub:'ЛАБИРИНТ', img:'img/ruins.jpg', aspect:1.5, sky:'rgb(7,119,225)'}
@@ -2994,8 +3376,67 @@ const SceneFx = (() => {
     }
     ctx.globalCompositeOperation = 'source-over';
   }
+  // степь: пух ковыля летит по ветру, в лиловом небе зажигаются первые звёзды, парит орёл
+  const seeds = [], birds = [];
+  let nextBird = 3;
+  function stepSteppe(dt){
+    t += dt;
+    const wd = G && G.wind && G.wind.dir ? G.wind : null, gust = wd ? wd.pow : 0, dx = wd && wd.dir.x ? wd.dir.x : 1;
+    while (seeds.length < 48) seeds.push({x: Math.random() * W, y: H * (.4 + Math.random() * .6), v: 14 + Math.random() * 26, ph: Math.random() * 6.28, r: .8 + Math.random() * 1.5, a: .35 + Math.random() * .5});
+    for (const p of seeds){
+      p.x += p.v * (1 + gust * 5) * (gust > .1 ? dx : 1) * dt; p.y += (Math.sin(t * 1.7 + p.ph) * 10 - 2) * dt;
+      if (p.x > W + 10) p.x = -10; else if (p.x < -10) p.x = W + 10;
+      if (p.y < H * .3) p.y = H; else if (p.y > H + 5) p.y = H * .4;
+    }
+    if ((nextGlint -= dt) <= 0){ nextGlint = .3 + Math.random() * .7; glints.push({x: Math.random() * W, y: Math.random() * H * .38, life: 0, max: 1 + Math.random() * 1.2, r: 2 + Math.random() * 3}); }
+    for (let i = glints.length - 1; i >= 0; i--){ const g = glints[i]; g.life += dt; if (g.life >= g.max) glints.splice(i, 1); }
+    if ((nextBird -= dt) <= 0 && !birds.length){ nextBird = 9 + Math.random() * 10; const l = Math.random() < .5; birds.push({x: l ? -30 : W + 30, y: H * (.12 + Math.random() * .2), vx: (l ? 1 : -1) * (28 + Math.random() * 18), ph: 0}); }
+    for (let i = birds.length - 1; i >= 0; i--){ const b = birds[i]; b.x += b.vx * dt; b.ph += dt; b.y += Math.sin(b.ph * .8) * 4 * dt; if (b.x < -40 || b.x > W + 40) birds.splice(i, 1); }
+  }
+  function drawSteppe(){
+    ctx.setTransform(pr, 0, 0, pr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (const g of glints){
+      const k = Math.sin(Math.PI * g.life / g.max), r = g.r * k;
+      ctx.strokeStyle = `rgba(255,236,250,${.7 * k})`; ctx.lineWidth = .8;
+      ctx.beginPath(); ctx.moveTo(g.x - r, g.y); ctx.lineTo(g.x + r, g.y); ctx.moveTo(g.x, g.y - r); ctx.lineTo(g.x, g.y + r); ctx.stroke();
+      ctx.fillStyle = `rgba(255,250,240,${k})`; ctx.beginPath(); ctx.arc(g.x, g.y, .9, 0, 7); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    for (const b of birds){
+      const f = Math.sin(b.ph * 2.2) * .25, s = 9;
+      ctx.save(); ctx.translate(b.x, b.y); if (b.vx < 0) ctx.scale(-1, 1);
+      ctx.strokeStyle = 'rgba(30,14,34,.85)'; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-s * 1.4, -s * (.1 + f)); ctx.quadraticCurveTo(-s * .6, -s * (.4 + f), 0, 0); ctx.quadraticCurveTo(s * .6, -s * (.4 + f), s * 1.4, -s * (.1 + f)); ctx.stroke();
+      ctx.restore();
+    }
+    for (const p of seeds){
+      const tw = .6 + .4 * Math.sin(t * 3 + p.ph);
+      ctx.fillStyle = `rgba(255,244,222,${p.a * tw})`; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.8, p.r * .8, Math.sin(t + p.ph) * .5, 0, 7); ctx.fill();
+    }
+  }
+  // двор: полдень — солнечное сияние в углу и пух одуванчиков (движение то же, что у ковыля)
+  function drawYard(){
+    ctx.setTransform(pr, 0, 0, pr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    const sx = X(1520), sy = Y(318), R = 520 * sc, pulse = .5 + .5 * Math.sin(t * .8);   // солнце у горизонта справа на картинке
+    const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, R);
+    g.addColorStop(0, `rgba(255,252,225,${.28 + .08 * pulse})`); g.addColorStop(.3, 'rgba(255,245,200,.08)'); g.addColorStop(1, 'rgba(255,240,200,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+    for (const p of seeds){
+      const tw = .7 + .3 * Math.sin(t * 3 + p.ph);
+      ctx.fillStyle = `rgba(255,255,250,${p.a * tw})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 1.2, 0, 7); ctx.fill();
+      ctx.strokeStyle = `rgba(255,255,250,${p.a * tw * .5})`; ctx.lineWidth = .5; ctx.beginPath();
+      for (let k = 0; k < 6; k++){ const a = k * 1.047 + t * .5; ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + Math.cos(a) * p.r * 3, p.y + Math.sin(a) * p.r * 3); }
+      ctx.stroke();
+    }
+  }
   function step(dt){
     if (kind === 'meadow') return stepMeadow(dt);
+    if (kind === 'steppe' || kind === 'yard') return stepSteppe(dt);
     if (kind === 'forest') return stepForest(dt);
     t += dt;
     // порывы ветра: то затишье, то песок срывается струями
@@ -3035,6 +3476,8 @@ const SceneFx = (() => {
   }
   function draw(){
     if (kind === 'meadow') return drawMeadow();
+    if (kind === 'steppe') return drawSteppe();
+    if (kind === 'yard') return drawYard();
     if (kind === 'forest') return drawForest();
     ctx.setTransform(pr, 0, 0, pr, 0, 0);
     ctx.clearRect(0, 0, W, H);
@@ -3074,7 +3517,7 @@ const SceneFx = (() => {
   }
   return {
     set(k){
-      if (k !== kind){ sand.length = stars.length = glints.length = flies.length = fog.length = 0; ctx.clearRect(0, 0, cvs.width, cvs.height); }
+      if (k !== kind){ sand.length = stars.length = glints.length = flies.length = fog.length = seeds.length = birds.length = 0; ctx.clearRect(0, 0, cvs.width, cvs.height); }
       kind = k;
       if (k && !raf){ last = 0; raf = requestAnimationFrame(loop); }
     },
@@ -3091,6 +3534,8 @@ function applyScene(){
   $('game').classList.toggle('scenic', on);
   $('game').classList.toggle('fx-dunes', on && loc.fx === 'dunes');
   $('game').classList.toggle('fx-forest', on && loc.fx === 'forest');
+  $('game').classList.toggle('fx-steppe', on && loc.fx === 'steppe');
+  $('game').classList.toggle('fx-yard', on && loc.fx === 'yard');
   $('game').classList.toggle('fx', on && !!loc.fx);
   SceneFx.set(on && loc.fx ? loc.fx : null);
   if (on) $('sceneImg').style.backgroundImage = `url("${loc.img}")`;
@@ -3130,12 +3575,12 @@ function layoutScene(){
 let titleTimer = null;
 function showTitle(){
   const loc = LOCATIONS[BIOME[mode]], tc = $('titleCard');
-  const arab = !!loc.arabic, rus = !!loc.rus, runic = !!loc.runes;
-  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus); tc.classList.toggle('runic', runic);
+  const arab = !!loc.arabic, rus = !!loc.rus, runic = !!loc.runes, scyth = !!loc.greek, sten = !!loc.stencil;
+  tc.classList.toggle('arab', arab); tc.classList.toggle('rus', rus); tc.classList.toggle('runic', runic); tc.classList.toggle('scyth', scyth); tc.classList.toggle('stencil', sten);
   // арабскую вязь не режем на буквы — иначе рассыплются соединения
   if (arab) $('tcKanji').textContent = loc.arabic;
-  else $('tcKanji').innerHTML = [...(rus ? loc.rus : runic ? loc.runes : loc.kanji)].map(ch => `<span>${ch}</span>`).join('');
-  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : (arab || runic) ? loc.seal : '蛇';
+  else $('tcKanji').innerHTML = [...(rus ? loc.rus : runic ? loc.runes : scyth ? loc.greek : sten ? loc.stencil : loc.kanji)].map((ch, i) => `<span style="--i:${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+  tc.querySelector('.tc-seal').innerHTML = rus ? `<b>${loc.seal}</b>` : (arab || runic || scyth || sten) ? loc.seal : '蛇';
   $('tcName').textContent = loc.name; $('tcSub').textContent = freePlay ? '∞ СВОБОДНАЯ ИГРА' : loc.sub;
   clearTimeout(titleTimer);
   tc.classList.remove('show', 'out'); void tc.offsetWidth; tc.classList.add('show');
@@ -3148,6 +3593,18 @@ function showTitle(){
       tone(f, .42, 'sawtooth', .025, null, d); tone(f * 2, .25, 'triangle', .03, null, d);
     });
     tone(146.8, 1.6, 'sine', .07, null, 1.5);
+  } else if (sten){
+    // двор: скрип гермодвери, звонкий «чпок» и светлый мажорный перелив — наверху день
+    tone(60, .9, 'sawtooth', .04, 45); tone(180, .7, 'square', .015, 120, .05);
+    tone(900, .06, 'square', .03, 300, .85);
+    [523.3, 659.3, 784, 1046.5, 1318.5].forEach((f, i) => { tone(f, .5, 'triangle', .06, null, 1 + i * .09); tone(f * 2, .2, 'sine', .015, null, 1 + i * .09); });
+    tone(2093, 1.2, 'sine', .025, null, 1.5);
+  } else if (scyth){
+    // степь: бубен скачет галопом, низкий бурдон и «горловые» обертоны, свист ветра
+    for (let i = 0; i < 4; i++){ const d = .25 + i * .42; tone(72, .22, 'sine', .16, 48, d); tone(72, .16, 'sine', .1, 50, d + .13); tone(1400, .03, 'square', .012, 700, d + .26); }
+    tone(82.4, 2.6, 'sawtooth', .025, null, .2); tone(123.5, 2.4, 'sine', .04, null, .3);
+    [659.3, 741.6, 824, 988.8, 824, 741.6].forEach((f, i) => tone(f, .5, 'sine', .035, f * 1.01, .6 + i * .28));
+    whoosh(.03, 2.2);
   } else if (runic){
     // лес: низкий гул, флейта в ля-миноре, крик совы
     tone(55, 2.6, 'sine', .1, 52); tone(82.4, 2.4, 'sine', .05, null, .2);

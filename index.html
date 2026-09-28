@@ -571,6 +571,23 @@ canvas{display:block}
 .btn:disabled{opacity:.7;font-size:14px}
 
 /* ---------- OVERLAYS ---------- */
+/* ---------- пролог: видео перед первой игрой ---------- */
+#intro{position:fixed;inset:0;z-index:60;background:#000;display:none}
+#intro.on{display:block;animation:fade .5s}
+#introVid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+#introSkip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;padding:9px 18px;border-radius:999px;
+  background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.35);font:700 14px system-ui,sans-serif;letter-spacing:.02em;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .4s;cursor:pointer}
+#introSkip.show{opacity:1;pointer-events:auto}
+#introPlay{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;border:2px solid rgba(255,255,255,.7);
+  background:rgba(0,0,0,.45);color:#fff;font-size:36px;display:none;place-items:center;cursor:pointer;padding-left:6px}
+#introPlay.show{display:grid}
+#introLoad{position:absolute;left:0;right:0;top:50%;text-align:center;color:rgba(255,255,255,.7);font:600 14px system-ui,sans-serif;letter-spacing:.1em;display:none}
+#introLoad.show{display:block}
+.mc-intro{display:block;margin:10px auto 0;padding:6px 14px;border-radius:999px;background:transparent;color:#e8c46a;border:1px solid rgba(232,196,106,.4);font:700 13px system-ui,sans-serif;cursor:pointer}
+#map .tree-head{grid-template-columns:46px minmax(0,1fr) auto}
+#map .tree-head h2{min-width:0;line-height:1.1;white-space:normal;text-align:center}
+@media (max-width:380px){#map .tree-head h2{font-size:19px}}
 .overlay{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:20px;
   background:rgba(8,3,16,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .overlay.active{display:flex;animation:fade .2s}
@@ -669,6 +686,12 @@ canvas{display:block}
 </section>
 
 <!-- ===== WORLD MAP ===== -->
+<div id="intro" aria-label="Пролог">
+  <video id="introVid" playsinline webkit-playsinline preload="auto"></video>
+  <div id="introLoad">ЗАГРУЗКА…</div>
+  <button id="introPlay" aria-label="Смотреть пролог">▶</button>
+  <button id="introSkip">Пропустить ›</button>
+</div>
 <section id="map" class="screen">
   <div class="map-bg"></div>
   <div class="tree-head">
@@ -1234,6 +1257,7 @@ const Music = (() => {
       else if (want && !cur && settings.music) switchTo(want);
     },
     duck(on){ ducked = on; apply(); },
+    stop(){ want = null; if (cur){ cur.stop(); cur = null; } },
     setWave(w){ wave = w; },
     refresh(){
       if (!ensure()) return;
@@ -3815,7 +3839,41 @@ function openTree(){
   $('treeGrid').parentElement.scrollTop = 0;
 }
 
-$('btnPlay').onclick = () => { SFX.click(); openMap(); };
+/* ---------- пролог: один раз для каждого игрока перед первой игрой ---------- */
+let introFinish = null;
+function playIntro(done){
+  const ov = $('intro'), v = $('introVid'), skip = $('introSkip'), play = $('introPlay'), load = $('introLoad');
+  let over = false, skipT = 0, stall = 0;
+  const finish = () => {
+    if (over) return; over = true; introFinish = null;
+    clearTimeout(skipT); clearTimeout(stall);
+    store.set(pk('ss_intro'), true);
+    v.onended = v.onerror = v.onplaying = null;
+    v.pause(); v.removeAttribute('src'); v.load();
+    ov.classList.remove('on'); skip.classList.remove('show'); play.classList.remove('show'); load.classList.remove('show');
+    done && done();
+  };
+  introFinish = finish;
+  Music.stop();
+  ov.classList.add('on'); load.classList.add('show');
+  v.muted = !settings.sound && !settings.music;
+  v.onended = finish;
+  v.onerror = finish;                                    // нет файла или нет сети — сразу к карте
+  v.onplaying = () => { load.classList.remove('show'); play.classList.remove('show'); clearTimeout(stall); };
+  v.src = 'video/intro.mp4';
+  skipT = setTimeout(() => skip.classList.add('show'), 1200);
+  stall = setTimeout(finish, 15000);                     // совсем не грузится — не держим игрока
+  const pr = v.play();
+  if (pr) pr.catch(() => { load.classList.remove('show'); play.classList.add('show'); });   // браузер запретил автозапуск — покажем ▶
+  play.onclick = e => { e.stopPropagation(); play.classList.remove('show'); v.play().catch(finish); };
+  skip.onclick = e => { e.stopPropagation(); SFX.click(); finish(); };
+}
+function startCampaign(){
+  if (!store.get(pk('ss_intro'), false)) playIntro(openMap);
+  else openMap();
+}
+$('btnPlay').onclick = () => { SFX.click(); startCampaign(); };
+
 $('btnPause').onclick = () => { SFX.click(); pause(); };
 $('btnResume').onclick = () => { SFX.click(); resume(); };
 $('btnRestart').onclick = () => { SFX.click(); startGame(); };
@@ -3836,6 +3894,7 @@ window.addEventListener('resize', () => { if (G) resize(); });
 /* ===================== CONTROLS ===================== */
 document.addEventListener('keydown', e => {
   if (e.target && e.target.tagName === 'INPUT') return;
+  if (introFinish){ if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); introFinish(); } return; }
   const map = {ArrowUp:'u', w:'u', W:'u', 'ц':'u', ArrowDown:'d', s:'d', S:'d', 'ы':'d',
                ArrowLeft:'l', a:'l', A:'l', 'ф':'l', ArrowRight:'r', d:'r', D:'r', 'в':'r'};
   if (map[e.key] && G){ e.preventDefault(); queueDir(DIRS[map[e.key]]); return; }
@@ -3846,7 +3905,7 @@ document.addEventListener('keydown', e => {
     if (!G) return;
     if (G.state === 'paused') resume(); else pause();
   }
-  if (e.key === 'Enter' && $('menu').classList.contains('active')) openMap();
+  if (e.key === 'Enter' && $('menu').classList.contains('active')) startCampaign();
   else if (e.key === 'Enter' && G && G.state === 'over') startGame();
 });
 
@@ -4114,13 +4173,15 @@ function renderMapCard(){
     ${!open ? `<button class="btn ghost" disabled>🔒 Сначала пройди «${prev.name}»</button>`
       : st ? `<div class="mc-btns"><button class="btn primary" id="btnMapGo">▶ Поход<small>до ${OASIS_WAVE}-й волны</small></button>
                <button class="btn magic" id="btnMapFree">∞ Свободная<small>рекорд ${getBest(w.mode, true)}</small></button></div>`
-      : `<button class="btn primary" id="btnMapGo">▶ В путь!</button><div class="mc-hint">∞ Свободная игра откроется после прохождения мира</div>`}`;
+      : `<button class="btn primary" id="btnMapGo">▶ В путь!</button><div class="mc-hint">∞ Свободная игра откроется после прохождения мира</div>`}
+    ${mapSel === 0 ? '<button class="mc-intro" id="btnIntro">📜 Смотреть пролог</button>' : ''}`;
 }
 $('mapPath').addEventListener('click', e => {
   const n = e.target.closest('.wnode[data-w]'); if (!n) return;
   mapSel = +n.dataset.w; SFX.click(); renderMap();
 });
 $('mapCard').addEventListener('click', e => {
+  if (e.target.closest('#btnIntro')){ SFX.click(); playIntro(openMap); return; }
   const go = e.target.closest('#btnMapGo'), free = e.target.closest('#btnMapFree');
   if (!go && !free) return;
   if (free && !worldStars(WORLDS[mapSel].id)) return;

@@ -1332,6 +1332,8 @@ const SPECIALS = [
 const DIRS = {u:{x:0,y:-1}, d:{x:0,y:1}, l:{x:-1,y:0}, r:{x:1,y:0}};
 
 const cv = $('cv'), ctx = cv.getContext('2d');
+// с Pixi поле рисуется на двух холстах: cv — всё, что под змейкой, cvTop — голова и всё, что над ней
+const cvTop = document.createElement('canvas'), ctxTop = cvTop.getContext('2d');
 const bg = document.createElement('canvas');
 let size = 300, cell = 15, dpr = 1;
 let G = null;
@@ -2525,6 +2527,7 @@ function resize(){
   cell = size / COLS;
   cv.width = bg.width = Math.round(size * dpr);
   cv.height = bg.height = Math.round(size * dpr);
+  cvTop.width = PX.on ? cv.width : 1; cvTop.height = PX.on ? cv.height : 1;
   cv.style.width = cv.style.height = size + 'px';
   PX.resize();
   buildBg();
@@ -3203,6 +3206,8 @@ function drawSnake(c, t, dt){
     }
     return path;
   };
+  // тело на видеокарте (Pixi): тень, объём, узор, чешуя, блики и живые скины — в шейдере
+  if (PX.on && PX.snakeBody(segs, n, skin, c.globalAlpha)) return drawHead(c, P, S, skin, dead, dt);
   // 1. тень на земле
   c.save(); c.translate(S * .1, S * .16); c.fillStyle = 'rgba(0,0,0,.28)'; c.fill(tube(1, 0, 0)); c.restore();
   // 2. контур и тело: цвет плавно меняется от головы к хвосту
@@ -3259,8 +3264,11 @@ function drawSnake(c, t, dt){
   // 4. блик вдоль спины
   c.fillStyle = 'rgba(255,255,255,.18)'; c.fill(tube(.34, -.1, -.14, .5));
   c.fillStyle = 'rgba(255,255,255,.22)'; c.fill(tube(.12, -.14, -.2, .5));
+  drawHead(c, P, S, skin, dead, dt);
+}
 
-  // 5. голова
+// 5. голова (одинаково и с Pixi, и без)
+function drawHead(c, P, S, skin, dead, dt){
   const hx = P[0].x, hy = P[0].y;
   const target = Math.atan2(G.dir.y, G.dir.x);
   let diff = target - G.headAng; while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
@@ -3360,14 +3368,12 @@ function drawEffects(c, dt){
 }
 
 function render(dt){
-  const c = ctx;
-  c.setTransform(dpr, 0, 0, dpr, 0, 0);
-  c.clearRect(0, 0, size, size);
-  c.save();
+  const c = ctx, two = PX.on && cvTop.width === cv.width, top = two ? ctxTop : ctx;
+  for (const k of two ? [c, top] : [c]){ k.setTransform(dpr, 0, 0, dpr, 0, 0); k.clearRect(0, 0, size, size); k.save(); }
   let shx = 0, shy = 0;
   if (G.shake > 0){
     shx = (Math.random() - .5) * G.shake; shy = (Math.random() - .5) * G.shake;
-    c.translate(shx, shy);
+    c.translate(shx, shy); if (two) top.translate(shx, shy);
     G.shake = Math.max(0, G.shake - dt * .04);
   }
   if (!PX.on) c.drawImage(bg, 0, 0, size, size);   // с Pixi фон живёт на видеокарте
@@ -3384,17 +3390,18 @@ function render(dt){
   let t = 1;
   if (G.state === 'play' || G.state === 'paused') t = Math.min(1, G.acc / stepMs());
   else if (G.state === 'ready') t = 0;
-  drawSnake(c, t, dt);
-  if (mode === 'steppe') drawTumbles(c);
-  drawComboAura(c);
-  drawRays(c);
-  drawAmbient(c, dt);
-  if (mode === 'steppe') drawWind(c, dt);
-  drawAtmosphere(c, dt);
-  if (mode === 'forest') drawDarkness(c);
-  drawEffects(c, dt);
-  c.restore();
-  if (PX.on) PX.frame(dt, shx, shy);
+  // дальше — слой «над змейкой» (при Pixi тело змейки лежит между двумя холстами)
+  drawSnake(top, t, dt);
+  if (mode === 'steppe') drawTumbles(top);
+  drawComboAura(top);
+  drawRays(top);
+  drawAmbient(top, dt);
+  if (mode === 'steppe') drawWind(top, dt);
+  drawAtmosphere(top, dt);
+  if (mode === 'forest') drawDarkness(top);
+  drawEffects(top, dt);
+  c.restore(); if (two) top.restore();
+  if (PX.on) PX.frame(dt, shx, shy, two);
 }
 
 /* ===================== PIXI: свечение, GPU-частицы, дрожание воздуха =====================
@@ -3499,7 +3506,7 @@ const PX = (() => {
       app.ticker.stop();
       const el = app.canvas;
       el.id = 'pxv'; el.style.cssText = 'position:absolute;left:0;top:0;display:block;pointer-events:none';
-      $('board').appendChild(el);
+      cv.after(el);          // сразу над холстом — подсказки и баннер волны остаются сверху
       root = new PIXI.Container(); app.stage.addChild(root);
       ground = new PIXI.Container(); root.addChild(ground);
       bgSpr = new PIXI.Sprite(PIXI.Texture.EMPTY); ground.addChild(bgSpr);
@@ -3511,11 +3518,13 @@ const PX = (() => {
       lamp = new PIXI.Sprite(lampTex); lamp.anchor.set(.5); lamp.blendMode = 'screen'; ground.addChild(lamp);
       const tex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cv, resolution:1})});
       main = new PIXI.Sprite(tex); root.addChild(main);
+      topSpr = new PIXI.Sprite(PIXI.Texture.EMPTY); root.addChild(topSpr);
       // свечение: 1) яркие места → текстура в пол-размера, 2) размываем, 3) накладываем «экраном»
       glowCM = new PIXI.ColorMatrixFilter();
       hiBg = new PIXI.Sprite(PIXI.Texture.EMPTY);
       hi = new PIXI.Sprite(tex);
-      hiBox = new PIXI.Container(); hiBox.addChild(hiBg); hiBox.addChild(hi); hiBox.filters = [glowCM];
+      hiTop = new PIXI.Sprite(PIXI.Texture.EMPTY);
+      hiBox = new PIXI.Container(); hiBox.addChild(hiBg); hiBox.addChild(hi); hiBox.addChild(hiTop); hiBox.filters = [glowCM];
       hiRT = PIXI.RenderTexture.create({width:Math.max(16, size >> 1), height:Math.max(16, size >> 1), resolution:1});
       glow = new PIXI.Sprite(hiRT); glow.blendMode = 'screen';
       const blur = new PIXI.BlurFilter({strength:8, quality:3});
@@ -3555,6 +3564,11 @@ const PX = (() => {
     const old = main.texture, tex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cv, resolution:1})});
     main.texture = hi.texture = tex;
     if (old && old !== PIXI.Texture.EMPTY) old.destroy(false);
+    const oldT = topSpr.texture;
+    if (cvTop.width > 1){ topSpr.texture = hiTop.texture = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cvTop, resolution:1})}); }
+    if (oldT && oldT !== PIXI.Texture.EMPTY) oldT.destroy(false);
+    topSpr.width = topSpr.height = size;
+    hiTop.width = hiTop.height = Math.max(16, size >> 1);
     main.width = main.height = glow.width = glow.height = size;
     hiRT.resize(Math.max(16, size >> 1), Math.max(16, size >> 1), 1);
     hi.width = hi.height = hiBg.width = hiBg.height = Math.max(16, size >> 1);
@@ -3564,6 +3578,143 @@ const PX = (() => {
     lamp.width = lamp.height = size * .55;
     glow.width = glow.height = size;
     dispSpr.width = dispSpr.height = size * 1.5;
+  };
+  /* ---------- этап 3: тело змейки — меш с собственным шейдером ---------- */
+  const SNAKE_VS = `
+    in vec2 aPosition; in vec2 aUV; in vec2 aInfo;
+    out vec2 vUV; out vec2 vInfo;
+    uniform mat3 uProjectionMatrix; uniform mat3 uWorldTransformMatrix; uniform mat3 uTransformMatrix;
+    void main(){
+      mat3 mvp = uProjectionMatrix * uWorldTransformMatrix * uTransformMatrix;
+      gl_Position = vec4((mvp * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
+      vUV = aUV; vInfo = aInfo;
+    }`;
+  // vUV.x — место вдоль тела в клетках (узор «прилипает» к телу), vUV.y — поперёк (-1..1)
+  // vInfo.x — 0 у головы … 1 у хвоста, vInfo.y — ширина тела в клетках
+  const SNAKE_FS = `
+    in vec2 vUV; in vec2 vInfo;
+    uniform sampler2D uRamp;
+    uniform float uTime; uniform float uAlpha; uniform float uShadow; uniform float uFx; uniform float uN; uniform float uCellPx;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    void main(){
+      float y = vUV.y, ay = abs(y);
+      float w = max(vInfo.y, 0.05), f = vUV.x;
+      float aa = clamp(3.0 / (w * uCellPx), 0.02, 0.5);   // ~1,5 пикселя сглаживания по краю (без fwidth — работает и на WebGL1)
+      float edge = 1.0 - smoothstep(1.0 - aa, 1.0, ay);
+      if (uShadow > 0.5){ float a = 0.28 * edge * uAlpha; gl_FragColor = vec4(0.0, 0.0, 0.0, a); return; }
+      vec3 base = texture2D(uRamp, vec2(clamp(vInfo.x, 0.0, 1.0), 0.5)).rgb;
+      // объём: цилиндр, свет сверху-слева, тёмный контур по краю
+      float cyl = sqrt(max(0.0, 1.0 - y * y));
+      vec3 col = base * (0.66 + 0.42 * cyl - 0.1 * y);
+      col *= mix(1.0, 0.7, smoothstep(0.78, 0.93, ay));
+      // узор на спине: ромбы с точкой и пятна по бокам
+      float body = smoothstep(0.9, 1.3, f) * (1.0 - smoothstep(uN - 1.6, uN - 1.0, f));
+      float Pd = 0.42, k = floor(f / Pd), ls = (fract(f / Pd) - 0.5) * Pd;
+      float d = abs(ls) / (0.3 * w) + abs(y * 0.5) / 0.21;
+      float dia = (1.0 - smoothstep(0.88, 1.0, d)) * body;
+      col = mix(col, col * 0.66, dia * 0.85);
+      float dot0 = (1.0 - smoothstep(0.045, 0.065, length(vec2(ls / w, y * 0.5)))) * body;
+      col = mix(col, min(col * 1.45, vec3(1.0)), dot0 * 0.55);
+      float side = mod(k, 2.0) < 1.0 ? 1.0 : -1.0;
+      float sp = (1.0 - smoothstep(0.05, 0.075, length(vec2((ls + 0.1 * w) / w, y * 0.5 - side * 0.3)))) * body;
+      col = mix(col, col * 0.6, sp * 0.55);
+      // чешуя: мелкие дужки
+      vec2 sc = vec2(f * 7.0, y * 2.6 + mod(floor(f * 7.0), 2.0) * 0.5);
+      vec2 q = fract(sc) - vec2(0.5, 0.2);
+      float ring = smoothstep(0.03, 0.0, abs(length(q) - 0.36)) * step(0.0, -q.x + 0.3);
+      col *= 1.0 - 0.12 * ring * smoothstep(0.95, 0.6, ay);
+      // блик вдоль спины
+      col += 0.18 * (1.0 - smoothstep(0.0, 0.34, abs(y + 0.3))) * smoothstep(0.4, 0.9, f);
+      col += 0.22 * (1.0 - smoothstep(0.0, 0.12, abs(y + 0.42))) * smoothstep(0.4, 0.9, f);
+      // живые скины
+      if (uFx > 0.5 && uFx < 1.5){          // золото: по телу бежит блик
+        float g = exp(-pow((fract(f * 0.07 - uTime * 0.00035) - 0.5) * 12.0, 2.0));
+        col += vec3(1.0, 0.92, 0.6) * g * 0.55 * cyl;
+      } else if (uFx > 1.5 && uFx < 2.5){   // космос: мерцающие звёзды
+        vec2 cellp = floor(vec2(f * 9.0, y * 4.0 + 4.0));
+        float h = hash(cellp);
+        if (h > 0.9){
+          vec2 pp = fract(vec2(f * 9.0, y * 4.0 + 4.0)) - 0.5;
+          float tw = 0.5 + 0.5 * sin(uTime * 0.004 + h * 60.0);
+          col += vec3(0.95, 0.9, 1.0) * (1.0 - smoothstep(0.05, 0.16, length(pp))) * tw * cyl;
+        }
+      } else if (uFx > 2.5 && uFx < 3.5){   // огонь: по бокам бегут языки пламени
+        float fl = sin(f * 6.0 + uTime * 0.012) * sin(f * 2.3 - uTime * 0.007 + y * 3.0);
+        col += vec3(1.0, 0.55, 0.1) * max(0.0, fl) * 0.35 * smoothstep(0.3, 0.9, ay);
+      } else if (uFx > 3.5 && uFx < 4.5){   // неон: пульсирующая кромка
+        col += base * 0.7 * smoothstep(0.55, 0.95, ay) * (0.5 + 0.5 * sin(uTime * 0.006 - f * 1.6));
+      } else if (uFx > 4.5){                // радуга: перелив
+        col += 0.12 * (0.5 + 0.5 * sin(f * 3.0 - uTime * 0.005)) * cyl;
+      }
+      float a = edge * uAlpha;
+      gl_FragColor = vec4(col * a, a);
+    }`;
+  const FX_OF_SKIN = {gold:1, galaxy:2, fire:3, neon:4, rainbow:5};
+  let snakeBox = null, sBody = null, sShadow = null, sGeo = null, sCap = 0, rampCv = null, rampTex = null, sUsed = false;
+  let topSpr = null, hiTop = null;
+  function makeSnake(){
+    rampCv = document.createElement('canvas'); rampCv.width = 64; rampCv.height = 1;
+    rampTex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:rampCv, resolution:1})});
+    const mk = shadow => PIXI.Shader.from({
+      gl:{vertex:SNAKE_VS, fragment:SNAKE_FS},
+      resources:{uRamp:rampTex.source, su:{uTime:{value:0, type:'f32'}, uAlpha:{value:1, type:'f32'}, uShadow:{value:shadow, type:'f32'},
+                                            uFx:{value:0, type:'f32'}, uN:{value:3, type:'f32'}, uCellPx:{value:30, type:'f32'}}}
+    });
+    growSnake(600);
+    snakeBox = new PIXI.Container();
+    sShadow = new PIXI.Mesh({geometry:sGeo, shader:mk(1)});
+    sBody = new PIXI.Mesh({geometry:sGeo, shader:mk(0)});
+    snakeBox.addChild(sShadow, sBody);
+    root.addChildAt(snakeBox, root.getChildIndex(main) + 1);   // между «нижним» и «верхним» холстом
+  }
+  function growSnake(pts){
+    sCap = pts;
+    const pos = new Float32Array(pts * 4), uv = new Float32Array(pts * 4), inf = new Float32Array(pts * 4), idx = new Uint16Array(pts * 6);
+    if (!sGeo){
+      sGeo = new PIXI.Geometry({attributes:{aPosition:{buffer:pos, format:'float32x2'}, aUV:{buffer:uv, format:'float32x2'}, aInfo:{buffer:inf, format:'float32x2'}}, indexBuffer:idx});
+    } else {
+      sGeo.getAttribute('aPosition').buffer.data = pos; sGeo.getAttribute('aUV').buffer.data = uv;
+      sGeo.getAttribute('aInfo').buffer.data = inf; sGeo.indexBuffer.data = idx;
+    }
+  }
+  api.snakeBody = (segs, n, skin, alpha) => {
+    if (!api.on || slow >= 4) return false;
+    if (!snakeBox){ try { makeSnake(); } catch (e){ console.warn('змейка на Pixi не собралась', e); slow = 4; return false; } }
+    let total = 0; for (const sg of segs) total += sg.length;
+    if (total + 4 > sCap) growSnake(Math.ceil((total + 4) * 1.5));
+    const pos = sGeo.getAttribute('aPosition').buffer.data, uv = sGeo.getAttribute('aUV').buffer.data;
+    const inf = sGeo.getAttribute('aInfo').buffer.data, idx = sGeo.indexBuffer.data;
+    const L = Math.max(1, n - 1 + .4);
+    let v = 0, ii = 0;
+    for (const sg of segs){
+      const m = sg.length, v0 = v;
+      if (m < 2) continue;
+      for (let j = 0; j < m; j++){
+        const a = sg[Math.max(0, j - 1)], b = sg[Math.min(m - 1, j + 1)], p = sg[j];
+        let tx = b.x - a.x, ty = b.y - a.y; const d = Math.hypot(tx, ty) || 1; tx /= d; ty /= d;
+        const r = p.w / 2 * 1.04, nx = -ty, ny = tx, o = v * 4;   // 2 вершины × 2 числа на точку
+        pos[o] = p.x - nx * r; pos[o + 1] = p.y - ny * r; pos[o + 2] = p.x + nx * r; pos[o + 3] = p.y + ny * r;
+        uv[o] = p.f; uv[o + 1] = -1.04; uv[o + 2] = p.f; uv[o + 3] = 1.04;
+        inf[o] = inf[o + 2] = p.f / L; inf[o + 1] = inf[o + 3] = p.w / cell;
+        if (j){ const A = (v - 1) * 2, B = v * 2; idx[ii++] = A; idx[ii++] = A + 1; idx[ii++] = B; idx[ii++] = A + 1; idx[ii++] = B + 1; idx[ii++] = B; }
+        v++;
+      }
+    }
+    for (let k = ii; k < idx.length; k++) idx[k] = 0;
+    sGeo.getAttribute('aPosition').buffer.update(); sGeo.getAttribute('aUV').buffer.update();
+    sGeo.getAttribute('aInfo').buffer.update(); sGeo.indexBuffer.update();
+    // цвета скина: полоска 64×1 от головы к хвосту (скины анимированы — обновляем каждый кадр)
+    const rc = rampCv.getContext('2d');
+    for (let i = 0; i < 64; i++){ rc.fillStyle = HSL(skin.col(i / 63, G.anim), 0); rc.fillRect(i, 0, 1, 1); }
+    rampTex.source.update();
+    const fx = FX_OF_SKIN[settings.skin] || 0;
+    for (const m of [sBody, sShadow]){
+      const u = m.shader.resources.su.uniforms;
+      u.uTime = G.anim; u.uAlpha = alpha; u.uFx = fx; u.uN = n; u.uCellPx = cell * dpr;
+    }
+    sShadow.position.set(cell * .1, cell * .16);
+    snakeBox.visible = true; sUsed = true;
+    return true;
   };
   api.bgChanged = () => {
     if (!api.ready) return;
@@ -3587,7 +3738,7 @@ const PX = (() => {
     }
     while (live.length > 900){ const p = live.shift(); p.s.visible = false; pool.push(p); }
   };
-  api.frame = (dt, shx = 0, shy = 0) => {
+  api.frame = (dt, shx = 0, shy = 0, two = false) => {
     if (!api.on) return;
     const b = BIOME[mode], A = G ? G.anim : 0, GL = GROUND[b] || GROUND.meadow;
     if (b !== lastBiome) setLook(b);
@@ -3621,8 +3772,10 @@ const PX = (() => {
       lamp.position.set(lampX, lampY); lamp.tint = GL.lampC || 0xffffff;
       lamp.alpha = GL.lamp * (1 + .06 * Math.sin(A / 90) + .04 * Math.sin(A / 37));
     }
-    // тряска поля переносится и на свечение
     main.texture.source.update();
+    topSpr.visible = hiTop.visible = two && topSpr.texture !== PIXI.Texture.EMPTY;
+    if (topSpr.visible) topSpr.texture.source.update();
+    if (snakeBox) snakeBox.position.set(shx, shy);
     // искры: летят, тормозят, падают, вытягиваются по скорости
     const k = dt / 16.67;
     for (let i = live.length - 1; i >= 0; i--){
@@ -3646,6 +3799,7 @@ const PX = (() => {
     const L = LOOK[b] || LOOK.meadow;
     glow.alpha = slow >= 3 ? 0 : L.bloom * (1 + (G ? G.flash * 1.5 : 0));
     glow.visible = glow.alpha > .01;
+    if (snakeBox){ if (!sUsed) snakeBox.visible = false; sUsed = false; }
     if (glow.visible) app.renderer.render({container:hiBox, target:hiRT, clear:true});
     app.render();
     // авто-качество: если телефон не тянет, выключаем сначала марево, потом свечение

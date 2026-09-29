@@ -2906,6 +2906,7 @@ function buildBg(){
   motes = [];
   for (let i = 0; i < cfg.n; i++) motes.push({x:rr(0, W), y:rr(0, W), vx:cfg.vx * rr(.5, 1.5) * (biome === 'dunes' ? 1 : (R() < .5 ? -1 : 1)),
     vy:cfg.vy * rr(.5, 1.5), r:S * cfg.r * rr(.6, 1.3), c:cfg.c, ph:R() * 6, tw:rr(300, 900), a:rr(.4, .9)});
+  PX.bgChanged();
 }
 
 /* ---------- анимированные детали окружения ---------- */
@@ -2932,7 +2933,7 @@ function drawGround(c){
 }
 function drawAtmosphere(c, dt){
   const A = G.anim, W = size, S = cell, biome = BIOME[mode];
-  if (biome !== 'ruins' && biome !== 'forest'){        // тени от облаков
+  if (biome !== 'ruins' && biome !== 'forest' && !PX.on){        // тени от облаков (с Pixi — на видеокарте)
     for (let k = 0; k < 2; k++){
       const x = ((A * .01 + k * W * 1.1) % (W * 2.2)) - W * .6, y = W * (.25 + .5 * k), r = W * (.42 + .1 * k);
       const g = c.createRadialGradient(x, y, 0, x, y, r);
@@ -3363,11 +3364,13 @@ function render(dt){
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   c.clearRect(0, 0, size, size);
   c.save();
+  let shx = 0, shy = 0;
   if (G.shake > 0){
-    c.translate((Math.random() - .5) * G.shake, (Math.random() - .5) * G.shake);
+    shx = (Math.random() - .5) * G.shake; shy = (Math.random() - .5) * G.shake;
+    c.translate(shx, shy);
     G.shake = Math.max(0, G.shake - dt * .04);
   }
-  c.drawImage(bg, 0, 0, size, size);
+  if (!PX.on) c.drawImage(bg, 0, 0, size, size);   // с Pixi фон живёт на видеокарте
   drawGround(c);
   drawDust(c, dt);
   if (G.powers.slow){ c.fillStyle = 'rgba(125,211,252,.1)'; c.fillRect(0, 0, size, size); }
@@ -3391,7 +3394,7 @@ function render(dt){
   if (mode === 'forest') drawDarkness(c);
   drawEffects(c, dt);
   c.restore();
-  if (PX.on) PX.frame(dt);
+  if (PX.on) PX.frame(dt, shx, shy);
 }
 
 /* ===================== PIXI: свечение, GPU-частицы, дрожание воздуха =====================
@@ -3404,7 +3407,10 @@ function render(dt){
 const PX = (() => {
   const api = {on:false, ready:false};
   let app = null, root = null, main = null, glow = null, glowCM = null, sparks = null, disp = null, dispSpr = null, dotTex = null;
-  let hi = null, hiBox = null, hiRT = null;   // яркие места вырезаются в отдельную текстуру (8 бит — отрицательные значения обрезаются)
+  let hi = null, hiBox = null, hiRT = null;
+  // этап 2: земля — фон, волны по траве, тени облаков, свет вокруг головы
+  let ground = null, bgSpr = null, hiBg = null, gDisp = null, gNoise = null, clouds = null, lamp = null, cloudTex = null, lampTex = null;
+  let lampX = 0, lampY = 0;   // яркие места вырезаются в отдельную текстуру (8 бит — отрицательные значения обрезаются)
   const pool = [], live = [];
   let slow = 0, lastBiome = null, want = true;
   // мягкая точка для искр
@@ -3439,13 +3445,42 @@ const PX = (() => {
   };
   // оттенок и сила свечения по времени суток мира
   const LOOK = {
-    yard:  {bloom:.32, r:1.05, g:1.02, b:.95, t:-1.4},
-    road:  {bloom:.36, r:1.1,  g:1.0,  b:.85, t:-1.35},
+    yard:  {bloom:.32, r:1.05, g:1.02, b:.95, t:-1.8},
+    road:  {bloom:.36, r:1.1,  g:1.0,  b:.85, t:-1.6},
     meadow:{bloom:.45, r:1.15, g:.95,  b:.8},
-    steppe:{bloom:.42, r:1.1,  g:.9,   b:1.05},
-    dunes: {bloom:.5,  r:.9,   g:.98,  b:1.15, t:-1.4},
+    steppe:{bloom:.34, r:1.05, g:.98,  b:1.02},
+    dunes: {bloom:.5,  r:.9,   g:.98,  b:1.15, t:-1.55},
     forest:{bloom:.6,  r:.95,  g:1.1,  b:1.0},
     ruins: {bloom:.4,  r:1.12, g:1.0,  b:.95}
+  };
+  // мягкое облако: несколько размытых пятен
+  function makeCloud(){
+    const N = 256, c = document.createElement('canvas'); c.width = c.height = N;
+    const g = c.getContext('2d');
+    for (let i = 0; i < 7; i++){
+      const x = N * (.25 + Math.random() * .5), y = N * (.3 + Math.random() * .4), r = N * (.18 + Math.random() * .16);
+      const gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, N, N);
+    }
+    return PIXI.Texture.from(c);
+  }
+  function makeLamp(){
+    const N = 256, c = document.createElement('canvas'); c.width = c.height = N;
+    const g = c.getContext('2d'), gr = g.createRadialGradient(N / 2, N / 2, 0, N / 2, N / 2, N / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, N, N);
+    return PIXI.Texture.from(c);
+  }
+  // как оживает земля в каждом мире: волны по траве, тени облаков, тёплый свет у головы
+  const GROUND = {
+    yard:  {wave:0,   clouds:.9, lamp:0},
+    road:  {wave:0,   clouds:.9, lamp:0},
+    meadow:{wave:1.2, clouds:.8, lamp:.12, lampC:0xffc27a},
+    steppe:{wave:1.0, clouds:.6, lamp:.22, lampC:0xffb08a},
+    dunes: {wave:0,   clouds:0,  lamp:.3,  lampC:0xffd9a0},
+    forest:{wave:1.1, clouds:0,  lamp:.35, lampC:0xffc070},
+    ruins: {wave:0,   clouds:.4, lamp:.12, lampC:0xffd0b0}
   };
   function setLook(b){
     const L = LOOK[b] || LOOK.meadow, k = 2.4, t = L.t || -1.1;   // вытягиваем только яркие места (на светлых полях порог выше)
@@ -3466,12 +3501,21 @@ const PX = (() => {
       el.id = 'pxv'; el.style.cssText = 'position:absolute;left:0;top:0;display:block;pointer-events:none';
       $('board').appendChild(el);
       root = new PIXI.Container(); app.stage.addChild(root);
+      ground = new PIXI.Container(); root.addChild(ground);
+      bgSpr = new PIXI.Sprite(PIXI.Texture.EMPTY); ground.addChild(bgSpr);
+      gNoise = new PIXI.Sprite(makeNoise()); gNoise.renderable = false; app.stage.addChild(gNoise);
+      gDisp = new PIXI.DisplacementFilter({sprite:gNoise, scale:0});
+      cloudTex = makeCloud(); lampTex = makeLamp();
+      clouds = new PIXI.Container(); ground.addChild(clouds);
+      for (let i = 0; i < 3; i++){ const cl = new PIXI.Sprite(cloudTex); cl.anchor.set(.5); cl.tint = 0x1c0a30; cl._k = i; clouds.addChild(cl); }
+      lamp = new PIXI.Sprite(lampTex); lamp.anchor.set(.5); lamp.blendMode = 'screen'; ground.addChild(lamp);
       const tex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cv, resolution:1})});
       main = new PIXI.Sprite(tex); root.addChild(main);
       // свечение: 1) яркие места → текстура в пол-размера, 2) размываем, 3) накладываем «экраном»
       glowCM = new PIXI.ColorMatrixFilter();
-      hi = new PIXI.Sprite(tex); hi.filters = [glowCM];
-      hiBox = new PIXI.Container(); hiBox.addChild(hi);
+      hiBg = new PIXI.Sprite(PIXI.Texture.EMPTY);
+      hi = new PIXI.Sprite(tex);
+      hiBox = new PIXI.Container(); hiBox.addChild(hiBg); hiBox.addChild(hi); hiBox.filters = [glowCM];
       hiRT = PIXI.RenderTexture.create({width:Math.max(16, size >> 1), height:Math.max(16, size >> 1), resolution:1});
       glow = new PIXI.Sprite(hiRT); glow.blendMode = 'screen';
       const blur = new PIXI.BlurFilter({strength:8, quality:3});
@@ -3513,9 +3557,22 @@ const PX = (() => {
     if (old && old !== PIXI.Texture.EMPTY) old.destroy(false);
     main.width = main.height = glow.width = glow.height = size;
     hiRT.resize(Math.max(16, size >> 1), Math.max(16, size >> 1), 1);
-    hi.width = hi.height = Math.max(16, size >> 1);
+    hi.width = hi.height = hiBg.width = hiBg.height = Math.max(16, size >> 1);
+    bgSpr.width = bgSpr.height = size;
+    gNoise.width = size * 2.4; gNoise.height = size * 1.2;
+    clouds.children.forEach(cl => { cl.width = cl.height = size * (.9 + cl._k * .2); });
+    lamp.width = lamp.height = size * .55;
     glow.width = glow.height = size;
     dispSpr.width = dispSpr.height = size * 1.5;
+  };
+  api.bgChanged = () => {
+    if (!api.ready) return;
+    const old = bgSpr.texture;
+    const t = new PIXI.Texture({source:new PIXI.CanvasSource({resource:bg, resolution:1})});
+    bgSpr.texture = hiBg.texture = t;
+    if (old && old !== PIXI.Texture.EMPTY) old.destroy(false);
+    bgSpr.width = bgSpr.height = size;
+    hiBg.width = hiBg.height = Math.max(16, size >> 1);
   };
   api.burst = (x, y, colors, n) => {
     const N = Math.round(n * 1.6);
@@ -3530,10 +3587,40 @@ const PX = (() => {
     }
     while (live.length > 900){ const p = live.shift(); p.s.visible = false; pool.push(p); }
   };
-  api.frame = dt => {
+  api.frame = (dt, shx = 0, shy = 0) => {
     if (!api.on) return;
-    const b = BIOME[mode];
+    const b = BIOME[mode], A = G ? G.anim : 0, GL = GROUND[b] || GROUND.meadow;
     if (b !== lastBiome) setLook(b);
+    ground.position.set(shx, shy);
+    // волны по траве: шум вытянут по горизонтали и ползёт по ветру
+    const wind = G && G.wind && G.wind.dir ? G.wind : null;
+    let wave = GL.wave;
+    if (b === 'steppe' && wind) wave += 2 * wind.pow;
+    if (wave > .05 && slow < 1){
+      const wx = wind && wind.pow > .1 ? wind.dir.x || 0 : 1, wy = wind && wind.pow > .1 ? wind.dir.y || 0 : 0;
+      const PXw = size * .8, PYw = size * .4, wrap = (v, P) => -(((v % P) + P) % P);
+      api._gx = (api._gx || 0) + (wx * .03 + .012) * dt; api._gy = (api._gy || 0) + wy * .03 * dt;
+      gNoise.x = wrap(api._gx, PXw); gNoise.y = wrap(api._gy, PYw);
+      gDisp.scale.x = wave; gDisp.scale.y = wave * .6;
+      if (!bgSpr.filters) bgSpr.filters = [gDisp];
+    } else if (bgSpr.filters) bgSpr.filters = null;
+    // тени облаков медленно плывут по полю
+    clouds.visible = GL.clouds > 0;
+    if (clouds.visible) clouds.children.forEach(cl => {
+      const k = cl._k, span = size * 2.4;
+      cl.x = ((A * (.008 + k * .003) + k * size * .9) % span) - size * .7;
+      cl.y = size * (.2 + .3 * k) + Math.sin(A / 9000 + k) * size * .05;
+      cl.alpha = GL.clouds * (.55 - k * .1);
+    });
+    // тёплый свет у головы: подсвечивает землю, а не рисуется кругом поверх
+    lamp.visible = GL.lamp > 0 && !!G && G.snake && G.snake.length > 0;
+    if (lamp.visible){
+      const h = G.snake[0], tx = (h.x + .5) * cell, ty = (h.y + .5) * cell;
+      if (Math.abs(tx - lampX) > cell * 3 || Math.abs(ty - lampY) > cell * 3){ lampX = tx; lampY = ty; }   // прыжок через край
+      lampX += (tx - lampX) * Math.min(1, dt / 90); lampY += (ty - lampY) * Math.min(1, dt / 90);
+      lamp.position.set(lampX, lampY); lamp.tint = GL.lampC || 0xffffff;
+      lamp.alpha = GL.lamp * (1 + .06 * Math.sin(A / 90) + .04 * Math.sin(A / 37));
+    }
     // тряска поля переносится и на свечение
     main.texture.source.update();
     // искры: летят, тормозят, падают, вытягиваются по скорости
@@ -3549,7 +3636,7 @@ const PX = (() => {
     // дрожание воздуха: марево в пустыне, рябь в порыв ветра
     let ds = 0;
     if (b === 'dunes') ds = 2.2;
-    if (b === 'steppe' && G && G.wind) ds = 1 + 4 * G.wind.pow;
+    if (b === 'steppe' && G && G.wind) ds = .6 + 1.4 * G.wind.pow;   // рябь воздуха слабая, чтобы не рвать полосы ветра
     if (ds > 0.1 && slow < 2){
       dispSpr.x = -((G ? G.anim : 0) * .012) % (size * .5); dispSpr.y = -((G ? G.anim : 0) * .02) % (size * .5);
       disp.scale.x = disp.scale.y = ds;

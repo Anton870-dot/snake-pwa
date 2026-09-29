@@ -176,6 +176,16 @@ button:disabled{cursor:default}
 .mc-img{width:58px;height:58px;border-radius:16px;background:#1a2414 center/cover;flex:none;border:2px solid rgba(214,240,160,.25)}
 .mc-name{font-size:19px;font-weight:900}
 .mc-sub{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:2px}
+.mc-heroes{display:flex;align-items:center;gap:6px;margin:10px 0 2px;flex-wrap:wrap}
+.mc-heroes>span{font-size:12px;font-weight:800;color:var(--muted);margin-right:2px}
+.hchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:0;cursor:pointer;color:rgba(255,244,236,.75);font:700 10.5px system-ui,sans-serif}
+.hchip img{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.18);transition:.2s}
+.hchip.on img{border-color:#ffd166;box-shadow:0 0 12px rgba(255,209,102,.6);transform:scale(1.08)}
+.hchip.on{color:#ffd166}
+.hchip.lock img{filter:grayscale(1) brightness(.45)}
+.hchip.lock::after{content:"🔒";position:absolute;top:10px;font-size:14px}
+.hchip .lead{position:absolute;top:-4px;right:-3px;font-size:11px;filter:drop-shadow(0 1px 2px #000)}
+.mc-who{font-size:12px;color:rgba(255,244,236,.6);margin-top:2px;text-align:left}
 .mc-desc{font-size:13.5px;color:rgba(255,244,236,.8);margin:10px 0 2px;text-align:left}
 .mc-goal{font-size:12px;color:#d9f0a8;font-weight:700;text-align:left}
 .map-card .btn{margin:10px 0 12px;padding:14px}
@@ -900,8 +910,9 @@ function plural(n, one, few, many){
 const fmt = n => String(n).replace('.', ',');
 
 /* ===================== SETTINGS & STORAGE ===================== */
-const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false, music:true, mvol:'mid', fx:true}, store.get('ss_settings', {}));
+const settings = Object.assign({diff:'normal', skin:'natural', sound:true, vibro:true, dpad:false, music:true, mvol:'mid', fx:true}, store.get('ss_settings', {}));
 const saveSettings = () => store.set('ss_settings', settings);
+if (settings.skinV !== 2){ settings.skinV = 2; settings.skin = 'natural'; saveSettings(); }
 // ---- игроки: у каждого свой профиль и рекорды режимов (первый игрок — на старых ключах)
 const players = store.get('ss_players', null) || {cur:'p1', list:[{id:'p1', name:''}], fresh:true};
 if (!players.list.some(p => p.id === players.cur)) players.cur = players.list[0].id;
@@ -1047,6 +1058,7 @@ function nodeStatus(id){
 const hue = h => ((h % 360) + 360) % 360;
 const HSL = (c, dl = 0, a = 1) => `hsla(${hue(c[0])},${c[1]}%,${Math.max(0, Math.min(100, c[2] + dl))}%,${a})`;
 const SKINS = {
+  natural:{name:'Родной', lvl:1, col:(t)=>HEROES[curHero()].col(t)},   // окрас самого героя
   sunset: {name:'Закат',  lvl:1, col:(t)=>[42 - t*70, 88, 56 - t*8]},
   neon:   {name:'Неон',   lvl:1, col:(t)=>[185 + t*110, 85, 54 - t*6]},
   fire:   {name:'Огонь',  lvl:1, col:(t)=>[48 - t*48, 92, 54 - t*12]},
@@ -1055,7 +1067,27 @@ const SKINS = {
   gold:   {name:'Золото', lvl:5, col:(t,a)=>[44 - t*12, 90, 56 - t*16 + Math.sin(t*14 - a*0.006)*6]},
   galaxy: {name:'Космос', lvl:8, col:(t,a)=>[265 + Math.sin(t*5 + a*0.003)*55, 78, 52 + Math.sin(t*11 - a*0.005)*10]}
 };
-const skinOf = () => SKINS[settings.skin] || SKINS.sunset;
+/* ---------- герои отряда: у каждого свой окрас, узор тела, форма и снаряжение ---------- */
+const HEROES = {
+  yar:   {name:'Яр',      who:'юный уж',          width:1,   pat:1, col:t => [70 - t * 6, 20, 26 + t * 5]},
+  klubok:{name:'Клубок',  who:'песчаный удав',    width:.84, pat:5, col:t => [36, 36, 70 - t * 8]},
+  iva:   {name:'Ива',     who:'древесный удав',   width:.95, pat:3, col:t => [120 - t * 10, 64, 40 - t * 5]},
+  kremen:{name:'Кремень', who:'рогатая гадюка',   width:1.08, pat:2, col:t => [34, 34, 64 - t * 8]},
+  vint:  {name:'Винт',    who:'маисовый полоз',   width:.95, pat:4, col:t => [24 - t * 6, 80, 58 - t * 8]}
+};
+const HERO_ORDER = ['yar', 'klubok', 'iva', 'kremen', 'vint'];
+// кто ведёт какой мир (его глава истории); игрок может сменить на любого открытого героя
+const LEADER = {yard:'yar', road:'klubok', meadow:'iva', steppe:'kremen', dunes:'vint', forest:'yar', ruins:'yar'};
+function heroUnlocked(h){
+  if (h === 'yar') return true;
+  return WORLDS.some((w, i) => LEADER[w.id] === h && worldOpen(i));   // открывается, когда дошёл до его мира
+}
+function heroFor(worldId){
+  const pick = store.get(pk('ss_heroes'), {})[worldId];
+  return pick && HEROES[pick] && heroUnlocked(pick) ? pick : (LEADER[worldId] || 'yar');
+}
+const curHero = () => (G && G.hero) || heroFor(worldOf(mode).id);
+const skinOf = () => SKINS[settings.skin] || SKINS.natural;
 
 /* ===================== SOUND & VIBRATION ===================== */
 let ac = null;
@@ -1357,6 +1389,7 @@ function newGame(){
     headAng:0, overShown:false, wave:0, gulps:[], tongue:0, tongueT:800,
     wind:{st:'calm', t:6500, dir:null, n:0, lean:0, pow:0}, tumbles:[]
   };
+  G.hero = heroFor(worldOf(mode).id); G.heroW = HEROES[G.hero].width;
   G.from = G.snake.map(s => ({...s}));
   if (mode === 'maze') for (let i = 0; i < Math.max(1, 3 - sk('stonemason')); i++) addCluster();
   if (mode === 'forest') for (let i = 0; i < 7; i++) addTree();
@@ -3440,7 +3473,7 @@ function buildSpine(t){
 
 function bodyWidth(f){
   const n = G.snake.length, S = cell, u = f / Math.max(1, n - 1 + .4);
-  let w = u < .62 ? S * (.76 - .08 * u) : S * .71 * Math.max(.16, 1 - Math.pow((u - .62) / .38, 1.3) * .84);
+  let w = (u < .62 ? S * (.76 - .08 * u) : S * .71 * Math.max(.16, 1 - Math.pow((u - .62) / .38, 1.3) * .84)) * (G.heroW || 1);
   if (f < 1) w *= .8 + f * .2;
   w *= 1 + .035 * Math.sin(G.anim / 650 - f * .4);
   for (const g of G.gulps) w += S * .26 * Math.exp(-((f - g.p) ** 2) / .3);
@@ -3563,7 +3596,7 @@ function drawHead(c, P, S, skin, dead, dt){
   G.headAng += diff * Math.min(1, dt * .025);
   const idle = G.state === 'ready' || G.state === 'paused' ? Math.sin(G.anim / 520) * .28 : Math.sin(G.wave) * .08;
   const ang = G.headAng + idle;
-  const hc = skin.col(0, G.anim), hw = S * .68 * (1 + .03 * Math.sin(G.anim / 650));
+  const hc = skin.col(0, G.anim), hw = S * .68 * (1 + .03 * Math.sin(G.anim / 650)) * (.4 + .6 * (G.heroW || 1));
   // язык: короткие частые движения, особенно рядом с едой
   const f = G.food, near = f && Math.abs(f.x - G.snake[0].x) + Math.abs(f.y - G.snake[0].y) <= 3;
   if (!dead){
@@ -3621,8 +3654,74 @@ function drawHead(c, P, S, skin, dead, dt){
       c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(ex - S * .03, ey - S * .03, S * .02, 0, 7); c.fill();
     }
   }
+  drawGear(c, S, hw, G.hero, dead);
   c.restore();
   c.restore();
+}
+
+// снаряжение и приметы героя (в системе координат головы: +x — вперёд, голова от -0.36S до 0.47S)
+function drawGear(c, S, hw, hero, dead){
+  const A = G.anim, O = 'rgba(30,14,6,.55)';
+  const blob = (x, y, rx, ry, rot, c1, c2) => {
+    const g = c.createRadialGradient(x - rx * .3, y - ry * .4, 0, x, y, Math.max(rx, ry) * 1.1);
+    g.addColorStop(0, c1); g.addColorStop(1, c2);
+    c.fillStyle = g; c.beginPath(); c.ellipse(x, y, rx, ry, rot, 0, 7); c.fill(); c.strokeStyle = O; c.lineWidth = S * .025; c.stroke();
+  };
+  if (hero === 'yar'){
+    // жёлтые «ушки» ужа за головой
+    for (const s of [-1, 1]) blob(-S * .22, s * hw * .44, S * .14, S * .09, s * .45, '#fff07a', '#e0a010');
+    // оранжевая бандана: узел и два хвостика, треплются на ходу
+    const fl = Math.sin(A / 110) * S * .05;
+    c.fillStyle = '#e8741a'; c.strokeStyle = O; c.lineWidth = S * .025;
+    for (const s of [-1, 1]){
+      c.beginPath(); c.moveTo(-S * .42, s * S * .04); c.lineTo(-S * .72, s * S * .14 + fl * s); c.lineTo(-S * .64, s * S * .02 + fl * .5); c.closePath(); c.fill(); c.stroke();
+    }
+    const g = c.createLinearGradient(0, -hw * .4, 0, hw * .4); g.addColorStop(0, '#ffb04a'); g.addColorStop(1, '#c2540c');
+    c.fillStyle = g; c.beginPath(); c.roundRect(-S * .47, -hw * .44, S * .13, hw * .88, S * .05); c.fill(); c.stroke();
+    c.fillStyle = '#b8480a'; c.beginPath(); c.arc(-S * .44, 0, S * .06, 0, 7); c.fill();
+  } else if (hero === 'kremen'){
+    // рожки над глазами
+    for (const s of [-1, 1]){
+      const g = c.createLinearGradient(S * .1, s * hw * .45, -S * .08, s * hw * .8); g.addColorStop(0, '#d9c29a'); g.addColorStop(1, '#6e5634');
+      c.fillStyle = g; c.strokeStyle = O; c.lineWidth = S * .02;
+      c.beginPath(); c.moveTo(S * .22, s * hw * .3); c.quadraticCurveTo(S * .1, s * hw * .72, -S * .16, s * hw * .92);
+      c.quadraticCurveTo(S * .0, s * hw * .52, S * .0, s * hw * .28); c.closePath(); c.fill(); c.stroke();
+      c.strokeStyle = 'rgba(60,40,20,.5)'; c.lineWidth = S * .015;
+      for (const k of [.3, .55]){ c.beginPath(); c.moveTo(S * (.16 - k * .22), s * hw * (.36 + k * .3)); c.lineTo(S * (.06 - k * .22), s * hw * (.4 + k * .28)); c.stroke(); }
+    }
+    // бурые пятна на макушке
+    c.fillStyle = 'rgba(95,60,30,.55)';
+    for (const [x, y, r] of [[-S * .18, -hw * .15, S * .07], [-S * .16, hw * .18, S * .06], [S * .02, 0, S * .05]]){ c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }
+  } else if (hero === 'iva'){
+    // капюшон знахарки и листик
+    const g = c.createLinearGradient(-S * .45, -hw * .5, -S * .1, hw * .5); g.addColorStop(0, '#2f7a72'); g.addColorStop(1, '#123c3a');
+    c.fillStyle = g; c.strokeStyle = O; c.lineWidth = S * .025;
+    c.beginPath(); c.moveTo(-S * .5, -hw * .5); c.quadraticCurveTo(-S * .05, -hw * .78, S * .04, -hw * .3);
+    c.quadraticCurveTo(-S * .06, 0, S * .04, hw * .3); c.quadraticCurveTo(-S * .05, hw * .78, -S * .5, hw * .5); c.closePath(); c.fill(); c.stroke();
+    c.strokeStyle = 'rgba(180,230,210,.35)'; c.lineWidth = S * .02; c.beginPath(); c.moveTo(S * .01, -hw * .3); c.quadraticCurveTo(-S * .08, 0, S * .01, hw * .3); c.stroke();
+    c.save(); c.translate(-S * .28, -hw * .42); c.rotate(-.6 + Math.sin(A / 500) * .1);
+    c.fillStyle = '#6fd14f'; c.strokeStyle = '#2f6a1c'; c.lineWidth = S * .015;
+    c.beginPath(); c.ellipse(0, 0, S * .1, S * .045, 0, 0, 7); c.fill(); c.stroke(); c.beginPath(); c.moveTo(-S * .09, 0); c.lineTo(S * .09, 0); c.stroke(); c.restore();
+  } else if (hero === 'vint' || hero === 'klubok'){
+    // очки-гоглы на лбу: латунная оправа, голубое стекло, ремешок
+    const brass = hero === 'vint' ? ['#ffe29a', '#9a6a1c'] : ['#d8b48a', '#6a4a2a'];
+    c.strokeStyle = hero === 'vint' ? '#5a3a1a' : '#4a3020'; c.lineWidth = S * .05;
+    c.beginPath(); c.moveTo(-S * .1, -hw * .52); c.lineTo(-S * .1, hw * .52); c.stroke();
+    for (const s of [-1, 1]){
+      blob(-S * .06, s * hw * .22, S * .11, S * .11, 0, brass[0], brass[1]);
+      const gl = c.createRadialGradient(-S * .09, s * hw * .22 - S * .03, 0, -S * .06, s * hw * .22, S * .075);
+      gl.addColorStop(0, '#e8fbff'); gl.addColorStop(.5, '#7cc8e8'); gl.addColorStop(1, '#2a6a8a');
+      c.fillStyle = gl; c.beginPath(); c.arc(-S * .06, s * hw * .22, S * .07, 0, 7); c.fill();
+    }
+    if (hero === 'klubok'){
+      // флажок разведчика
+      const wv = Math.sin(A / 140) * S * .05;
+      c.strokeStyle = '#5a3a1a'; c.lineWidth = S * .035; c.beginPath(); c.moveTo(-S * .3, hw * .3); c.lineTo(-S * .72, hw * .62); c.stroke();
+      c.fillStyle = '#e03a3a'; c.strokeStyle = O; c.lineWidth = S * .02;
+      c.beginPath(); c.moveTo(-S * .72, hw * .62); c.quadraticCurveTo(-S * .66 + wv, hw * .92, -S * .5 + wv, hw * .98); c.lineTo(-S * .6, hw * .5); c.closePath(); c.fill(); c.stroke();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(-S * .62, hw * .72, S * .025, 0, 7); c.fill();
+    }
+  }
 }
 
 function drawEffects(c, dt){
@@ -3882,7 +3981,7 @@ const PX = (() => {
   const SNAKE_FS = `
     in vec2 vUV; in vec2 vInfo;
     uniform sampler2D uRamp;
-    uniform float uTime; uniform float uAlpha; uniform float uShadow; uniform float uFx; uniform float uN; uniform float uCellPx;
+    uniform float uTime; uniform float uAlpha; uniform float uShadow; uniform float uFx; uniform float uN; uniform float uCellPx; uniform float uPat;
     float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     void main(){
       float y = vUV.y, ay = abs(y);
@@ -3895,8 +3994,37 @@ const PX = (() => {
       float cyl = sqrt(max(0.0, 1.0 - y * y));
       vec3 col = base * (0.66 + 0.42 * cyl - 0.1 * y);
       col *= mix(1.0, 0.7, smoothstep(0.78, 0.93, ay));
-      // узор на спине: ромбы с точкой и пятна по бокам
       float body = smoothstep(0.9, 1.3, f) * (1.0 - smoothstep(uN - 1.6, uN - 1.0, f));
+      // узор героя
+      if (uPat > 0.5 && uPat < 1.5){        // Яр (уж): тёмные шашечки в шахматном порядке
+        vec2 g2 = vec2(f * 3.2, y * 2.2 + mod(floor(f * 3.2), 2.0) * 0.5);
+        float cb = 1.0 - smoothstep(0.18, 0.26, length(fract(g2) - 0.5));
+        col = mix(col, col * 0.55, cb * body * 0.8);
+      } else if (uPat > 1.5 && uPat < 2.5){ // Кремень: неровные бурые пятна разного размера
+        float kk = floor(f / 0.55), hk = hash(vec2(kk, 3.0));
+        float ls2 = (fract(f / 0.55) - 0.5) * 0.55 + (hk - 0.5) * 0.08;
+        float sd = length(vec2(ls2 / ((0.13 + 0.1 * hk) * w), (y - (hk - 0.5) * 0.5) / (0.4 + 0.3 * hk)));
+        col = mix(col, col * vec3(0.62, 0.5, 0.42), (1.0 - smoothstep(0.85, 1.0, sd)) * body);
+        col = mix(col, col * 1.25, smoothstep(0.85, 1.0, sd) * (1.0 - smoothstep(1.0, 1.15, sd)) * body * 0.6);
+      } else if (uPat > 2.5 && uPat < 3.5){ // Ива: белый зигзаг вдоль спины и светлые чешуйки
+        float tri = abs(fract(f * 1.6) - 0.5) * 2.0 - 0.5;
+        float zz = 1.0 - smoothstep(0.1, 0.16, abs(y - tri * 0.5));
+        col = mix(col, vec3(0.95, 1.0, 0.92), zz * body * 0.85);
+        float hs = hash(floor(vec2(f * 8.0, y * 5.0 + 5.0)));
+        col = mix(col, col * 1.5, step(0.88, hs) * body * 0.5);
+      } else if (uPat > 3.5 && uPat < 4.5){ // Винт: красные сёдла в чёрной окантовке (как у маисового полоза)
+        float ls2 = (fract(f / 0.62) - 0.5) * 0.62;
+        vec2 q2 = vec2(ls2 / (0.26 * w), y / 0.78);
+        float sd = pow(pow(abs(q2.x), 3.0) + pow(abs(q2.y), 3.0), 1.0 / 3.0);
+        col = mix(col, vec3(0.1, 0.03, 0.02), (1.0 - smoothstep(0.95, 1.08, sd)) * body);
+        col = mix(col, vec3(0.86, 0.18, 0.08) * (0.7 + 0.4 * cyl), (1.0 - smoothstep(0.78, 0.9, sd)) * body);
+      } else if (uPat > 4.5){               // Клубок: бурая крапинка
+        vec2 g2 = vec2(f * 3.6, y * 2.4 + 4.0);
+        float h = hash(floor(g2)), sp2 = 1.0 - smoothstep(0.2, 0.3, length(fract(g2) - vec2(0.3 + 0.4 * h, 0.5)));
+        col = mix(col, col * vec3(0.55, 0.42, 0.3), sp2 * step(0.35, h) * body);
+      }
+      // классический узор (скины без героя): ромбы с точкой и пятна по бокам
+      if (uPat < 0.5){
       float Pd = 0.42, k = floor(f / Pd), ls = (fract(f / Pd) - 0.5) * Pd;
       float d = abs(ls) / (0.3 * w) + abs(y * 0.5) / 0.21;
       float dia = (1.0 - smoothstep(0.88, 1.0, d)) * body;
@@ -3906,6 +4034,7 @@ const PX = (() => {
       float side = mod(k, 2.0) < 1.0 ? 1.0 : -1.0;
       float sp = (1.0 - smoothstep(0.05, 0.075, length(vec2((ls + 0.1 * w) / w, y * 0.5 - side * 0.3)))) * body;
       col = mix(col, col * 0.6, sp * 0.55);
+      }
       // чешуя: мелкие дужки
       vec2 sc = vec2(f * 7.0, y * 2.6 + mod(floor(f * 7.0), 2.0) * 0.5);
       vec2 q = fract(sc) - vec2(0.5, 0.2);
@@ -3946,7 +4075,7 @@ const PX = (() => {
     const mk = shadow => PIXI.Shader.from({
       gl:{vertex:SNAKE_VS, fragment:SNAKE_FS},
       resources:{uRamp:rampTex.source, su:{uTime:{value:0, type:'f32'}, uAlpha:{value:1, type:'f32'}, uShadow:{value:shadow, type:'f32'},
-                                            uFx:{value:0, type:'f32'}, uN:{value:3, type:'f32'}, uCellPx:{value:30, type:'f32'}}}
+                                            uFx:{value:0, type:'f32'}, uN:{value:3, type:'f32'}, uCellPx:{value:30, type:'f32'}, uPat:{value:1, type:'f32'}}}
     });
     growSnake(600);
     snakeBox = new PIXI.Container();
@@ -3998,7 +4127,7 @@ const PX = (() => {
     const fx = FX_OF_SKIN[settings.skin] || 0;
     for (const m of [sBody, sShadow]){
       const u = m.shader.resources.su.uniforms;
-      u.uTime = G.anim; u.uAlpha = alpha; u.uFx = fx; u.uN = n; u.uCellPx = cell * dpr;
+      u.uTime = G.anim; u.uAlpha = alpha; u.uFx = fx; u.uN = n; u.uCellPx = cell * dpr; u.uPat = HEROES[G.hero] ? HEROES[G.hero].pat : 0;
     }
     sShadow.position.set(cell * .1, cell * .16);
     snakeBox.visible = true; sUsed = true;
@@ -4874,6 +5003,13 @@ function renderMap(){
   box.innerHTML = html;
   renderMapCard();
 }
+function heroRow(wid){
+  const cur = heroFor(wid), lead = LEADER[wid], H = HEROES[cur];
+  return `<div class="mc-heroes"><span>Ведёт:</span>` + HERO_ORDER.map(h => {
+    const lk = !heroUnlocked(h);
+    return `<button class="hchip ${h === cur ? 'on' : ''} ${lk ? 'lock' : ''}" data-hero="${h}" aria-label="${HEROES[h].name}"><img src="img/heroes/${h}.jpg" alt="">${h === lead ? '<i class="lead">★</i>' : ''}${HEROES[h].name}</button>`;
+  }).join('') + `</div><div class="mc-who">${H.name} — ${H.who}${cur === lead ? ', ведущий этого мира' : ''}</div>`;
+}
 function renderMapCard(){
   const w = WORLDS[mapSel], open = worldOpen(mapSel), st = worldStars(w.id), best = getBest(w.mode);
   const prev = WORLDS[mapSel - 1];
@@ -4881,6 +5017,7 @@ function renderMapCard(){
     <div class="mc-top"><div class="mc-img" style="background-image:url('img/${w.id}.jpg')"></div>
       <div><div class="mc-name">${w.name}</div><div class="mc-sub">Мир ${mapSel + 1} · ${MODES[w.mode].icon} ${MODES[w.mode].name} · рекорд ${best}</div></div></div>
     <div class="mc-desc">${w.desc}</div>
+    ${open ? heroRow(w.id) : ''}
     <div class="mc-goal">★ дойти до ${OASIS_WAVE}-й волны · ★★ ${STAR_SCORE[1]} очков · ★★★ ${STAR_SCORE[2]} очков</div>
     ${!open ? `<button class="btn ghost" disabled>🔒 Сначала пройди «${prev.name}»</button>`
       : st ? `<div class="mc-btns"><button class="btn primary" id="btnMapGo">▶ Поход<small>до ${OASIS_WAVE}-й волны</small></button>
@@ -4894,6 +5031,13 @@ $('mapPath').addEventListener('click', e => {
 });
 $('mapCard').addEventListener('click', e => {
   if (e.target.closest('#btnIntro')){ SFX.click(); playIntro(openMap); return; }
+  const hc = e.target.closest('.hchip');
+  if (hc){
+    const h = hc.dataset.hero;
+    if (!heroUnlocked(h)){ SFX.deny(); return; }
+    const all = store.get(pk('ss_heroes'), {}); all[WORLDS[mapSel].id] = h; store.set(pk('ss_heroes'), all);
+    SFX.click(); renderMapCard(); return;
+  }
   const go = e.target.closest('#btnMapGo'), free = e.target.closest('#btnMapFree');
   if (!go && !free) return;
   if (free && !worldStars(WORLDS[mapSel].id)) return;

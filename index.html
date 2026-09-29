@@ -852,6 +852,7 @@ canvas{display:block}
       <small id="musicSrc" style="color:var(--muted);font-size:11.5px">…</small>
     </div>
     <div class="toggle-row">🎮 Кнопки на экране<button class="switch" data-key="dpad"></button></div>
+    <div class="toggle-row">✨ Красивые эффекты<button class="switch" data-key="fx"></button></div>
     <button class="btn primary" id="btnCloseSettings">Готово</button>
   </div>
 </div>
@@ -874,6 +875,7 @@ canvas{display:block}
   </div>
 </div>
 
+<script src="lib/pixi.min.js"></script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -898,7 +900,7 @@ function plural(n, one, few, many){
 const fmt = n => String(n).replace('.', ',');
 
 /* ===================== SETTINGS & STORAGE ===================== */
-const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false, music:true, mvol:'mid'}, store.get('ss_settings', {}));
+const settings = Object.assign({diff:'normal', skin:'sunset', sound:true, vibro:true, dpad:false, music:true, mvol:'mid', fx:true}, store.get('ss_settings', {}));
 const saveSettings = () => store.set('ss_settings', settings);
 // ---- игроки: у каждого свой профиль и рекорды режимов (первый игрок — на старых ключах)
 const players = store.get('ss_players', null) || {cur:'p1', list:[{id:'p1', name:''}], fresh:true};
@@ -2449,6 +2451,7 @@ function showGameOver(){
 /* ===================== EFFECTS ===================== */
 function burst(x, y, colors, n){
   const cx = (x + .5) * cell, cy = (y + .5) * cell;
+  if (PX.on) return PX.burst(cx, cy, colors, n);
   for (let i = 0; i < n; i++){
     const a = Math.random() * Math.PI * 2, sp = (0.04 + Math.random() * 0.16) * cell;
     G.particles.push({x:cx, y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:1, decay:0.012 + Math.random()*0.02,
@@ -2518,11 +2521,12 @@ function resize(){
   const st = $('stage').getBoundingClientRect();
   size = Math.floor(Math.min(st.width, st.height, 600));
   if (size < 120) size = 120;
-  dpr = Math.min(window.devicePixelRatio || 1, 3);
+  dpr = Math.min(window.devicePixelRatio || 1, PX.on ? 2 : 3);
   cell = size / COLS;
   cv.width = bg.width = Math.round(size * dpr);
   cv.height = bg.height = Math.round(size * dpr);
   cv.style.width = cv.style.height = size + 'px';
+  PX.resize();
   buildBg();
   layoutScene();
 }
@@ -3387,7 +3391,185 @@ function render(dt){
   if (mode === 'forest') drawDarkness(c);
   drawEffects(c, dt);
   c.restore();
+  if (PX.on) PX.frame(dt);
 }
+
+/* ===================== PIXI: свечение, GPU-частицы, дрожание воздуха =====================
+   Этап 1 перехода на PixiJS. Всё поле пока рисуется на обычном холсте (cv), а Pixi выводит его
+   на экран через WebGL и добавляет то, что холст не тянет:
+   • bloom — светлые места (яблоки, светлячки, змейка) мягко светятся;
+   • GPU-частицы — искры с хвостами и сложением света вместо кружков;
+   • дрожание воздуха — марево в пустыне, рябь от ветра в степи.
+   Нет WebGL или эффекты выключены в настройках — игра работает как раньше, через cv. */
+const PX = (() => {
+  const api = {on:false, ready:false};
+  let app = null, root = null, main = null, glow = null, glowCM = null, sparks = null, disp = null, dispSpr = null, dotTex = null;
+  let hi = null, hiBox = null, hiRT = null;   // яркие места вырезаются в отдельную текстуру (8 бит — отрицательные значения обрезаются)
+  const pool = [], live = [];
+  let slow = 0, lastBiome = null, want = true;
+  // мягкая точка для искр
+  function makeDot(){
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(255,255,255,.85)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    return PIXI.Texture.from(c);
+  }
+  // плавный шум для дрожания воздуха
+  function makeNoise(){
+    const N = 256, c = document.createElement('canvas'); c.width = c.height = N;
+    const g = c.getContext('2d'), im = g.createImageData(N, N), T = Math.PI * 2 / N;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+      const i = (y * N + x) * 4;
+      const a = Math.sin(x * T * 3 + Math.sin(y * T * 2) * 2) + Math.sin(y * T * 5 + x * T) * .5;
+      const b = Math.cos(y * T * 3 + Math.sin(x * T * 2) * 2) + Math.cos(x * T * 4 - y * T) * .5;
+      im.data[i] = 128 + a * 80; im.data[i + 1] = 128 + b * 80; im.data[i + 2] = 128; im.data[i + 3] = 255;
+    }
+    g.putImageData(im, 0, 0);
+    const t = PIXI.Texture.from(c); t.source.addressMode = 'repeat'; if (t.source.style) t.source.style.addressMode = 'repeat';
+    return t;
+  }
+  const hex = c => {
+    if (typeof c !== 'string') return 0xffffff;
+    if (c[0] === '#'){ const h = c.length === 4 ? c.slice(1).split('').map(x => x + x).join('') : c.slice(1, 7); return parseInt(h, 16); }
+    const m = c.match(/\d+(\.\d+)?/g);
+    if (c.startsWith('hsl') && m){ const [h, s2, l] = m.map(Number), S2 = s2 / 100, L = l / 100, k = n => (n + h / 30) % 12, a = S2 * Math.min(L, 1 - L), f = n => L - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return (Math.round(f(0) * 255) << 16) | (Math.round(f(8) * 255) << 8) | Math.round(f(4) * 255); }
+    if (m) return (+m[0] << 16) | (+m[1] << 8) | +m[2];
+    return 0xffffff;
+  };
+  // оттенок и сила свечения по времени суток мира
+  const LOOK = {
+    yard:  {bloom:.32, r:1.05, g:1.02, b:.95, t:-1.4},
+    road:  {bloom:.36, r:1.1,  g:1.0,  b:.85, t:-1.35},
+    meadow:{bloom:.45, r:1.15, g:.95,  b:.8},
+    steppe:{bloom:.42, r:1.1,  g:.9,   b:1.05},
+    dunes: {bloom:.5,  r:.9,   g:.98,  b:1.15, t:-1.4},
+    forest:{bloom:.6,  r:.95,  g:1.1,  b:1.0},
+    ruins: {bloom:.4,  r:1.12, g:1.0,  b:.95}
+  };
+  function setLook(b){
+    const L = LOOK[b] || LOOK.meadow, k = 2.4, t = L.t || -1.1;   // вытягиваем только яркие места (на светлых полях порог выше)
+    glowCM.matrix = [k * L.r, 0, 0, 0, t, 0, k * L.g, 0, 0, t, 0, 0, k * L.b, 0, t, 0, 0, 0, 1, 0];
+    glow.alpha = L.bloom;
+    lastBiome = b;
+  }
+  async function init(){
+    if (api.ready || !window.PIXI) return false;
+    try {
+      const probe = document.createElement('canvas');
+      if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) return false;
+      app = new PIXI.Application();
+      await app.init({width:size, height:size, backgroundAlpha:0, antialias:false, resolution:dpr, autoDensity:true,
+                      autoStart:false, preference:'webgl', powerPreference:'high-performance'});
+      app.ticker.stop();
+      const el = app.canvas;
+      el.id = 'pxv'; el.style.cssText = 'position:absolute;left:0;top:0;display:block;pointer-events:none';
+      $('board').appendChild(el);
+      root = new PIXI.Container(); app.stage.addChild(root);
+      const tex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cv, resolution:1})});
+      main = new PIXI.Sprite(tex); root.addChild(main);
+      // свечение: 1) яркие места → текстура в пол-размера, 2) размываем, 3) накладываем «экраном»
+      glowCM = new PIXI.ColorMatrixFilter();
+      hi = new PIXI.Sprite(tex); hi.filters = [glowCM];
+      hiBox = new PIXI.Container(); hiBox.addChild(hi);
+      hiRT = PIXI.RenderTexture.create({width:Math.max(16, size >> 1), height:Math.max(16, size >> 1), resolution:1});
+      glow = new PIXI.Sprite(hiRT); glow.blendMode = 'screen';
+      const blur = new PIXI.BlurFilter({strength:8, quality:3});
+      blur.blendMode = 'screen';   // у спрайта с фильтром режим наложения задаётся фильтру, иначе свечение затемняет
+      glow.filters = [blur];
+      root.addChild(glow);
+      sparks = new PIXI.Container(); app.stage.addChild(sparks);
+      dotTex = makeDot();
+      dispSpr = new PIXI.Sprite(makeNoise()); dispSpr.renderable = false; app.stage.addChild(dispSpr);
+      disp = new PIXI.DisplacementFilter({sprite:dispSpr, scale:0});
+      api.ready = true;
+      return true;
+    } catch (e){
+      console.warn('Pixi не запустился, остаёмся на холсте', e);
+      try { app && app.destroy(true); } catch (e2){}
+      app = null; return false;
+    }
+  }
+  function show(on){
+    api.on = on && api.ready;
+    if (app) app.canvas.style.display = api.on ? 'block' : 'none';
+    cv.style.visibility = api.on ? 'hidden' : 'visible';
+    if (!api.on) clearSparks();
+  }
+  function clearSparks(){ while (live.length){ const p = live.pop(); p.s.visible = false; pool.push(p); } }
+  api.enable = async on => {
+    want = on;
+    if (on && !api.ready) await init();
+    show(want);
+    if (G && typeof resize === 'function') resize();
+  };
+  api.resize = () => {
+    if (!app || !api.ready) return;
+    app.renderer.resize(size, size, dpr);
+    app.canvas.style.width = app.canvas.style.height = size + 'px';
+    // холст сменил размер — пересоздаём текстуру под новый размер
+    const old = main.texture, tex = new PIXI.Texture({source:new PIXI.CanvasSource({resource:cv, resolution:1})});
+    main.texture = hi.texture = tex;
+    if (old && old !== PIXI.Texture.EMPTY) old.destroy(false);
+    main.width = main.height = glow.width = glow.height = size;
+    hiRT.resize(Math.max(16, size >> 1), Math.max(16, size >> 1), 1);
+    hi.width = hi.height = Math.max(16, size >> 1);
+    glow.width = glow.height = size;
+    dispSpr.width = dispSpr.height = size * 1.5;
+  };
+  api.burst = (x, y, colors, n) => {
+    const N = Math.round(n * 1.6);
+    for (let i = 0; i < N; i++){
+      let p = pool.pop();
+      if (!p){ const sp = new PIXI.Sprite(dotTex); sp.anchor.set(.5); sp.blendMode = 'add'; sparks.addChild(sp); p = {s:sp}; }
+      const a = Math.random() * Math.PI * 2, v = (0.05 + Math.random() * 0.22) * cell;
+      p.x = x; p.y = y; p.vx = Math.cos(a) * v; p.vy = Math.sin(a) * v - cell * .02;
+      p.life = 1; p.decay = .012 + Math.random() * .022; p.r = cell * (.05 + Math.random() * .1);
+      p.s.tint = hex(colors[(Math.random() * colors.length) | 0]); p.s.visible = true;
+      live.push(p);
+    }
+    while (live.length > 900){ const p = live.shift(); p.s.visible = false; pool.push(p); }
+  };
+  api.frame = dt => {
+    if (!api.on) return;
+    const b = BIOME[mode];
+    if (b !== lastBiome) setLook(b);
+    // тряска поля переносится и на свечение
+    main.texture.source.update();
+    // искры: летят, тормозят, падают, вытягиваются по скорости
+    const k = dt / 16.67;
+    for (let i = live.length - 1; i >= 0; i--){
+      const p = live[i];
+      p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(.94, k); p.vy = p.vy * Math.pow(.94, k) + cell * .004 * k; p.life -= p.decay * k;
+      if (p.life <= 0){ p.s.visible = false; pool.push(p); live.splice(i, 1); continue; }
+      const sp = Math.hypot(p.vx, p.vy), sz = p.r * (0.5 + p.life * .7) / 32;
+      p.s.position.set(p.x, p.y); p.s.alpha = Math.min(1, p.life * 1.4);
+      p.s.rotation = Math.atan2(p.vy, p.vx); p.s.scale.set(sz * (1 + sp / cell * 6), sz);
+    }
+    // дрожание воздуха: марево в пустыне, рябь в порыв ветра
+    let ds = 0;
+    if (b === 'dunes') ds = 2.2;
+    if (b === 'steppe' && G && G.wind) ds = 1 + 4 * G.wind.pow;
+    if (ds > 0.1 && slow < 2){
+      dispSpr.x = -((G ? G.anim : 0) * .012) % (size * .5); dispSpr.y = -((G ? G.anim : 0) * .02) % (size * .5);
+      disp.scale.x = disp.scale.y = ds;
+      if (root.filters !== disp._arr) root.filters = disp._arr = [disp];
+    } else if (root.filters) root.filters = null;
+    // вспышка при бонусах усиливает свечение
+    const L = LOOK[b] || LOOK.meadow;
+    glow.alpha = slow >= 3 ? 0 : L.bloom * (1 + (G ? G.flash * 1.5 : 0));
+    glow.visible = glow.alpha > .01;
+    if (glow.visible) app.renderer.render({container:hiBox, target:hiRT, clear:true});
+    app.render();
+    // авто-качество: если телефон не тянет, выключаем сначала марево, потом свечение
+    api._acc = (api._acc || 0) * .97 + dt * .03;
+    if (api._acc > 26 && slow < 3){ api._bad = (api._bad || 0) + dt; if (api._bad > 2500){ slow++; api._bad = 0; api._acc = 17; } }
+    else api._bad = 0;
+  };
+  return api;
+})();
+
+if (settings.fx) PX.enable(true);
 
 /* ===================== LOOP ===================== */
 let lastT = performance.now();
@@ -4050,6 +4232,7 @@ $('ovSettings').addEventListener('click', e => {
   }
   else return;
   saveSettings(); SFX.click(); renderSettings(); Music.refresh();
+  if (sw2 && sw2.dataset.key === 'fx'){ PX.enable(settings.fx); if (G) resize(); }
 });
 $('btnSettings').onclick = () => { SFX.click(); renderSettings(); overlay('ovSettings', true); };
 $('btnCloseSettings').onclick = () => { SFX.click(); overlay('ovSettings', false); };

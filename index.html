@@ -141,6 +141,22 @@ button:disabled{cursor:default}
 .offer b{font-size:12px;color:#ffd166}
 .offer:disabled{opacity:.45}
 .offer.best{border-color:rgba(255,209,102,.7);box-shadow:0 0 16px rgba(255,209,102,.25)}
+.ward{max-height:92vh;overflow:auto}
+#wardPv{display:block;width:100%;max-width:360px;margin:6px auto 4px;border-radius:16px;aspect-ratio:12/5;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.35)}
+.ward-heroes{display:flex;justify-content:center;gap:8px;margin:6px 0 8px}
+.ward-heroes .hchip img{width:36px;height:36px}
+.ward-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.witem{position:relative;padding:10px 4px 8px;border-radius:14px;background:var(--panel);border:1px solid var(--stroke);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:#fff3dc;cursor:pointer}
+.witem b{font-size:11.5px;line-height:1.15;text-align:center}
+.witem small{font-size:10.5px;font-weight:800;color:var(--muted)}
+.witem small.pr{color:#ffd166}.witem small.eq{color:#7ee0a0}
+.witem .sw{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 -4px 6px rgba(0,0,0,.35),0 0 0 2px rgba(255,255,255,.12)}
+.witem .ic{font-size:26px;font-style:normal;line-height:34px}
+.witem.lock .sw,.witem.lock .ic{filter:saturate(.5) brightness(.8)}
+.witem.sel{border-color:#ffd166;box-shadow:0 0 14px rgba(255,209,102,.35)}
+.witem.on{border-color:rgba(126,224,160,.7)}
+.ward-note{font-size:12px;color:var(--muted);margin:10px 0 2px}
+#wardAct .btn{margin-top:10px}
 .shop-note{font-size:11.5px;color:var(--muted);margin-top:8px}
 .shop-soon{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .shop-soon span{padding:7px 10px;border-radius:12px;border:1px dashed var(--stroke);font-size:12.5px;font-weight:700;color:var(--muted)}
@@ -822,6 +838,20 @@ canvas{display:block}
   </div>
 </div>
 
+<!-- ===== WARDROBE ===== -->
+<div class="overlay" id="ovWard">
+  <div class="card ward">
+    <h2>👗 Гардероб</h2>
+    <div class="shop-wal" id="wardWal"></div>
+    <canvas id="wardPv"></canvas>
+    <div class="ward-heroes" id="wardHeroes"></div>
+    <div class="seg" id="wardTabs"><button data-val="skin">🎨 Окрас</button><button data-val="hat">🎩 Шапки</button></div>
+    <div class="ward-grid" id="wardGrid"></div>
+    <div id="wardAct"></div>
+    <button class="btn ghost" id="btnCloseWard">Готово</button>
+  </div>
+</div>
+
 <!-- ===== SHOP ===== -->
 <div class="overlay" id="ovShop">
   <div class="card shop">
@@ -832,8 +862,9 @@ canvas{display:block}
     <div class="shop-sec">📺 Награда за рекламу</div>
     <div class="shop-grid" id="shopAds"></div>
     <div class="shop-note" id="shopAdNote"></div>
-    <div class="shop-sec">✨ Скоро</div>
-    <div class="shop-soon"><span>🎩 Украшения</span><span>🎨 Скины</span><span>🎵 Мелодии</span></div>
+    <div class="shop-sec">✨ Внешний вид</div>
+    <button class="btn magic" id="btnShopWard">👗 Гардероб<small>окрасы и шапки для змейки</small></button>
+    <div class="shop-soon" style="margin-top:8px"><span>🌠 Шлейфы — скоро</span><span>🎵 Мелодии — скоро</span></div>
     <button class="btn ghost" id="btnCloseShop">Закрыть</button>
   </div>
 </div>
@@ -852,7 +883,7 @@ canvas{display:block}
     </div>
     <div class="set-row">
       <label>ЗМЕЙКА</label>
-      <div class="skins" id="skins"></div>
+      <button class="btn ghost" id="btnSetWard" style="margin:0">👗 Гардероб — окрас и шапка</button>
     </div>
     <div class="toggle-row">🔊 Звук<button class="switch" data-key="sound"></button></div>
     <div class="toggle-row">📳 Вибрация<button class="switch" data-key="vibro"></button></div>
@@ -1065,7 +1096,11 @@ const SKINS = {
   mint:   {name:'Мята',   lvl:1, col:(t)=>[150 - t*50, 62, 48 - t*10]},
   rainbow:{name:'Радуга', lvl:1, col:(t,a)=>[t*300 + a*0.08, 85, 56]},
   gold:   {name:'Золото', lvl:5, col:(t,a)=>[44 - t*12, 90, 56 - t*16 + Math.sin(t*14 - a*0.006)*6]},
-  galaxy: {name:'Космос', lvl:8, col:(t,a)=>[265 + Math.sin(t*5 + a*0.003)*55, 78, 52 + Math.sin(t*11 - a*0.005)*10]}
+  galaxy: {name:'Космос', lvl:8, col:(t,a)=>[265 + Math.sin(t*5 + a*0.003)*55, 78, 52 + Math.sin(t*11 - a*0.005)*10]},
+  lava:   {name:'Лава',   lvl:1, col:(t,a)=>[8 + t*10, 70, 22 + Math.sin(t*9 - a*0.004)*4]},
+  glass:  {name:'Изумруд', lvl:1, col:(t)=>[150 - t*20, 72, 46 + t*6]},
+  aurora: {name:'Сияние', lvl:1, col:(t,a)=>[150 + Math.sin(t*4 - a*0.0012)*60 + t*60, 78, 55]},
+  bronze: {name:'Бронза богов', lvl:1, col:(t,a)=>[30 - t*4, 48, 42 + Math.sin(t*6 + a*0.001)*3]}
 };
 /* ---------- герои отряда: у каждого свой окрас, узор тела, форма и снаряжение ---------- */
 const HEROES = {
@@ -1087,7 +1122,10 @@ function heroFor(worldId){
   return pick && HEROES[pick] && heroUnlocked(pick) ? pick : (LEADER[worldId] || 'yar');
 }
 const curHero = () => (G && G.hero) || heroFor(worldOf(mode).id);
-const skinOf = () => SKINS[settings.skin] || SKINS.natural;
+let lookOv = null;   // примерка в гардеробе: временно подменяет надетое
+const curSkinId = () => (lookOv && lookOv.skin) || curLook('skin');
+const curHatId = () => (lookOv && lookOv.hat) || curLook('hat');
+const skinOf = () => SKINS[curSkinId()] || SKINS.natural;
 
 /* ===================== SOUND & VIBRATION ===================== */
 let ac = null;
@@ -3566,11 +3604,13 @@ function drawSnake(c, t, dt){
         }
       }
       acc += d;
-      if (acc >= S * .42){
+      const pat = HEROES[G.hero] ? HEROES[G.hero].pat : 0;
+      if (acc >= S * PAT_STEP[pat]){
         acc = 0; flip ^= 1;
         if (b.f < .9 || b.f > n - 1.1) continue;
         const col = colAt(b.f);
         c.save(); c.translate(b.x, b.y); c.rotate(ang);
+        if (pat){ drawPat2D(c, pat, w, col, flip, b.f); c.restore(); continue; }
         c.fillStyle = HSL(col, -18, .85);
         c.beginPath(); c.moveTo(w * .3, 0); c.lineTo(0, w * .21); c.lineTo(-w * .3, 0); c.lineTo(0, -w * .21); c.closePath(); c.fill();
         c.fillStyle = HSL(col, 14, .55);
@@ -3655,6 +3695,7 @@ function drawHead(c, P, S, skin, dead, dt){
     }
   }
   drawGear(c, S, hw, G.hero, dead);
+  drawHat(c, S, hw, curHatId());
   c.restore();
   c.restore();
 }
@@ -4060,13 +4101,23 @@ const PX = (() => {
         col += vec3(1.0, 0.55, 0.1) * max(0.0, fl) * 0.35 * smoothstep(0.3, 0.9, ay);
       } else if (uFx > 3.5 && uFx < 4.5){   // неон: пульсирующая кромка
         col += base * 0.7 * smoothstep(0.55, 0.95, ay) * (0.5 + 0.5 * sin(uTime * 0.006 - f * 1.6));
-      } else if (uFx > 4.5){                // радуга: перелив
+      } else if (uFx > 4.5 && uFx < 5.5){   // радуга/сияние: перелив
         col += 0.12 * (0.5 + 0.5 * sin(f * 3.0 - uTime * 0.005)) * cyl;
+      } else if (uFx > 5.5 && uFx < 6.5){   // лава: тёмная корка и светящиеся трещины
+        float n1 = abs(sin(f * 7.0 + sin(y * 5.0 + f * 2.0) * 1.6));
+        float n2 = abs(sin(f * 4.3 - y * 6.0 + sin(f * 3.1) * 1.2));
+        float cr = max(1.0 - smoothstep(0.0, 0.12, n1), 1.0 - smoothstep(0.0, 0.09, n2));
+        float pulse = 0.75 + 0.25 * sin(uTime * 0.004 + f * 1.3);
+        col = mix(col * 0.45, vec3(1.0, 0.5, 0.08) * pulse, cr * smoothstep(0.95, 0.5, ay));
+      } else if (uFx > 6.5){                // изумруд: стекло с бликом по краю
+        col = mix(col, col * 1.25 + 0.08, cyl * 0.4);
+        col += vec3(0.55, 1.0, 0.8) * pow(ay, 4.0) * 0.45;
+        col += vec3(1.0) * exp(-pow((fract(f * 0.1 - uTime * 0.0003) - 0.5) * 10.0, 2.0)) * 0.3 * cyl;
       }
-      float a = edge * uAlpha;
+      float a = edge * uAlpha * (uFx > 6.5 ? 0.86 : 1.0);
       gl_FragColor = vec4(col * a, a);
     }`;
-  const FX_OF_SKIN = {gold:1, galaxy:2, fire:3, neon:4, rainbow:5};
+  const FX_OF_SKIN = {gold:1, galaxy:2, fire:3, neon:4, rainbow:5, aurora:5, bronze:1, lava:6, glass:7};
   let snakeBox = null, sBody = null, sShadow = null, sGeo = null, sCap = 0, rampCv = null, rampTex = null, sUsed = false;
   let topSpr = null, hiTop = null;
   function makeSnake(){
@@ -4124,7 +4175,7 @@ const PX = (() => {
     const rc = rampCv.getContext('2d');
     for (let i = 0; i < 64; i++){ rc.fillStyle = HSL(skin.col(i / 63, G.anim), 0); rc.fillRect(i, 0, 1, 1); }
     rampTex.source.update();
-    const fx = FX_OF_SKIN[settings.skin] || 0;
+    const fx = FX_OF_SKIN[curSkinId()] || 0;
     for (const m of [sBody, sShadow]){
       const u = m.shader.resources.su.uniforms;
       u.uTime = G.anim; u.uAlpha = alpha; u.uFx = fx; u.uN = n; u.uCellPx = cell * dpr; u.uPat = HEROES[G.hero] ? HEROES[G.hero].pat : 0;
@@ -4874,10 +4925,7 @@ function renderSettings(){
   });
   document.querySelectorAll('#ovSettings .switch').forEach(s => s.classList.toggle('on', !!settings[s.dataset.key]));
   $('musicSrc').textContent = Music.status();
-  $('skins').innerHTML = Object.entries(SKINS).map(([id, s]) => {
-    const lock = L < s.lvl;
-    return `<button class="skin ${settings.skin === id ? 'on' : ''} ${lock ? 'lock' : ''}" data-skin="${id}"><i style="background:linear-gradient(135deg,${HSL(s.col(0,0))},${HSL(s.col(.5,0))},${HSL(s.col(1,0))})"></i>${lock ? 'ур. ' + s.lvl : s.name}</button>`;
-  }).join('');
+
 }
 $('ovSettings').addEventListener('click', e => {
   const segBtn = e.target.closest('.seg button'), sw2 = e.target.closest('.switch'), sk2 = e.target.closest('.skin');
@@ -4927,6 +4975,241 @@ if (window.YaGames) YaGames.init().then(s => { Ads.sdk = s; }).catch(() => {});
 const today = () => new Date().toISOString().slice(0, 10);
 function adQuota(){ if (!profile.ads || profile.ads.d !== today()) profile.ads = {d:today(), gold:0, cr:0}; return profile.ads; }
 
+/* ===================== ГАРДЕРОБ: окрасы и шапки ===================== */
+// обычные вещи — за 🪙, редкие — за 💠, корона — только приз за звёзды
+const LOOKS = {
+  skin: [
+    {id:'natural', name:'Родной',  free:true},
+    {id:'sunset',  name:'Закат',   free:true},
+    {id:'neon',    name:'Неон',    free:true},
+    {id:'fire',    name:'Огонь',   free:true},
+    {id:'mint',    name:'Мята',    free:true},
+    {id:'rainbow', name:'Радуга',  free:true},
+    {id:'gold',    name:'Золото',  gold:180},
+    {id:'lava',    name:'Лава',    gold:220},
+    {id:'glass',   name:'Изумруд', gold:260},
+    {id:'galaxy',  name:'Космос',  cr:3},
+    {id:'aurora',  name:'Сияние',  cr:3},
+    {id:'bronze',  name:'Бронза богов', cr:2}
+  ],
+  hat: [
+    {id:'none',    name:'Без шапки', icon:'🐍', free:true},
+    {id:'wreath',  name:'Венок',     icon:'🌼', gold:60},
+    {id:'straw',   name:'Шляпа',     icon:'👒', gold:90},
+    {id:'shades',  name:'Очки',      icon:'🕶️', gold:100},
+    {id:'phones',  name:'Наушники',  icon:'🎧', gold:120},
+    {id:'ushanka', name:'Ушанка',    icon:'🧣', gold:140},
+    {id:'tricorn', name:'Треуголка', icon:'🏴‍☠️', gold:160},
+    {id:'helmet',  name:'Каска богов', icon:'⛑️', cr:2},
+    {id:'crown',   name:'Корона',    icon:'👑', prize:15}
+  ]
+};
+const totalStars = () => WORLDS.reduce((a, w) => a + worldStars(w.id), 0);
+function lookItem(cat, id){ return LOOKS[cat].find(x => x.id === id); }
+function ensureWardrobe(){
+  if (!profile.owned){
+    profile.owned = {skin:LOOKS.skin.filter(x => x.free).map(x => x.id), hat:['none']};
+    // кто раньше открыл «Золото» и «Космос» уровнем змейки — не теряет их
+    const L = levelInfo(profile.xp).level;
+    if (L >= 5) profile.owned.skin.push('gold');
+    if (L >= 8) profile.owned.skin.push('galaxy');
+  }
+  if (!profile.look){
+    const old = settings.skin;
+    profile.look = {skin:profile.owned.skin.includes(old) ? old : 'natural', hat:'none'};
+    saveProfile();
+  }
+}
+function owns(cat, id){
+  const it = lookItem(cat, id); if (!it) return false;
+  if (it.free) return true;
+  if (it.prize) return totalStars() >= it.prize;
+  ensureWardrobe(); return profile.owned[cat].includes(id);
+}
+function curLook(cat){
+  ensureWardrobe();
+  const id = profile.look[cat];
+  return owns(cat, id) ? id : (cat === 'skin' ? 'natural' : 'none');
+}
+function buyLook(cat, id){
+  const it = lookItem(cat, id); if (!it || owns(cat, id) || it.prize) return false;
+  if (it.gold && profile.gold < it.gold) return false;
+  if (it.cr && profile.crystals < it.cr) return false;
+  if (it.gold) profile.gold -= it.gold; if (it.cr) profile.crystals -= it.cr;
+  profile.owned[cat].push(id); saveProfile(); return true;
+}
+
+// ---------- шапки (в системе координат головы: +x — вперёд) ----------
+function drawHat(c, S, hw, hat){
+  if (!hat || hat === 'none') return;
+  const A = G ? G.anim : 0, O = 'rgba(30,14,6,.55)';
+  const grad = (x0, y0, x1, y1, a, b) => { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, a); g.addColorStop(1, b); return g; };
+  const ell = (x, y, rx, ry, fill, line = true) => { c.fillStyle = fill; c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, 7); c.fill(); if (line){ c.strokeStyle = O; c.lineWidth = S * .025; c.stroke(); } };
+  c.save();
+  if (hat === 'wreath'){
+    const cols = ['#ffffff', '#ffe066', '#ff8fb8', '#b98cff', '#8fd3ff'];
+    for (let i = 0; i < 10; i++){
+      const a = i / 10 * Math.PI * 2, x = -S * .05 + Math.cos(a) * S * .27, y = Math.sin(a) * hw * .5;
+      c.fillStyle = '#3f8f3a'; c.beginPath(); c.ellipse(x, y, S * .07, S * .035, a + 1.2, 0, 7); c.fill();
+      if (i % 2) continue;
+      c.fillStyle = cols[(i / 2) % cols.length];
+      for (let k = 0; k < 5; k++){ const b = k * 1.2566; c.beginPath(); c.arc(x + Math.cos(b) * S * .035, y + Math.sin(b) * S * .035, S * .03, 0, 7); c.fill(); }
+      c.fillStyle = '#f5b82e'; c.beginPath(); c.arc(x, y, S * .025, 0, 7); c.fill();
+    }
+  } else if (hat === 'straw'){
+    ell(-S * .08, 0, S * .34, hw * .62, grad(0, -hw * .7, 0, hw * .7, '#f6dc8a', '#c89a3a'));
+    c.strokeStyle = 'rgba(140,100,30,.35)'; c.lineWidth = S * .012;
+    for (const k of [.55, .75, .9]){ c.beginPath(); c.ellipse(-S * .08, 0, S * .34 * k, hw * .62 * k, 0, 0, 7); c.stroke(); }
+    ell(-S * .1, 0, S * .21, hw * .38, grad(0, -hw * .4, 0, hw * .4, '#ecc768', '#b58426'));
+    c.strokeStyle = '#d23a3a'; c.lineWidth = S * .05; c.beginPath(); c.ellipse(-S * .1, 0, S * .22, hw * .39, 0, 0, 7); c.stroke();
+  } else if (hat === 'shades'){
+    for (const s of [-1, 1]){
+      c.fillStyle = grad(0, s * hw * .25, 0, s * hw * .5, '#3a3a4a', '#050508'); c.beginPath(); c.ellipse(S * .12, s * hw * .37, S * .13, S * .12, 0, 0, 7); c.fill();
+      c.strokeStyle = '#111'; c.lineWidth = S * .03; c.stroke();
+      c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(S * .08, s * hw * .37 - S * .04, S * .04, S * .02, -.5, 0, 7); c.fill();
+    }
+    c.strokeStyle = '#111'; c.lineWidth = S * .035; c.beginPath(); c.moveTo(S * .14, -hw * .2); c.lineTo(S * .14, hw * .2); c.stroke();
+  } else if (hat === 'phones'){
+    c.strokeStyle = grad(0, -hw * .6, 0, hw * .6, '#5a5a6a', '#1a1a24'); c.lineWidth = S * .08; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(-S * .02, -hw * .56); c.quadraticCurveTo(-S * .2, 0, -S * .02, hw * .56); c.stroke();
+    for (const s of [-1, 1]){
+      c.fillStyle = '#2a2a34'; c.beginPath(); c.roundRect(-S * .12, s * hw * .56 - S * .08, S * .2, S * .16, S * .06); c.fill(); c.strokeStyle = O; c.lineWidth = S * .02; c.stroke();
+      c.fillStyle = '#ff4d8a'; c.beginPath(); c.arc(-S * .02, s * hw * .56, S * .045, 0, 7); c.fill();
+    }
+  } else if (hat === 'ushanka'){
+    for (const s of [-1, 1]) ell(-S * .12, s * hw * .52, S * .16, S * .09, grad(0, 0, 0, s * hw * .6, '#8a6a4a', '#5a3e24'));
+    ell(-S * .12, 0, S * .27, hw * .5, grad(0, -hw * .5, 0, hw * .5, '#9a7652', '#5e4228'));
+    c.fillStyle = '#d8c6ac'; c.beginPath(); c.ellipse(S * .1, 0, S * .08, hw * .44, 0, 0, 7); c.fill(); c.strokeStyle = O; c.lineWidth = S * .02; c.stroke();
+    c.fillStyle = '#e03a3a'; c.beginPath();
+    for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? S * .025 : S * .055; c[i ? 'lineTo' : 'moveTo'](S * .1 + Math.cos(a) * r, Math.sin(a) * r); }
+    c.closePath(); c.fill();
+  } else if (hat === 'tricorn'){
+    const p = new Path2D(); p.moveTo(S * .2, 0); p.quadraticCurveTo(-S * .02, -hw * .4, -S * .38, -hw * .62); p.quadraticCurveTo(-S * .26, 0, -S * .38, hw * .62); p.quadraticCurveTo(-S * .02, hw * .4, S * .2, 0); p.closePath();
+    c.fillStyle = grad(-S * .3, 0, S * .2, 0, '#2a2a30', '#0c0c10'); c.fill(p); c.strokeStyle = '#d8a43a'; c.lineWidth = S * .035; c.stroke(p);
+    c.fillStyle = '#f2efe6'; c.beginPath(); c.arc(-S * .08, 0, S * .06, 0, 7); c.fill();
+    c.fillStyle = '#0c0c10'; c.beginPath(); c.arc(-S * .06, -S * .02, S * .014, 0, 7); c.arc(-S * .06, S * .02, S * .014, 0, 7); c.fill();
+  } else if (hat === 'helmet'){
+    ell(-S * .02, 0, S * .34, hw * .6, grad(0, -hw * .6, 0, hw * .6, '#ffe45a', '#d89a00'));
+    c.fillStyle = '#f2c200'; c.beginPath(); c.ellipse(S * .22, 0, S * .1, hw * .42, 0, -Math.PI / 2, Math.PI / 2); c.fill(); c.strokeStyle = O; c.lineWidth = S * .02; c.stroke();
+    c.strokeStyle = '#c88a00'; c.lineWidth = S * .05; c.beginPath(); c.moveTo(-S * .3, 0); c.lineTo(S * .22, 0); c.stroke();
+    c.fillStyle = 'rgba(255,255,255,.75)'; c.fillRect(-S * .22, -hw * .44, S * .04, hw * .88);
+    c.fillStyle = 'rgba(255,255,255,.4)'; c.beginPath(); c.ellipse(-S * .08, -hw * .3, S * .1, S * .04, -.2, 0, 7); c.fill();
+  } else if (hat === 'crown'){
+    const p = new Path2D();
+    for (let i = 0; i < 10; i++){ const a = i / 10 * Math.PI * 2 + A / 2000, r = i % 2 ? S * .2 : S * .32; p[i ? 'lineTo' : 'moveTo'](-S * .06 + Math.cos(a) * r, Math.sin(a) * r * hw / S * 1.1); }
+    p.closePath();
+    c.fillStyle = grad(-S * .3, -hw * .4, S * .2, hw * .4, '#fff3a0', '#c88a00'); c.fill(p); c.strokeStyle = '#7a4e00'; c.lineWidth = S * .025; c.stroke(p);
+    c.fillStyle = 'rgba(40,20,0,.25)'; c.beginPath(); c.arc(-S * .06, 0, S * .14, 0, 7); c.fill();
+    const gems = ['#e8283a', '#2a8ae8', '#2ac86a', '#e8283a', '#2a8ae8'];
+    for (let i = 0; i < 5; i++){ const a = i / 5 * Math.PI * 2 + A / 2000; c.fillStyle = gems[i]; c.beginPath(); c.arc(-S * .06 + Math.cos(a) * S * .22, Math.sin(a) * S * .22 * hw / S * 1.1, S * .035, 0, 7); c.fill(); }
+  }
+  c.restore();
+}
+
+// ---------- 2D-узоры героев (для режима без Pixi и для витрины) ----------
+const PAT_STEP = [.42, .3, .55, .21, .62, .3];
+function drawPat2D(c, pat, w, col, flip, f){
+  if (pat === 1){          // Яр: тёмные шашечки
+    c.fillStyle = HSL(col, -16, .75); c.beginPath(); c.arc(0, (flip ? 1 : -1) * w * .2, w * .09, 0, 7); c.fill();
+  } else if (pat === 2){   // Кремень: неровные бурые пятна
+    const r = .8 + .4 * ((f * 7.3) % 1);
+    c.fillStyle = 'rgba(95,60,30,.6)'; c.beginPath(); c.ellipse(0, (flip ? 1 : -1) * w * .06, w * .18 * r, w * .3 * r, .3, 0, 7); c.fill();
+  } else if (pat === 3){   // Ива: белый зигзаг
+    c.strokeStyle = 'rgba(245,255,240,.9)'; c.lineWidth = w * .1; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(-w * .16, (flip ? 1 : -1) * w * .2); c.lineTo(w * .16, (flip ? -1 : 1) * w * .2); c.stroke();
+  } else if (pat === 4){   // Винт: красные сёдла в чёрной кайме
+    c.fillStyle = '#1a0806'; c.beginPath(); c.roundRect(-w * .2, -w * .4, w * .4, w * .8, w * .14); c.fill();
+    c.fillStyle = '#d42e14'; c.beginPath(); c.roundRect(-w * .16, -w * .35, w * .32, w * .7, w * .12); c.fill();
+  } else if (pat === 5){   // Клубок: бурая крапинка
+    c.fillStyle = 'rgba(110,75,40,.6)';
+    for (let k = 0; k < 2; k++){ const h = ((f * 13.7 + k * 3.1) % 1); c.beginPath(); c.arc((h - .5) * w * .3, (k ? 1 : -1) * w * (.1 + h * .15), w * .07, 0, 7); c.fill(); }
+  }
+}
+
+// ---------- окно гардероба с живой витриной ----------
+let wardTab = 'skin', wardSel = null, wardHero = null, pvRaf = 0;
+const PV = {st:null, acc:0, last:0, path:[]};
+function pvInit(){
+  // змейка ползёт по кругу по краю маленького поля 12×5
+  const path = [];
+  for (let x = 1; x <= 10; x++) path.push({x, y:1});
+  for (let y = 2; y <= 3; y++) path.push({x:10, y});
+  for (let x = 10; x >= 1; x--) path.push({x, y:4});
+  for (let y = 3; y >= 2; y--) path.push({x:1, y});
+  PV.path = path; PV.i = 9;
+  const body = []; for (let k = 0; k < 9; k++) body.push({...path[(PV.i - k + path.length) % path.length]});
+  PV.st = {snake:body, from:body.map(s => ({...s})), dir:{x:1, y:0}, queue:[], headAng:0, state:'play', anim:0, wave:0, gulps:[], powers:{},
+           food:null, tongue:0, tongueT:600, deathT:0, hero:'yar', heroW:1};
+}
+function pvStep(){
+  const s = PV.st, P = PV.path; PV.i = (PV.i + 1) % P.length;
+  const nh = P[PV.i], h = s.snake[0];
+  s.dir = {x:Math.sign(nh.x - h.x), y:Math.sign(nh.y - h.y)};
+  s.from = s.snake.map(q => ({...q}));
+  s.snake.unshift({...nh}); s.snake.pop();
+}
+function pvFrame(now){
+  pvRaf = 0;
+  if (!$('ovWard').classList.contains('active')) return;
+  const cvp = $('wardPv'), W = cvp.clientWidth || 320, H = Math.round(W * 5 / 12);
+  const pr = Math.min(window.devicePixelRatio || 1, 2);
+  if (cvp.width !== Math.round(W * pr)){ cvp.width = Math.round(W * pr); cvp.height = Math.round(H * pr); }
+  const dt = Math.min(50, now - (PV.last || now)); PV.last = now;
+  const s = PV.st; s.anim += dt; s.wave += dt / 220 * 2.4; PV.acc += dt;
+  if (PV.acc >= 220){ PV.acc -= 220; pvStep(); }
+  const pc = cvp.getContext('2d');
+  pc.setTransform(pr, 0, 0, pr, 0, 0);
+  const bgG = pc.createLinearGradient(0, 0, 0, H); bgG.addColorStop(0, '#4f7a34'); bgG.addColorStop(1, '#2f5222');
+  pc.fillStyle = bgG; pc.fillRect(0, 0, W, H);
+  pc.fillStyle = 'rgba(255,255,255,.04)';
+  for (let x = 0; x < 12; x++) for (let y = 0; y < 5; y++) if ((x + y) % 2) pc.fillRect(x * W / 12, y * W / 12, W / 12, W / 12);
+  // рисуем настоящей функцией змейки: подменяем состояние игры на витринное и возвращаем обратно
+  const sv = {G, cell, px:PX.on};
+  lookOv = {skin:wardSel && wardSel.cat === 'skin' ? wardSel.id : curLook('skin'), hat:wardSel && wardSel.cat === 'hat' ? wardSel.id : curLook('hat')};
+  G = s; cell = W / 12; PX.on = false;
+  G.hero = wardHero; G.heroW = HEROES[wardHero].width;
+  try { drawSnake(pc, Math.min(1, PV.acc / 220), dt); } catch (e){ console.warn(e); }
+  G = sv.G; cell = sv.cell; PX.on = sv.px; lookOv = null;
+  pvRaf = requestAnimationFrame(pvFrame);
+}
+function priceTag(it){ return it.gold ? `${it.gold} 🪙` : it.cr ? `${it.cr} 💠` : it.prize ? `★ ${it.prize}` : ''; }
+function renderWard(){
+  ensureWardrobe();
+  $('wardWal').innerHTML = `<span>🪙 ${profile.gold}</span><span>💠 ${profile.crystals}</span><span>★ ${totalStars()}</span>`;
+  $('wardHeroes').innerHTML = HERO_ORDER.filter(heroUnlocked).map(h =>
+    `<button class="hchip ${h === wardHero ? 'on' : ''}" data-hero="${h}"><img src="img/Heroes/${h}.jpg" alt="">${HEROES[h].name}</button>`).join('');
+  $('wardTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.val === wardTab));
+  const on = curLook(wardTab);
+  $('wardGrid').innerHTML = LOOKS[wardTab].map(it => {
+    const own = owns(wardTab, it.id), sel = wardSel && wardSel.cat === wardTab && wardSel.id === it.id;
+    let pic;
+    if (wardTab === 'skin'){
+      const sk2 = it.id === 'natural' ? {col:t => HEROES[wardHero].col(t)} : SKINS[it.id];
+      pic = `<i class="sw" style="background:linear-gradient(135deg,${HSL(sk2.col(0, 0))},${HSL(sk2.col(.5, 0))},${HSL(sk2.col(1, 0))})"></i>`;
+    } else pic = `<i class="ic">${it.icon}</i>`;
+    const tag = it.id === on ? '<small class="eq">надето</small>' : own ? '<small>есть</small>' : `<small class="pr">${priceTag(it)}</small>`;
+    return `<button class="witem ${sel ? 'sel' : ''} ${it.id === on ? 'on' : ''} ${own ? '' : 'lock'}" data-id="${it.id}">${pic}<b>${it.name}</b>${tag}</button>`;
+  }).join('');
+  const it = wardSel && wardSel.cat === wardTab ? lookItem(wardTab, wardSel.id) : null;
+  let act = '';
+  if (it && !owns(wardTab, it.id)){
+    if (it.prize) act = `<div class="ward-note">👑 Корона — награда за ${it.prize} ★ на карте миров (сейчас ${totalStars()})</div>`;
+    else {
+      const can = it.gold ? profile.gold >= it.gold : profile.crystals >= it.cr;
+      act = `<button class="btn primary" id="btnWardBuy" ${can ? '' : 'disabled'}>Купить «${it.name}» за ${priceTag(it)}</button>` +
+            (can ? '' : `<div class="ward-note">Не хватает ${it.gold ? (it.gold - profile.gold) + ' 🪙' : (it.cr - profile.crystals) + ' 💠'} — яблоки меняются на золото в магазине</div>`);
+    }
+  }
+  $('wardAct').innerHTML = act || `<div class="ward-note">Нажми на вещь — змейка примерит её на витрине</div>`;
+}
+function openWard(){
+  ensureWardrobe();
+  wardHero = heroUnlocked(curHero()) ? curHero() : 'yar'; wardSel = null;
+  if (!PV.st) pvInit();
+  overlay('ovWard', true); renderWard();
+  if (!pvRaf) pvRaf = requestAnimationFrame(pvFrame);
+}
+
 /* ===================== SHOP ===================== */
 const EXCHANGE = [{a:30, g:3}, {a:100, g:11}, {a:300, g:36, best:true}];
 function renderShop(){
@@ -4940,6 +5223,25 @@ function renderShop(){
   $('shopAdNote').textContent = ok ? 'Посмотри короткий ролик — и получи награду.' : 'Реклама за награду заработает в версии игры на Яндекс Играх.';
 }
 $('btnShop').onclick = () => { SFX.click(); renderShop(); overlay('ovShop', true); };
+$('btnShopWard').onclick = () => { SFX.click(); overlay('ovShop', false); openWard(); };
+$('btnSetWard').onclick = () => { SFX.click(); overlay('ovSettings', false); openWard(); };
+$('btnCloseWard').onclick = () => { SFX.click(); overlay('ovWard', false); renderMenu(); };
+$('wardTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; wardTab = b.dataset.val; wardSel = null; SFX.click(); renderWard(); });
+$('wardHeroes').addEventListener('click', e => { const b = e.target.closest('.hchip'); if (!b) return; wardHero = b.dataset.hero; SFX.click(); renderWard(); });
+$('wardGrid').addEventListener('click', e => {
+  const b = e.target.closest('.witem'); if (!b) return;
+  const id = b.dataset.id;
+  if (owns(wardTab, id)){ profile.look[wardTab] = id; saveProfile(); wardSel = null; SFX.bonus(); buzz(10); }
+  else { wardSel = {cat:wardTab, id}; SFX.click(); }   // чужую вещь сначала примеряем
+  renderWard();
+});
+$('wardAct').addEventListener('click', e => {
+  if (!e.target.closest('#btnWardBuy') || !wardSel) return;
+  if (buyLook(wardSel.cat, wardSel.id)){
+    profile.look[wardSel.cat] = wardSel.id; saveProfile();
+    SFX.learn(); buzz([20, 30, 20]); wardSel = null; renderWard();
+  } else SFX.deny();
+});
 $('btnCloseShop').onclick = () => { SFX.click(); overlay('ovShop', false); renderMenu(); };
 $('shopExchange').addEventListener('click', e => {
   const b = e.target.closest('[data-ex]'); if (!b) return;

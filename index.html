@@ -5007,7 +5007,7 @@ function heroRow(wid){
   const cur = heroFor(wid), lead = LEADER[wid], H = HEROES[cur];
   return `<div class="mc-heroes"><span>Ведёт:</span>` + HERO_ORDER.map(h => {
     const lk = !heroUnlocked(h);
-    return `<button class="hchip ${h === cur ? 'on' : ''} ${lk ? 'lock' : ''}" data-hero="${h}" aria-label="${HEROES[h].name}"><img src="img/heroes/${h}.jpg" alt="">${h === lead ? '<i class="lead">★</i>' : ''}${HEROES[h].name}</button>`;
+    return `<button class="hchip ${h === cur ? 'on' : ''} ${lk ? 'lock' : ''}" data-hero="${h}" aria-label="${HEROES[h].name}"><img src="img/Heroes/${h}.jpg" alt="">${h === lead ? '<i class="lead">★</i>' : ''}${HEROES[h].name}</button>`;
   }).join('') + `</div><div class="mc-who">${H.name} — ${H.who}${cur === lead ? ', ведущий этого мира' : ''}</div>`;
 }
 function renderMapCard(){

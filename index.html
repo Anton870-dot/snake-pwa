@@ -2788,6 +2788,8 @@ function die(win = false){
 
 function showGameOver(){
   G.state = 'over';
+  // Если игра открыта внутри мессенджера «Сияние» — сообщаем ему счёт для таблицы рекордов комнаты.
+  try { if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'snake-score', score: G.score, won: !!G.won }, '*'); } catch (e) {}
   $('goTitle').textContent = G.won ? worldOf(mode).title : 'Игра окончена';
   const R = G.won && G.result;
   $('goStars').innerHTML = R ? [1, 2, 3].map(i => `<span class="${i <= R.stars ? 'on' : ''}" style="animation-delay:${.3 + i * .25}s">★</span>`).join('') : '';
